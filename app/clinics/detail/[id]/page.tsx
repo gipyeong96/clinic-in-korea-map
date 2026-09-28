@@ -9,26 +9,24 @@ import StandardDetail from '@/components/StandardDetail';
 
 interface DetailPageProps {
   params: {
-    lang: Locale;
     id: string;
   };
 }
 
 export async function generateStaticParams() {
   const paramsList = [];
-  for (const lang of ['en', 'mn']) {
-    for (const clinic of mockClinics) {
-      paramsList.push({ lang, id: clinic.id });
-    }
+  for (const clinic of mockClinics) {
+    paramsList.push({ id: clinic.id });
   }
   return paramsList;
 }
 
 // Generate clinic-specific SEO, AEO, and GEO tags
-export async function generateMetadata({ params: { lang, id } }: DetailPageProps) {
+export async function generateMetadata({ params: { id } }: DetailPageProps) {
   const clinic = await getClinicById(id);
   if (!clinic) return {};
-
+  
+  const lang = 'en';
   const name = lang === 'mn' ? clinic.name_mn : clinic.name_en;
   const address = lang === 'mn' ? clinic.address_mn || clinic.address_ko : clinic.address_en || clinic.address_ko;
   const category = clinic.category?.name_en || 'Clinic';
@@ -51,7 +49,7 @@ export async function generateMetadata({ params: { lang, id } }: DetailPageProps
   };
 }
 
-export default async function DetailPage({ params: { lang, id } }: DetailPageProps) {
+export default async function DetailPage({ params: { id } }: DetailPageProps) {
   const lang = "en" as const;
 
   const clinic = await getClinicById(id);
