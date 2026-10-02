@@ -6,7 +6,6 @@ import { getClinics } from '@/lib/supabase';
 import ClinicSearchClient from '@/components/ClinicSearchClient';
 
 interface Params {
-  lang: Locale;
   department: string;
   location: string;
 }
@@ -21,11 +20,9 @@ export async function generateStaticParams() {
   const locations = ['all', 'gangnam', 'seoul-station', 'jamsil', 'incheon', 'dongtan'];
   const paramsList = [];
 
-  for (const lang of ['en', 'mn']) {
-    for (const dept of departments) {
-      for (const loc of locations) {
-        paramsList.push({ lang, department: dept, location: loc });
-      }
+  for (const dept of departments) {
+    for (const loc of locations) {
+      paramsList.push({ department: dept, location: loc });
     }
   }
   return paramsList;
@@ -45,7 +42,8 @@ function getNames(lang: Locale, department: string, location: string, dict: any)
 }
 
 // Generate dynamic metadata for Programmatic SEO (AEO/GEO ranking)
-export async function generateMetadata({ params: { lang, department, location } }: SearchPageProps) {
+export async function generateMetadata({ params: { department, location } }: SearchPageProps) {
+  const lang = 'en' as Locale;
   const dict = getDictionary(lang);
   const { deptName, locName } = getNames(lang, department, location, dict);
   
@@ -61,7 +59,7 @@ export async function generateMetadata({ params: { lang, department, location } 
   };
 }
 
-export default async function SearchPage({ params: { lang, department, location }, searchParams }: SearchPageProps) {
+export default async function SearchPage({ params: { department, location }, searchParams }: SearchPageProps) {
   const lang = "en" as const;
 
   const dict = getDictionary(lang);

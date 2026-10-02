@@ -9,22 +9,20 @@ import { mockArticles } from '@/lib/articles';
 
 interface ArticlePageProps {
   params: {
-    lang: Locale;
     slug: string;
   };
 }
 
 export async function generateStaticParams() {
   const paramsList = [];
-  for (const lang of ['en', 'mn']) {
-    for (const art of mockArticles) {
-      paramsList.push({ lang, slug: art.slug });
-    }
+  for (const art of mockArticles) {
+    paramsList.push({ slug: art.slug });
   }
   return paramsList;
 }
 
-export async function generateMetadata({ params: { lang, slug } }: ArticlePageProps) {
+export async function generateMetadata({ params: { slug } }: ArticlePageProps) {
+  const lang = 'en';
   const article = mockArticles.find(a => a.slug === slug);
   if (!article) return {};
 
@@ -40,7 +38,7 @@ export async function generateMetadata({ params: { lang, slug } }: ArticlePagePr
   };
 }
 
-export default function ArticlePage({ params: { lang, slug } }: ArticlePageProps) {
+export default function ArticlePage({ params: { slug } }: ArticlePageProps) {
   const lang = "en" as const;
 
   const dict = getDictionary(lang);
