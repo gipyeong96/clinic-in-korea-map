@@ -26,7 +26,7 @@ export async function generateMetadata({ params: { id } }: DetailPageProps) {
   const clinic = await getClinicById(id);
   if (!clinic) return {};
   
-  const lang = 'en';
+  const lang = 'en' as string;
   const name = lang === 'mn' ? clinic.name_mn : clinic.name_en;
   const address = lang === 'mn' ? clinic.address_mn || clinic.address_ko : clinic.address_en || clinic.address_ko;
   const category = clinic.category?.name_en || 'Clinic';
@@ -50,7 +50,7 @@ export async function generateMetadata({ params: { id } }: DetailPageProps) {
 }
 
 export default async function DetailPage({ params: { id } }: DetailPageProps) {
-  const lang = "en" as const;
+  const lang = "en" as any;
 
   const clinic = await getClinicById(id);
   if (!clinic) {

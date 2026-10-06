@@ -22,7 +22,7 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params: { slug } }: ArticlePageProps) {
-  const lang = 'en';
+  const lang = 'en' as string;
   const article = mockArticles.find(a => a.slug === slug);
   if (!article) return {};
 
@@ -39,7 +39,7 @@ export async function generateMetadata({ params: { slug } }: ArticlePageProps) {
 }
 
 export default function ArticlePage({ params: { slug } }: ArticlePageProps) {
-  const lang = "en" as const;
+  const lang = "en" as any;
 
   const dict = getDictionary(lang);
   const article = mockArticles.find(a => a.slug === slug);

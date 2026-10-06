@@ -60,7 +60,7 @@ export async function generateMetadata({ params: { department, location } }: Sea
 }
 
 export default async function SearchPage({ params: { department, location }, searchParams }: SearchPageProps) {
-  const lang = "en" as const;
+  const lang = "en" as any;
 
   const dict = getDictionary(lang);
   const allClinics = await getClinics();

@@ -14,6 +14,7 @@ interface ArticlesPageProps {
 
 
 export async function generateMetadata({ params }: ArticlesPageProps) {
+  const lang: string = 'en';
   const title = lang === 'mn' ? 'Эрүүл Мэндийн Нийтлэлүүд | Korea Clinic Map' : 'Medical Articles & Guides | Korea Clinic Map';
   const description = lang === 'mn'
     ? 'БНСУ-ын эмнэлгийн үйлчилгээ, шээс бэлгийн замын эмчилгээ болон бусад эрүүл мэндийн зөвлөгөө, мэдээлэл.'
@@ -29,7 +30,7 @@ export async function generateMetadata({ params }: ArticlesPageProps) {
 }
 
 export default function ArticlesPage({ params }: ArticlesPageProps) {
-  const lang = "en" as const;
+  const lang = "en" as any;
 
   const title = lang === 'mn' ? 'Эрүүл Мэндийн Зөвлөмж, Нийтлэл' : 'Medical Articles & Health Guides';
   const subtitle = lang === 'mn'
