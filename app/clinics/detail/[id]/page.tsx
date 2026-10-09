@@ -31,8 +31,8 @@ export async function generateMetadata({ params: { id } }: DetailPageProps) {
   const address = lang === 'mn' ? clinic.address_mn || clinic.address_ko : clinic.address_en || clinic.address_ko;
   const category = clinic.category?.name_en || 'Clinic';
 
-  const title = `${name} | Foreigner-Friendly ${category} in Korea`;
-  const description = `Consult at ${name} located in ${address}. View opening hours, coordinates, contact info, and available services.`;
+  const title = `${name} | ${category} in Korea`;
+  const description = `Information for ${name} located in ${address}. View opening hours, coordinates, and contact info based on public health data.`;
 
   return {
     title,

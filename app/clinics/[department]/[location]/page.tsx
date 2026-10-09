@@ -47,8 +47,13 @@ export async function generateMetadata({ params: { department, location } }: Sea
   const dict = getDictionary(lang);
   const { deptName, locName } = getNames(lang, department, location, dict);
   
-  const title = `Best English-Speaking ${deptName} Clinics in ${locName} | Korea Clinic Map`;
-  const description = `Find top-rated ${deptName} medical clinics in ${locName}, South Korea. Access locations, telephone numbers, English-speaking staff, and consultation hours.`;
+  const title = lang === 'mn' 
+    ? `${locName} ${deptName} эмнэлгүүд | Korea Clinic Map`
+    : `${locName} ${deptName} Clinics | Korea Clinic Map`;
+    
+  const description = lang === 'mn'
+    ? `${locName} орчимд байрлах ${deptName} эмнэлгүүдийн жагсаалт, хаяг, утасны дугаар болон цагийн хуваарь зэрэг нийтийн мэдээллийг хүргэж байна.`
+    : `List of ${deptName} clinics and hospitals located in ${locName}. Find addresses, telephone numbers, and operating hours based on public healthcare data.`;
 
   return {
     title,

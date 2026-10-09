@@ -63,7 +63,27 @@ export default function ClinicSearchClient({
   return (
     <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 items-start">
       {/* Clinic Cards List Column */}
-      <div className="lg:col-span-3 space-y-4 max-h-[750px] overflow-y-auto pr-2">
+      <div className="lg:col-span-3 flex flex-col gap-4">
+        {/* SEO Filter Chips (UI Only for now) */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide">
+          <button className="px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap bg-slate-800 text-white shadow-sm">
+            {lang === 'mn' ? 'Бүх' : 'All'}
+          </button>
+          <button className="px-4 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 transition shadow-sm">
+            {lang === 'mn' ? 'Мэргэжлийн эмч' : 'Specialist'}
+          </button>
+          <button className="px-4 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 transition shadow-sm">
+            {lang === 'mn' ? 'Ням гарагт нээлттэй' : 'Sunday'}
+          </button>
+          <button className="px-4 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 transition shadow-sm">
+            {lang === 'mn' ? 'Оройн цагаар' : 'Night'}
+          </button>
+          <button className="px-4 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 transition shadow-sm">
+            {lang === 'mn' ? 'Шинээр нээгдсэн' : 'New'}
+          </button>
+        </div>
+
+        <div className="space-y-4 max-h-[700px] overflow-y-auto pr-2">
         {filteredClinics.length > 0 ? (
           filteredClinics.map((clinic) => (
             <div 
@@ -85,6 +105,7 @@ export default function ClinicSearchClient({
             <p className="text-slate-500 font-semibold">{dict.not_found}</p>
           </div>
         )}
+      </div>
       </div>
 
       {/* Google Maps Container Sticky Column */}

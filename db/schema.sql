@@ -42,6 +42,12 @@ CREATE TABLE IF NOT EXISTS clinics (
     -- Operating hours specification
     opening_hours JSONB DEFAULT '{}'::jsonb,
     
+    -- SEO and Filtering Flags (Extracted from HIRA)
+    has_specialist BOOLEAN DEFAULT FALSE,
+    sunday_open BOOLEAN DEFAULT FALSE,
+    night_open BOOLEAN DEFAULT FALSE,
+    newly_opened BOOLEAN DEFAULT FALSE,
+    
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
