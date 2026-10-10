@@ -48,6 +48,10 @@ CREATE TABLE IF NOT EXISTS clinics (
     night_open BOOLEAN DEFAULT FALSE,
     newly_opened BOOLEAN DEFAULT FALSE,
     
+    -- Public Data Attachments (Extracted from HIRA)
+    public_facilities JSONB DEFAULT '{}'::jsonb, -- e.g. {"inpatient_beds": 5, "surgery_rooms": 1}
+    public_equipment JSONB DEFAULT '[]'::jsonb,  -- e.g. ["ESWL", "CT", "MRI"]
+    
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );

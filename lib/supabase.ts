@@ -45,7 +45,9 @@ export const mockClinics = [
       weekday: "09:00 - 18:00",
       saturday: "09:00 - 16:00",
       sunday: "Closed"
-    }
+    },
+    public_equipment: ["ESWL (Stone Crusher)", "Ultrasound", "PCR"],
+    public_facilities: { inpatient_beds: 0, surgery_rooms: 1 }
   },
   {
     id: "goldman-seoulyeok",
