@@ -12,8 +12,27 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Korea Clinic Map",
+    "url": "https://koreaclinicmap.com",
+    "description": "Find medical clinics and hospitals near you in Korea based on public healthcare data.",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://koreaclinicmap.com/clinics/all/all?q={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  };
+
   return (
     <html lang="en">
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      </head>
       <body className="antialiased text-slate-800 bg-slate-50 min-h-screen">
         <div className="flex flex-col min-h-screen">
           {/* Header */}
