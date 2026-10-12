@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next';
 import { mockClinics } from '@/lib/supabase';
 
-const BASE_URL = 'https://koreaclinicmap.com';
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://map.clinicinkorea.com';
 
 const departments = ['all', 'urology', 'dentistry', 'internal-medicine', 'dermatology', 'plastic-surgery'];
 const locations = ['all', 'gangnam', 'seoul-station', 'jamsil', 'incheon', 'dongtan'];

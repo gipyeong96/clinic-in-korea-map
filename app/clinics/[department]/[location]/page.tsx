@@ -5,15 +5,12 @@ import { Locale, getDictionary } from '@/lib/translation';
 import { getClinics } from '@/lib/supabase';
 import ClinicSearchClient from '@/components/ClinicSearchClient';
 
-interface Params {
-  department: string; // e.g., 'urology'
-  location: string;   // e.g., 'gangnam'
-  disease?: string;   // Note: If we use [...slug], this will need a different structure, but we'll simulate disease here via searchParams for now, or assume Next.js dynamic routes handle it.
-}
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 interface SearchPageProps {
-  params: Params;
-  searchParams: { q?: string; disease?: string };
+  params: { department: string; location: string };
+  searchParams: { [key: string]: string | string[] | undefined };
 }
 
 // Helper to get translated names, including 'all' cases
@@ -35,7 +32,8 @@ export async function generateMetadata({ params: { department, location }, searc
   const { deptName, locName } = getNames(lang, department, location, dict);
   
   // AEO/SEO Disease Prefix logic
-  const diseasePrefix = searchParams.disease ? `${searchParams.disease.toUpperCase()} Testing & Treatment - ` : '';
+  const diseaseParam = typeof searchParams?.disease === 'string' ? searchParams.disease : undefined;
+  const diseasePrefix = diseaseParam ? `${diseaseParam.toUpperCase()} Testing & Treatment - ` : '';
   
   const title = `${diseasePrefix}${locName} ${deptName} Clinics | Korea Clinic Map`;
   const description = `List of ${deptName} clinics and hospitals located in ${locName}. Find addresses, telephone numbers, and operating hours based on public healthcare data.`;
@@ -68,7 +66,8 @@ export default async function SearchPage({ params: { department, location }, sea
     : { lat: 37.5665, lng: 126.9780 };
 
   // Render header templates localized properly
-  const diseasePrefix = searchParams.disease ? `${searchParams.disease.toUpperCase()} at ` : '';
+  const diseaseParam = typeof searchParams?.disease === 'string' ? searchParams.disease : undefined;
+  const diseasePrefix = diseaseParam ? `${diseaseParam.toUpperCase()} at ` : '';
   const headerTitle = `${diseasePrefix}${deptName} Clinics in ${locName}`;
   const matchDescription = `${filteredClinics.length} clinics found based on public health data.`;
 
@@ -95,7 +94,7 @@ export default async function SearchPage({ params: { department, location }, sea
     }
   };
 
-  const isDiseaseSearch = !!searchParams.disease;
+  const isDiseaseSearch = Boolean(diseaseParam);
   const hasPremium = filteredClinics.some(c => c.is_premium);
 
   return (

@@ -16,11 +16,11 @@ export default function RootLayout({
     "@context": "https://schema.org",
     "@type": "WebSite",
     "name": "Korea Clinic Map",
-    "url": "https://koreaclinicmap.com",
+    "url": "https://map.clinicinkorea.com",
     "description": "Find medical clinics and hospitals near you in Korea based on public healthcare data.",
     "potentialAction": {
       "@type": "SearchAction",
-      "target": "https://koreaclinicmap.com/clinics/all/all?q={search_term_string}",
+      "target": "https://map.clinicinkorea.com/clinics/all/all?q={search_term_string}",
       "query-input": "required name=search_term_string"
     }
   };

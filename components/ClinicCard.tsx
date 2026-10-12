@@ -75,19 +75,19 @@ export default function ClinicCard({ clinic }: ClinicCardProps) {
         </div>
         
         {/* Public Facilities & Equipment Badges */}
-        {(clinic.public_equipment?.length > 0 || clinic.public_facilities?.inpatient_beds > 0) && (
+        {((clinic.public_equipment?.length ?? 0) > 0 || (clinic.public_facilities?.inpatient_beds ?? 0) > 0) && (
           <div className="mt-4 flex flex-wrap gap-1.5">
             {clinic.public_equipment?.map((eq: string) => (
               <span key={eq} className="px-1.5 py-0.5 bg-slate-100 text-slate-500 text-[10px] rounded border border-slate-200">
                 {eq}
               </span>
             ))}
-            {clinic.public_facilities?.inpatient_beds > 0 && (
+            {(clinic.public_facilities?.inpatient_beds ?? 0) > 0 && (
               <span className="px-1.5 py-0.5 bg-blue-50 text-blue-500 text-[10px] rounded border border-blue-100">
                 Inpatient Beds
               </span>
             )}
-            {clinic.public_facilities?.surgery_rooms > 0 && (
+            {(clinic.public_facilities?.surgery_rooms ?? 0) > 0 && (
               <span className="px-1.5 py-0.5 bg-rose-50 text-rose-500 text-[10px] rounded border border-rose-100">
                 Surgery Room
               </span>
