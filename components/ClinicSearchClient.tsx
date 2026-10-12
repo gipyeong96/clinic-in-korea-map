@@ -111,6 +111,7 @@ export default function ClinicSearchClient({
       {/* Google Maps Container Sticky Column */}
       <div className="lg:col-span-2 lg:sticky lg:top-24 h-[500px] lg:h-[680px]">
         <MapContainer 
+          apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}
           center={currentMapCenter}
           zoom={zoom}
           markers={mapMarkers}

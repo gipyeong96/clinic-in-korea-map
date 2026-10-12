@@ -135,11 +135,16 @@ export async function getClinics(params?: { categorySlug?: string, locationSlug?
       );
       const matchIds = new Set(directMatches.map(l => l.id));
       
-      matchedLocs.forEach(l => {
-        if (l.parent_id && matchIds.has(l.parent_id)) {
-          matchIds.add(l.id);
-        }
-      });
+      let added = true;
+      while (added) {
+        added = false;
+        matchedLocs.forEach(l => {
+          if (l.parent_id && matchIds.has(l.parent_id) && !matchIds.has(l.id)) {
+            matchIds.add(l.id);
+            added = true;
+          }
+        });
+      }
       locationIds = Array.from(matchIds);
     }
   }

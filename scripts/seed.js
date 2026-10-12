@@ -1,12 +1,6 @@
 require('dotenv').config({ path: '.env.local' });
 const XLSX = require('xlsx');
 const fs = require('fs');
-const { createClient } = require('@supabase/supabase-js');
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY // fallback to anon if service key missing
-);
 
 // Helper to find file by partial name
 function findFile(partial) {
@@ -14,15 +8,33 @@ function findFile(partial) {
   return './data/' + files.find(f => f.includes(partial));
 }
 
-// 1. Target Departments (Urology, Dentistry, Internal Med, Dermatology, Plastic Surgery)
+// 1. Target Departments (Urology: 15, Dentistry: 49~61, Internal Med: 01, Dermatology: 14, Plastic Surgery: 08)
 const TARGET_DEPTS = {
-  '01': { id: 3, slug: 'internal-medicine' },
-  '11': { id: 1, slug: 'urology' },
-  '14': { id: 4, slug: 'dermatology' },
+  // Urology (비뇨의학과) -> 1
+  '15': { id: 1, slug: 'urology' },
+
+  // Dentistry (치과) -> 2
   '49': { id: 2, slug: 'dentistry' },
-  '50': { id: 2, slug: 'dentistry' }, // 치과병원
-  '54': { id: 2, slug: 'dentistry' }, // 치과보철과 등
-  '13': { id: 5, slug: 'plastic-surgery' }
+  '50': { id: 2, slug: 'dentistry' },
+  '51': { id: 2, slug: 'dentistry' },
+  '52': { id: 2, slug: 'dentistry' },
+  '53': { id: 2, slug: 'dentistry' },
+  '54': { id: 2, slug: 'dentistry' },
+  '55': { id: 2, slug: 'dentistry' },
+  '56': { id: 2, slug: 'dentistry' },
+  '57': { id: 2, slug: 'dentistry' },
+  '58': { id: 2, slug: 'dentistry' },
+  '59': { id: 2, slug: 'dentistry' },
+  '61': { id: 2, slug: 'dentistry' },
+
+  // Internal Medicine (내과) -> 3
+  '01': { id: 3, slug: 'internal-medicine' },
+
+  // Dermatology (피부과) -> 4
+  '14': { id: 4, slug: 'dermatology' },
+
+  // Plastic Surgery (성형외과) -> 5
+  '08': { id: 5, slug: 'plastic-surgery' }
 };
 
 // Map all 12 public equipments to English
@@ -41,6 +53,23 @@ const EQ_MAP = {
   '종양치료기 (양성자치료기)': 'Proton Therapy'
 };
 
+function getPrimaryCategory(clinicName, deptList) {
+  if (clinicName.includes('비뇨')) return 1;
+  if (clinicName.includes('치과')) return 2;
+  if (clinicName.includes('내과')) return 3;
+  if (clinicName.includes('피부')) return 4;
+  if (clinicName.includes('성형')) return 5;
+  
+  if (deptList && deptList.length > 0) {
+    if (deptList.includes(1)) return 1;
+    if (deptList.includes(4)) return 4;
+    if (deptList.includes(5)) return 5;
+    if (deptList.includes(2)) return 2;
+    return deptList[0];
+  }
+  return 3;
+}
+
 async function main() {
   console.log("Loading files... this may take a minute.");
   
@@ -48,25 +77,26 @@ async function main() {
   const deptWb = XLSX.readFile(findFile('03_진료과목정보'));
   const deptData = XLSX.utils.sheet_to_json(deptWb.Sheets[deptWb.SheetNames[0]]);
   
-  // Filter for our target departments to reduce memory footprint
+  // Filter for our target departments
   const targetClinics = {};
   for (const row of deptData) {
     const code = String(row['진료과목코드']).padStart(2, '0');
     if (TARGET_DEPTS[code]) {
-      if (!targetClinics[row['암호화요양기호']]) {
-        targetClinics[row['암호화요양기호']] = { 
+      const id = row['암호화요양기호'];
+      if (!targetClinics[id]) {
+        targetClinics[id] = { 
           departments: [], 
           has_specialist: false
         };
       }
-      targetClinics[row['암호화요양기호']].departments.push(TARGET_DEPTS[code].id);
+      targetClinics[id].departments.push(TARGET_DEPTS[code].id);
       if (row['과목별 전문의수'] > 0) {
-        targetClinics[row['암호화요양기호']].has_specialist = true;
+        targetClinics[id].has_specialist = true;
       }
     }
   }
   
-  console.log(`Found ${Object.keys(targetClinics).length} target clinics (Urology, Dentistry, etc).`);
+  console.log(`Found ${Object.keys(targetClinics).length} target clinics with target specialties.`);
 
   // Load Base Info
   const baseWb = XLSX.readFile(findFile('1.병원정보서비스'));
@@ -85,6 +115,7 @@ async function main() {
     }
   }
 
+  // Load Equipment
   const eqWb = XLSX.readFile(findFile('05_의료장비정보'));
   const eqData = XLSX.utils.sheet_to_json(eqWb.Sheets[eqWb.SheetNames[0]]);
   const eqMap = {};
@@ -96,36 +127,24 @@ async function main() {
     }
   }
   
-  console.log("Merging data...");
+  console.log("Merging data with accurate department classification...");
   const finalRecords = [];
   
   for (const row of baseData) {
     const id = row['암호화요양기호'];
     if (!targetClinics[id]) continue;
     
-    // Check if newly opened (within 2 years) - approximate using excel date
-    // Excel date 45000 is approx 2023. Let's just flag manually or skip for now if too complex.
-    // 41641 = ~2014. 
+    const name = row['요양기관명'] || '';
+    const category_id = getPrimaryCategory(name, targetClinics[id].departments);
+    
     const excelDate = row['개설일자'];
-    const isNew = excelDate > 44900; // rough approx for 2023+
-    
-    // Location Mapping
-    // To match our schema: we need to link to location_id. 
-    // For MVP, let's just insert standard records. We will need to map SiGunGu to location_id properly later.
-    // Right now, let's just create a raw table or insert into clinics directly if we mapped locations.
-    // Since locations table only has 8 locations right now, we will just default to 1 (Seoul) and update locations later.
-    
-    // We will pick the FIRST target department for category_id
-    const category_id = targetClinics[id].departments[0];
+    const isNew = excelDate > 44900; // approximate for 2023+
     
     finalRecords.push({
       hira_code: id,
-      name_ko: row['요양기관명'],
-      name_en: row['요양기관명'], // Translate later
-      name_mn: row['요양기관명'], // Translate later
+      name_ko: name,
       category_id: category_id,
       
-      // Raw location data for building the locations table
       sido: row['시도코드명'],
       sigungu: row['시군구코드명'],
       dong: row['읍면동'],
@@ -141,11 +160,9 @@ async function main() {
     });
   }
 
-  console.log(`Generated ${finalRecords.length} records to insert.`);
-  
-  // Write to a JSON file for safety instead of inserting directly, so we can review
+  console.log(`Generated ${finalRecords.length} clean clinic records.`);
   fs.writeFileSync('./data/merged_clinics.json', JSON.stringify(finalRecords, null, 2));
-  console.log("Saved preview to data/merged_clinics.json ! Check it out.");
+  console.log("Saved clean records to data/merged_clinics.json !");
 }
 
 main().catch(console.error);

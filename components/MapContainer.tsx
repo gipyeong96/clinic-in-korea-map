@@ -28,22 +28,38 @@ const containerStyle = {
   height: '100%',
 };
 
+const DEFAULT_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '';
+
 export default function MapContainer({
-  apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '',
+  apiKey,
   center,
   zoom = 12,
   markers,
   onMarkerClick
 }: MapContainerProps) {
+  const effectiveKey = apiKey || DEFAULT_API_KEY;
   
   // Try loading Google Maps JS API if Key is present
-  const { isLoaded } = useJsApiLoader({
+  const { isLoaded, loadError } = useJsApiLoader({
     id: 'google-map-script',
-    googleMapsApiKey: apiKey,
+    googleMapsApiKey: effectiveKey,
   });
 
+  // Display error if Google Maps fails to load
+  if (loadError) {
+    return (
+      <div className="relative w-full h-full min-h-[400px] bg-red-50 flex flex-col items-center justify-center border border-red-200 rounded-xl p-6 text-center">
+        <span className="text-2xl mb-2">⚠️</span>
+        <h4 className="font-bold text-red-800 text-sm mb-1">Google Maps Loading Error</h4>
+        <p className="text-xs text-red-600 max-w-sm">
+          {loadError.message || "Failed to load Google Maps script. Please verify domain restriction in Google Cloud Console."}
+        </p>
+      </div>
+    );
+  }
+
   // Mock Map UI for development if no Google Maps Key is supplied
-  if (!apiKey || !isLoaded) {
+  if (!effectiveKey || !isLoaded) {
     return (
       <div className="relative w-full h-full min-h-[400px] bg-slate-100 flex flex-col items-center justify-center border border-slate-200 rounded-xl overflow-hidden shadow-inner">
         {/* Mock Grid Lines */}

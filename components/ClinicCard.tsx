@@ -22,10 +22,14 @@ interface ClinicCardProps {
   };
 }
 
-export default function ClinicCard({ clinic }: ClinicCardProps) {
+export default function ClinicCard({ clinic }: any) {
   const name = clinic.name_en || clinic.name_ko;
   const address = clinic.address_en || clinic.address_ko;
   const slogan = clinic.premium_data?.slogan_en;
+  
+  const categoryName = clinic.categories?.name_en || clinic.category?.name_en || '';
+  const locationName = clinic.locations?.name_en || clinic.location?.name_en || '';
+  const detailId = clinic.hira_code || clinic.id;
 
   return (
     <div 
@@ -46,14 +50,21 @@ export default function ClinicCard({ clinic }: ClinicCardProps) {
           </span>
         </div>
 
-        <Link href={`/clinics/detail/${clinic.id}`}>
-          <h3 className="text-lg font-bold text-slate-800 hover:text-emerald-600 transition mb-1 leading-snug">
+        <Link href={`/clinics/detail/${detailId}`}>
+          <h3 className="text-lg font-bold text-slate-800 hover:text-emerald-600 transition mb-0.5 leading-snug">
             {name}
           </h3>
         </Link>
-        <span className="text-xs text-slate-400 font-medium uppercase tracking-wider block mb-3">
-          {clinic.category?.name_en} • {clinic.location?.name_en}
-        </span>
+        {clinic.name_ko && clinic.name_ko !== name && (
+          <p className="text-xs text-slate-500 font-medium mb-1">
+            {clinic.name_ko}
+          </p>
+        )}
+        {(categoryName || locationName) && (
+          <span className="text-xs text-slate-400 font-medium uppercase tracking-wider block mb-3">
+            {categoryName} {categoryName && locationName ? '•' : ''} {locationName}
+          </span>
+        )}
 
         {clinic.is_premium && slogan && (
           <p className="text-xs italic text-slate-600 mb-4 line-clamp-2">
@@ -98,7 +109,7 @@ export default function ClinicCard({ clinic }: ClinicCardProps) {
 
       <div className="mt-5 pt-3 border-t border-slate-100 flex gap-2">
         <Link 
-          href={`/clinics/detail/${clinic.id}`}
+          href={`/clinics/detail/${detailId}`}
           className={`flex-1 text-center py-2 rounded-lg text-xs font-semibold transition ${
             clinic.is_premium
               ? 'bg-amber-500 hover:bg-amber-600 text-white'
