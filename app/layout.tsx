@@ -4,6 +4,9 @@ import Link from 'next/link';
 
 export const metadata = {
   title: 'Korea Clinic Map',
+  verification: {
+    google: 'WNYvoNAI9IV16XsH5Q1TFZQStHHmO9yrUm6R5Q6pPUY',
+  },
   description: 'Find English-speaking clinics near you in Korea',
 }
 
