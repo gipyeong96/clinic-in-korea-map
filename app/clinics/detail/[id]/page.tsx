@@ -1,4 +1,5 @@
 import React from 'react';
+import { SITE_URL, clinicPath, serializeJsonLd } from '@/lib/site';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getClinicById } from '@/lib/supabase';
@@ -20,7 +21,7 @@ export async function generateMetadata({ params }: ClinicDetailProps) {
     title: `${clinic.name_en} | Korea Clinic Map`,
     description: `Contact information, operating hours, and medical equipment details for ${clinic.name_en} in ${clinic.locations?.name_en || 'Korea'}.`,
     alternates: {
-      canonical: `https://koreaclinicmap.com/clinics/detail/${clinic.hira_code}`,
+      canonical: `${SITE_URL}${clinicPath(clinic)}`,
     }
   };
 }
@@ -37,7 +38,7 @@ export default async function ClinicDetail({ params }: ClinicDetailProps) {
   const medicalClinicSchema = {
     "@context": "https://schema.org",
     "@type": "MedicalClinic",
-    "@id": `https://koreaclinicmap.com/clinics/detail/${clinic.hira_code}`,
+    "@id": `${SITE_URL}${clinicPath(clinic)}`,
     "name": clinic.name_en,
     "alternateName": clinic.name_ko,
     "medicalSpecialty": clinic.categories?.name_en,
@@ -52,7 +53,7 @@ export default async function ClinicDetail({ params }: ClinicDetailProps) {
       "latitude": clinic.latitude,
       "longitude": clinic.longitude
     },
-    "url": pd.website || `https://koreaclinicmap.com/clinics/detail/${clinic.hira_code}`
+    "url": pd.website || `${SITE_URL}${clinicPath(clinic)}`
   };
 
   // FAQ Schema (AEO)
@@ -83,11 +84,11 @@ export default async function ClinicDetail({ params }: ClinicDetailProps) {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(medicalClinicSchema) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(medicalClinicSchema) }}
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(faqSchema) }}
       />
       
       <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">

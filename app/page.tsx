@@ -1,6 +1,9 @@
 'use strict';
 
 import React from 'react';
+import { SITE_URL } from '@/lib/site';
+
+export const metadata = { alternates: { canonical: SITE_URL } };
 import Link from 'next/link';
 import { getDictionary } from '@/lib/translation';
 import { mockClinics } from '@/lib/supabase';
@@ -69,7 +72,7 @@ export default function HomePage({ params }: HomePageProps) {
             {locations.map((loc) => (
               <Link 
                 key={loc.slug}
-                href={`/clinics/urology/${loc.slug}`}
+                href={`/clinics/all/${loc.slug}`}
                 className="text-xs font-semibold bg-slate-50 text-slate-700 py-2.5 px-4 rounded-lg border border-slate-200/60 hover:bg-amber-500 hover:text-white hover:border-amber-600 transition text-center"
               >
                 {loc.name}
@@ -88,7 +91,7 @@ export default function HomePage({ params }: HomePageProps) {
             {departments.map((dept) => (
               <Link 
                 key={dept.slug}
-                href={`/clinics/${dept.slug}/gangnam`}
+                href={`/clinics/${dept.slug}/all`}
                 className="text-xs font-semibold bg-slate-50 text-slate-700 py-2.5 px-4 rounded-lg border border-slate-200/60 hover:bg-amber-500 hover:text-white hover:border-amber-600 transition text-center"
               >
                 {dept.name}

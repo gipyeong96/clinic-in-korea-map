@@ -33,7 +33,7 @@ export async function generateMetadata({ params: { slug } }: ArticlePageProps) {
     title,
     description,
     alternates: {
-      canonical: `https://koreaclinicmap.comarticles/${slug}`,
+      canonical: `https://map.clinicinkorea.com/articles/${slug}`,
     }
   };
 }
@@ -57,7 +57,7 @@ export default function ArticlePage({ params: { slug } }: ArticlePageProps) {
         
         {/* Back Link */}
         <Link 
-          href={`/ `}
+          href="/"
           className="inline-flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-800 transition"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
