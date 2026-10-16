@@ -1,147 +1,76 @@
-'use strict';
-
 import React from 'react';
-import { Locale, getDictionary } from '@/lib/translation';
+import { notFound } from 'next/navigation';
+import { getDictionary } from '@/lib/translation';
 import { getClinics } from '@/lib/supabase';
+import { SITE_URL, clinicPath, serializeJsonLd } from '@/lib/site';
 import ClinicSearchClient from '@/components/ClinicSearchClient';
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 0;
-
-interface SearchPageProps {
+const departments = ['all', 'urology', 'dentistry', 'internal-medicine', 'dermatology', 'plastic-surgery'];
+interface Props {
   params: { department: string; location: string };
   searchParams: { [key: string]: string | string[] | undefined };
 }
-
-// Helper to get translated names, including 'all' cases
-function getNames(lang: Locale, department: string, location: string, dict: any) {
-  const deptName = department === 'all'
-    ? (lang === 'mn' ? 'Бүх төрлийн' : 'All Medical')
-    : (dict[department as keyof typeof dict] || department);
-
-  const locName = location === 'all'
-    ? (lang === 'mn' ? 'Бүх бүс' : 'All Area')
-    : (dict[location as keyof typeof dict] || location);
-
-  return { deptName, locName };
-}
-
-export async function generateMetadata({ params: { department, location }, searchParams }: SearchPageProps) {
-  const lang = 'en' as Locale;
-  const dict = getDictionary(lang);
-  const { deptName, locName } = getNames(lang, department, location, dict);
-  
-  // AEO/SEO Disease Prefix logic
-  const diseaseParam = typeof searchParams?.disease === 'string' ? searchParams.disease : undefined;
-  const diseasePrefix = diseaseParam ? `${diseaseParam.toUpperCase()} Testing & Treatment - ` : '';
-  
-  const title = `${diseasePrefix}${locName} ${deptName} Clinics | Korea Clinic Map`;
-  const description = `List of ${deptName} clinics and hospitals located in ${locName}. Find addresses, telephone numbers, and operating hours based on public healthcare data.`;
-
+function text(value: string | string[] | undefined) { return typeof value === 'string' ? value.trim().slice(0, 200) : ''; }
+function names(department: string, location: string) {
+  const dict = getDictionary('en');
   return {
-    title,
-    description,
-    alternates: {
-      canonical: `https://koreaclinicmap.com/clinics/${department}/${location}`,
-    }
+    dept: department === 'all' ? 'Medical' : (dict as Record<string, string>)[department] || department,
+    loc: location === 'all' ? 'Korea' : (dict as Record<string, string>)[location] || location.replace(/-/g, ' '),
   };
 }
-
-export default async function SearchPage({ params: { department, location }, searchParams }: SearchPageProps) {
-  const lang = "en" as any;
-  const dict = getDictionary(lang);
-  
-  // Fetch real data from Supabase
-  const filteredClinics = await getClinics({ 
-    categorySlug: department, 
-    locationSlug: location,
-    limit: 100 // Prevent crashing the browser while testing
+export function generateMetadata({ params, searchParams }: Props) {
+  const { dept, loc } = names(params.department, params.location);
+  return {
+    title: `${dept} Clinics in ${loc} | Korea Clinic Map`,
+    description: `Browse ${dept.toLowerCase()} clinics in ${loc}. View addresses and contact details. Contact clinics to confirm language support and services.`,
+    alternates: { canonical: `${SITE_URL}/clinics/${params.department}/${params.location}` },
+    robots: Object.keys(searchParams).length ? { index: false, follow: true } : undefined,
+  };
+}
+export default async function SearchPage({ params, searchParams }: Props) {
+  if (!departments.includes(params.department)) notFound();
+  const query = text(searchParams.q);
+  const specialist = searchParams.specialist === '1';
+  let clinics: any[] = [];
+  let failed = false;
+  try {
+    clinics = await getClinics({ categorySlug: params.department, locationSlug: params.location, query, specialist, limit: 100 });
+  } catch { failed = true; }
+  // Collapse repeated imported profiles in the displayed batch without modifying source data.
+  const seen = new Set<string>();
+  const filteredClinics = clinics.filter(clinic => {
+    const key = JSON.stringify([clinic.name_ko, clinic.address_ko?.replace(/\s/g, ''), clinic.telephone?.replace(/[^0-9]/g, '')]);
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
   });
-
-  const { deptName, locName } = getNames(lang, department, location, dict);
-
-  // Compute map center (fallback to Seoul City Hall if empty)
-  const mapCenter = filteredClinics.length > 0 
-    ? { lat: filteredClinics[0].latitude, lng: filteredClinics[0].longitude }
-    : { lat: 37.5665, lng: 126.9780 };
-
-  // Render header templates localized properly
-  const diseaseParam = typeof searchParams?.disease === 'string' ? searchParams.disease : undefined;
-  const diseasePrefix = diseaseParam ? `${diseaseParam.toUpperCase()} at ` : '';
-  const headerTitle = `${diseasePrefix}${deptName} Clinics in ${locName}`;
-  const matchDescription = `${filteredClinics.length} clinics found based on public health data.`;
-
-  // ItemList Schema for GEO/SEO
-  const itemListSchema = {
-    "@context": "https://schema.org",
-    "@type": "ItemList",
-    "itemListElement": filteredClinics.map((clinic, index) => ({
-      "@type": "ListItem",
-      "position": index + 1,
-      "url": `https://koreaclinicmap.com/clinics/detail/${clinic.hira_code}`
-    }))
+  const { dept, loc } = names(params.department, params.location);
+  const mapCenter = filteredClinics.length ? { lat: filteredClinics[0].latitude, lng: filteredClinics[0].longitude } : { lat: 37.5665, lng: 126.9780 };
+  const schema = {
+    '@context': 'https://schema.org', '@type': 'ItemList',
+    itemListElement: filteredClinics.map((clinic, i) => ({ '@type': 'ListItem', position: i + 1, url: `${SITE_URL}${clinicPath(clinic)}` })),
   };
-
-  // Place Schema for GEO mapping
-  const placeSchema = {
-    "@context": "https://schema.org",
-    "@type": "Place",
-    "name": locName,
-    "address": {
-      "@type": "PostalAddress",
-      "addressCountry": "KR",
-      "addressRegion": locName
-    }
-  };
-
-  const isDiseaseSearch = Boolean(diseaseParam);
-  const hasPremium = filteredClinics.some(c => c.is_premium);
-
-  return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(placeSchema) }}
-      />
-      
-      <div className="max-w-6xl mx-auto px-4 py-8 space-y-6">
-        {/* Empty State Trap Banner (Triggered when searching specific disease but no premium clinic exists yet) */}
-        {isDiseaseSearch && !hasPremium && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 flex items-start gap-4">
-            <div className="bg-blue-100 text-blue-700 p-2 rounded-full">
-              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" /></svg>
-            </div>
-            <div>
-              <h3 className="font-bold text-blue-900">Evaluating Premium Clinics</h3>
-              <p className="text-sm text-blue-800 mt-1">
-                We are currently verifying the most trusted premium clinics for <strong>{searchParams.disease}</strong> in {locName}. 
-                In the meantime, you can explore the standard public {deptName} clinics below.
-              </p>
-            </div>
-          </div>
-        )}
-
-        {/* Search Header */}
-        <div className="space-y-1">
-          <h1 className="text-2xl md:text-3xl font-black text-slate-800 tracking-tight leading-tight">
-            {headerTitle}
-          </h1>
-          <p className="text-xs text-slate-500 font-medium">
-            {matchDescription}
-          </p>
-        </div>
-
-        {/* Dual Layout Interactive Search Client */}
-        <ClinicSearchClient 
-          lang={lang}
-          filteredClinics={filteredClinics}
-          mapCenter={mapCenter}
-        />
-      </div>
-    </>
-  );
+  return <>
+    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(schema) }} />
+    <div className="max-w-6xl mx-auto px-4 py-8 space-y-6">
+      <h1 className="text-2xl md:text-3xl font-black">{dept} Clinics in {loc}</h1>
+      <form action={`/clinics/${params.department}/${params.location}`} method="get" className="flex flex-wrap items-end gap-3 bg-white p-4 rounded-xl border border-slate-200">
+        <label className="flex-1 min-w-[180px] text-sm font-semibold">Clinic name or address
+          <input name="q" defaultValue={query} maxLength={200} className="block border rounded-lg px-3 py-2 w-full mt-1" placeholder="Search names or addresses" />
+        </label>
+        <label className="text-sm flex gap-2 py-2 items-center"><input type="checkbox" name="specialist" value="1" defaultChecked={specialist} /> Specialist recorded</label>
+        <button className="bg-slate-800 text-white rounded-lg px-4 py-2">Search</button>
+      </form>
+      <nav aria-label="Browse medical departments" className="flex flex-wrap gap-3 text-sm">
+        {departments.map(dept => <a key={dept} aria-current={dept === params.department ? 'page' : undefined} className="underline p-2" href={`/clinics/${dept}/${params.location}`}>{dept === 'all' ? 'All departments' : names(dept, 'all').dept}</a>)}
+        <a href="/" className="underline p-2">Browse locations</a>
+      </nav>
+      <p className="text-sm text-slate-500" role={failed ? 'alert' : 'status'}>
+        {failed ? 'Clinic information is temporarily unavailable. Please try again later.' : `Showing ${filteredClinics.length} clinic profiles${clinics.length === 100 ? ' from the first 100 matching records. Narrow your search for more specific results.' : '.'}`}
+      </p>
+      <p className="text-xs text-slate-500">Specialist status reflects imported records and may concern a different department.</p>
+      {!failed && <ClinicSearchClient lang="en" filteredClinics={filteredClinics} mapCenter={mapCenter} />}
+    </div>
+  </>;
 }

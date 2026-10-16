@@ -24,7 +24,7 @@ export async function generateMetadata({ params }: ArticlesPageProps) {
     title,
     description,
     alternates: {
-      canonical: `https://koreaclinicmap.comarticles`,
+      canonical: `https://map.clinicinkorea.com/articles`,
     }
   };
 }

@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import { searchTerms } from './search';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://lgbiyvqwurtlqsfsdnyy.supabase.co';
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'sb_publishable_gw_11u4mkJiC-NvZPxUbOw_7AnTbO7s';
@@ -118,7 +119,7 @@ export const mockClinics: any[] = [
   }
 ];
 
-export async function getClinics(params?: { categorySlug?: string, locationSlug?: string, limit?: number }) {
+export async function getClinics(params?: { categorySlug?: string, locationSlug?: string, limit?: number, query?: string, specialist?: boolean }) {
   let locationIds: number[] = [];
   
   if (params?.locationSlug && params.locationSlug !== 'all') {
@@ -126,6 +127,7 @@ export async function getClinics(params?: { categorySlug?: string, locationSlug?
     const { data: matchedLocs } = await supabase
       .from('locations')
       .select('id, parent_id, slug');
+    if (!matchedLocs) throw new Error('Unable to load clinic locations');
       
     if (matchedLocs && matchedLocs.length > 0) {
       const directMatches = matchedLocs.filter(l => 
@@ -161,13 +163,22 @@ export async function getClinics(params?: { categorySlug?: string, locationSlug?
     query = query.eq('locations.slug', params.locationSlug);
   }
   
+  // Restrict the text to literal search terms; never pass PostgREST operators from input.
+  const terms = searchTerms(params?.query || '');
+  for (const term of terms) {
+    query = query.or(`name_en.ilike.%${term}%,name_ko.ilike.%${term}%,address_en.ilike.%${term}%,address_ko.ilike.%${term}%`);
+  }
+  // A nonempty query consisting only of punctuation cannot become an unfiltered search.
+  if (params?.query?.trim() && terms.length === 0) return [];
+  if (params?.specialist) query = query.eq('has_specialist', true);
+
   // Always bring premium first, then other clinics
-  query = query.order('is_premium', { ascending: false }).limit(params?.limit || 100);
+  query = query.order('is_premium', { ascending: false }).order('id').limit(params?.limit || 100);
   
   const { data, error } = await query;
   if (error) {
     console.error('Supabase getClinics error:', error);
-    return [];
+    throw new Error('Unable to load clinics. Please try again later.');
   }
   return data || [];
 }
@@ -175,7 +186,7 @@ export async function getClinics(params?: { categorySlug?: string, locationSlug?
 export async function getClinicById(id: string) {
   // Check mock clinics first for custom slugs
   const mockMatch = mockClinics.find(c => c.id === id);
-  if (mockMatch) return mockMatch;
+  if (mockMatch) return { ...mockMatch, categories: mockMatch.category, locations: mockMatch.location };
 
   let query = supabase.from('clinics').select('*, categories(*), locations(*)');
   const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);

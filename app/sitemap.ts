@@ -1,69 +1,24 @@
 import { MetadataRoute } from 'next';
 import { mockClinics } from '@/lib/supabase';
-
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://map.clinicinkorea.com';
-
-const departments = ['all', 'urology', 'dentistry', 'internal-medicine', 'dermatology', 'plastic-surgery'];
-const locations = ['all', 'gangnam', 'seoul-station', 'jamsil', 'incheon', 'dongtan'];
-const locales = ['en', 'mn'];
+import { mockArticles } from '@/lib/articles';
+import { SITE_URL, clinicPath } from '@/lib/site';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const routes: MetadataRoute.Sitemap = [];
-
-  // 1. Static main routes per locale
-  locales.forEach((lang) => {
-    routes.push({
-      url: `${BASE_URL}/${lang}`,
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 1.0,
-    });
-  });
-
-  // 2. Programmatic SEO list pages (/clinics/[department]/[location])
-  locales.forEach((lang) => {
-    departments.forEach((dept) => {
-      locations.forEach((loc) => {
-        routes.push({
-          url: `${BASE_URL}/${lang}/clinics/${dept}/${loc}`,
-          lastModified: new Date(),
-          changeFrequency: 'weekly',
-          priority: 0.8,
-        });
-      });
-    });
-  });
-
-  // 3. Dynamic Clinic Detail Pages (/clinics/detail/[id])
-  locales.forEach((lang) => {
-    mockClinics.forEach((clinic) => {
-      routes.push({
-        url: `${BASE_URL}/${lang}/clinics/detail/${clinic.id}`,
-        lastModified: new Date(),
-        changeFrequency: 'monthly',
-        priority: 0.7,
-      });
-    });
-  });
-
-  // 4. Article pages
-  locales.forEach((lang) => {
-    // Index page
-    routes.push({
-      url: `${BASE_URL}/${lang}/articles`,
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 0.7,
-    });
-
-    // Detail pages
-    routes.push({
-      url: `${BASE_URL}/${lang}/articles/things-to-know-before-visiting-urology-clinic`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
+  const departments = ['all', 'urology', 'dentistry', 'internal-medicine', 'dermatology', 'plastic-surgery'];
+  const locations = ['all', 'gangnam', 'seoul-station', 'jamsil', 'incheon', 'dongtan'];
+  return [
+    { url: SITE_URL, changeFrequency: 'weekly', priority: 1 },
+    { url: `${SITE_URL}/articles`, changeFrequency: 'monthly', priority: 0.6 },
+    ...departments.flatMap(department => locations.map(location => ({
+      url: `${SITE_URL}/clinics/${department}/${location}`,
+      changeFrequency: 'weekly' as const,
+      priority: 0.8,
+    }))),
+    ...mockClinics.map(clinic => ({ url: `${SITE_URL}${clinicPath(clinic)}`, priority: 0.7 })),
+    ...mockArticles.map(article => ({
+      url: `${SITE_URL}/articles/${article.slug}`,
+      lastModified: article.published_at,
       priority: 0.6,
-    });
-  });
-
-  return routes;
+    })),
+  ];
 }
