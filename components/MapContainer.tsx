@@ -2,7 +2,7 @@
 'use client';
 
 import React from 'react';
-import { GoogleMap, useJsApiLoader, Marker } from '@react-google-maps/api';
+import { GoogleMap, useJsApiLoader, Marker, InfoWindow } from '@react-google-maps/api';
 
 interface Location {
   lat: number;
@@ -19,7 +19,12 @@ interface MapContainerProps {
     lat: number;
     lng: number;
     isPremium?: boolean;
+    address?: string;
+    telephone?: string;
+    detailHref?: string;
   }>;
+  selectedMarkerId?: string | null;
+  onInfoWindowClose?: () => void;
   onMarkerClick?: (id: string) => void;
 }
 
@@ -35,8 +40,11 @@ export default function MapContainer({
   center,
   zoom = 12,
   markers,
+  selectedMarkerId,
+  onInfoWindowClose,
   onMarkerClick
 }: MapContainerProps) {
+  const selectedMarker = markers.find(marker => marker.id === selectedMarkerId);
   const effectiveKey = apiKey || DEFAULT_API_KEY;
   
   // Try loading Google Maps JS API if Key is present
@@ -123,6 +131,25 @@ export default function MapContainer({
             }}
           />
         ))}
+        {selectedMarker && (
+          <InfoWindow
+            key={selectedMarker.id}
+            position={{ lat: selectedMarker.lat, lng: selectedMarker.lng }}
+            onCloseClick={onInfoWindowClose}
+            options={{ pixelOffset: new window.google.maps.Size(0, -32), maxWidth: 280 }}
+          >
+            <div className="max-w-[250px] p-1 text-slate-800">
+              <h3 className="text-base font-bold mb-2">{selectedMarker.name}</h3>
+              {selectedMarker.address && <p className="text-xs leading-relaxed mb-2">{selectedMarker.address}</p>}
+              {selectedMarker.telephone && <p className="text-xs mb-3">{selectedMarker.telephone}</p>}
+              {selectedMarker.detailHref && (
+                <a href={selectedMarker.detailHref} className="inline-block rounded-lg bg-amber-500 px-4 py-2 text-sm font-semibold text-slate-900 hover:bg-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-600">
+                  View Details
+                </a>
+              )}
+            </div>
+          </InfoWindow>
+        )}
       </GoogleMap>
     </div>
   );
