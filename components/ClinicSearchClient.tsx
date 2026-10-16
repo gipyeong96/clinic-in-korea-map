@@ -52,7 +52,13 @@ export default function ClinicSearchClient({
       setTimeout(() => {
         const element = document.getElementById(`clinic-card-${id}`);
         if (element) {
-          element.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          const list = element.parentElement;
+          if (list) {
+            list.scrollTo({
+              top: list.scrollTop + element.getBoundingClientRect().top - list.getBoundingClientRect().top,
+              behavior: 'smooth',
+            });
+          }
         }
       }, 50);
     }
