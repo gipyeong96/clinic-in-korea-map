@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Locale, getDictionary } from '@/lib/translation';
 import ClinicCard from '@/components/ClinicCard';
+import { clinicPath } from '@/lib/site';
 import MapContainer from '@/components/MapContainer';
 
 interface ClinicSearchClientProps {
@@ -34,6 +35,9 @@ export default function ClinicSearchClient({
     name: c.name_en,
     lat: c.latitude,
     lng: c.longitude,
+    address: c.address_en || c.address_ko,
+    telephone: c.telephone,
+    detailHref: clinicPath(c),
     isPremium: c.is_premium
   }));
 
@@ -48,7 +52,13 @@ export default function ClinicSearchClient({
       setTimeout(() => {
         const element = document.getElementById(`clinic-card-${id}`);
         if (element) {
-          element.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          const list = element.parentElement;
+          if (list) {
+            list.scrollTo({
+              top: list.scrollTop + element.getBoundingClientRect().top - list.getBoundingClientRect().top,
+              behavior: 'smooth',
+            });
+          }
         }
       }, 50);
     }
@@ -96,6 +106,8 @@ export default function ClinicSearchClient({
           center={currentMapCenter}
           zoom={zoom}
           markers={mapMarkers}
+          selectedMarkerId={activeClinicId}
+          onInfoWindowClose={() => setActiveClinicId(null)}
           onMarkerClick={handleMarkerClick}
         />
       </div>
