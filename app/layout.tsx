@@ -1,6 +1,7 @@
 import '@/app/globals.css';
 import React from 'react';
 import Link from 'next/link';
+import GoogleAnalytics from '@/components/GoogleAnalytics';
 
 export const metadata = {
   title: 'Korea Clinic Map',
@@ -37,6 +38,7 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased text-slate-800 bg-slate-50 min-h-screen">
+        <GoogleAnalytics />
         <div className="flex flex-col min-h-screen">
           {/* Header */}
           <header className="bg-slate-900 text-white border-b border-slate-800 sticky top-0 z-50 px-4 py-3 shadow-md">
