@@ -40,6 +40,9 @@ CREATE OR REPLACE FUNCTION public.nearby_clinics(
         WHERE term <> '' AND position(lower(term) IN lower(concat_ws(' ',c.name_en,c.name_ko,c.address_en,c.address_ko)))=0
       )
       AND c.latitude BETWEEN 33 AND 39 AND c.longitude BETWEEN 124 AND 132
+      -- The original HIRA importer substituted this city-centre point when
+      -- coordinates were absent. It cannot support a measured station distance.
+      AND NOT (c.latitude=37.5665 AND c.longitude=126.9780)
   )
   SELECT to_jsonb(d) FROM distances d
   WHERE distance_m <= least(greatest(radius_m,100),3000)
