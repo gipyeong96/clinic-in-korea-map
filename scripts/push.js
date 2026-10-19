@@ -105,7 +105,7 @@ async function main() {
     const parentId = locationIds[sido];
     for (const sg of sgSet) {
       const { data: res, error } = await supabase.from('locations').upsert(
-        { slug: toSlug(sg), name_ko: sg, name_en: aromanize.romanize(sg), name_mn: aromanize.romanize(sg), level: 'sigungu', parent_id: parentId },
+        { slug: `${toSlug(sido)}--${toSlug(sg)}`, name_ko: sg, name_en: aromanize.romanize(sg), name_mn: aromanize.romanize(sg), level: 'sigungu', parent_id: parentId },
         { onConflict: 'slug' }
       ).select().single();
       if (!error) locationIds[`${sido}|${sg}`] = res.id;
@@ -118,7 +118,7 @@ async function main() {
     const parentId = locationIds[key];
     for (const dong of dongSet) {
       const { data: res, error } = await supabase.from('locations').upsert(
-        { slug: toSlug(dong), name_ko: dong, name_en: aromanize.romanize(dong), name_mn: aromanize.romanize(dong), level: 'dong', parent_id: parentId },
+        { slug: `${key.split('|').map(toSlug).join('--')}--${toSlug(dong)}`, name_ko: dong, name_en: aromanize.romanize(dong), name_mn: aromanize.romanize(dong), level: 'dong', parent_id: parentId },
         { onConflict: 'slug' }
       ).select().single();
       if (!error) locationIds[`${key}|${dong}`] = res.id;
@@ -141,7 +141,7 @@ async function main() {
       name_en: enName,
       name_mn: enName,
       category_id: c.category_id,
-      location_id: locId || 1,
+      location_id: locId,
       telephone: c.telephone,
       address_ko: c.address_ko,
       latitude: c.latitude,
@@ -153,6 +153,10 @@ async function main() {
       is_premium: false
     };
   });
+
+  if (formattedClinics.some(c => !c.location_id)) {
+    throw new Error('Missing scoped location: refusing to assign clinics to an unrelated default location');
+  }
 
   const BATCH_SIZE = 1000;
   for (let i = 0; i < formattedClinics.length; i += BATCH_SIZE) {

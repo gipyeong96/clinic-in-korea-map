@@ -10,6 +10,7 @@ import { mockClinics } from '@/lib/supabase';
 import ClinicCard from '@/components/ClinicCard';
 import HomeSearch from '@/components/HomeSearch';
 import { MapPin, Stethoscope } from 'lucide-react';
+import { stationPages } from '@/lib/stations';
 
 interface HomePageProps {
   params: any;
@@ -30,8 +31,7 @@ export default function HomePage({ params }: HomePageProps) {
   ];
 
   const locations = [
-    { slug: 'gangnam', name: dict.gangnam },
-    { slug: 'seoul-station', name: dict['seoul-station'] },
+    { slug: 'gangnam', name: 'Gangnam area' },
     { slug: 'jamsil', name: dict.jamsil },
     { slug: 'incheon', name: dict.incheon },
     { slug: 'dongtan', name: dict.dongtan },
@@ -60,13 +60,18 @@ export default function HomePage({ params }: HomePageProps) {
       </section>
 
       {/* Grid of Browse Links */}
-      <section className="max-w-5xl mx-auto px-4 grid grid-cols-1 md:grid-cols-2 gap-8">
+      <section className="max-w-6xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+          <h2 className="text-lg font-bold text-slate-800 border-b border-slate-100 pb-2">Find by Station</h2>
+          <p className="text-xs text-slate-500">Choose a station, then filter by distance and department.</p>
+          <div className="flex flex-col gap-2">{stationPages.map(station => <Link key={station.slug} href={`/clinics/all/${station.slug}`} className="text-sm font-semibold bg-slate-50 text-slate-700 py-3 px-4 rounded-lg border border-slate-200 hover:border-amber-500">{station.name_en}<span className="block text-xs font-normal text-slate-500">Seoul Metro · Line {station.stations.map(s => s.line).join(' / ')}</span></Link>)}</div>
+        </div>
         
         {/* Locations */}
         <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
           <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2 border-b border-slate-100 pb-2">
             <MapPin className="w-5 h-5 text-amber-500" />
-            Search by Location
+            Find by Area
           </h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
             {locations.map((loc) => (

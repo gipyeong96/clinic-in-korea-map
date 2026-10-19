@@ -1,0 +1,69 @@
+[
+  {
+    "slug": "seoul-station",
+    "name_ko": "서울역",
+    "name_en": "Seoul Station",
+    "stations": [
+      {
+        "id": "seoulmetro-1-150",
+        "name_ko": "서울",
+        "line": "1",
+        "latitude": 37.55315,
+        "longitude": 126.972533,
+        "source_date": "2025-08-14"
+      },
+      {
+        "id": "seoulmetro-4-426",
+        "name_ko": "서울",
+        "line": "4",
+        "latitude": 37.553172,
+        "longitude": 126.972836,
+        "source_date": "2025-08-14"
+      }
+    ],
+    "source_url": "https://www.data.go.kr/data/15099316/fileData.do",
+    "source_date": "2025-08-14"
+  },
+  {
+    "slug": "gangnam-station",
+    "name_ko": "강남역",
+    "name_en": "Gangnam Station",
+    "stations": [
+      {
+        "id": "seoulmetro-2-222",
+        "name_ko": "강남",
+        "line": "2",
+        "latitude": 37.497958,
+        "longitude": 127.027539,
+        "source_date": "2025-08-14"
+      }
+    ],
+    "source_url": "https://www.data.go.kr/data/15099316/fileData.do",
+    "source_date": "2025-08-14"
+  },
+  {
+    "slug": "jamsil-station",
+    "name_ko": "잠실역",
+    "name_en": "Jamsil Station",
+    "stations": [
+      {
+        "id": "seoulmetro-2-216",
+        "name_ko": "잠실",
+        "line": "2",
+        "latitude": 37.513305,
+        "longitude": 127.100129,
+        "source_date": "2025-08-14"
+      },
+      {
+        "id": "seoulmetro-8-2815",
+        "name_ko": "잠실",
+        "line": "8",
+        "latitude": 37.514649,
+        "longitude": 127.104267,
+        "source_date": "2025-08-14"
+      }
+    ],
+    "source_url": "https://www.data.go.kr/data/15099316/fileData.do",
+    "source_date": "2025-08-14"
+  }
+]

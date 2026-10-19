@@ -1,5 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { searchTerms } from './search';
+import { regionAddresses, addressFilter, locationIdsForSlug } from './regions';
+import { stationForSlug } from './stations';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://lgbiyvqwurtlqsfsdnyy.supabase.co';
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'sb_publishable_gw_11u4mkJiC-NvZPxUbOw_7AnTbO7s';
@@ -119,35 +121,29 @@ export const mockClinics: any[] = [
   }
 ];
 
-export async function getClinics(params?: { categorySlug?: string, locationSlug?: string, limit?: number, query?: string, specialist?: boolean }) {
+export async function getClinics(params?: { categorySlug?: string, locationSlug?: string, limit?: number, query?: string, specialist?: boolean, radius?: number }) {
+  if (params?.query?.trim() && searchTerms(params.query).length === 0) return [];
+  const station = stationForSlug(params?.locationSlug || '');
+  if (station) {
+    const { data, error } = await supabase.rpc('nearby_clinics', {
+      station_ids: station.stations.map(s => s.id), radius_m: params?.radius || 1000,
+      category_slug: params?.categorySlug || 'all', search_query: searchTerms(params?.query || '').join(' '),
+      specialist_only: params?.specialist || false, result_limit: params?.limit || 100,
+    });
+    if (error) throw new Error('Unable to load clinics near this station');
+    return (data || []).map((clinic: any) => ({ ...clinic, station_name: station.name_en }));
+  }
   let locationIds: number[] = [];
   
-  if (params?.locationSlug && params.locationSlug !== 'all') {
-    const cleanSlug = params.locationSlug.toLowerCase().replace(/[^a-z0-9]/g, '');
+  const addressPrefixes = regionAddresses[params?.locationSlug || ''];
+  if (params?.locationSlug && params.locationSlug !== 'all' && !addressPrefixes) {
     const { data: matchedLocs } = await supabase
       .from('locations')
       .select('id, parent_id, slug');
     if (!matchedLocs) throw new Error('Unable to load clinic locations');
       
     if (matchedLocs && matchedLocs.length > 0) {
-      const directMatches = matchedLocs.filter(l => 
-        l.slug === params.locationSlug || 
-        l.slug?.replace(/[^a-z0-9]/g, '') === cleanSlug ||
-        l.slug?.startsWith(cleanSlug)
-      );
-      const matchIds = new Set(directMatches.map(l => l.id));
-      
-      let added = true;
-      while (added) {
-        added = false;
-        matchedLocs.forEach(l => {
-          if (l.parent_id && matchIds.has(l.parent_id) && !matchIds.has(l.id)) {
-            matchIds.add(l.id);
-            added = true;
-          }
-        });
-      }
-      locationIds = Array.from(matchIds);
+      locationIds = locationIdsForSlug(matchedLocs, params.locationSlug);
     }
   }
 
@@ -157,7 +153,9 @@ export async function getClinics(params?: { categorySlug?: string, locationSlug?
     query = query.eq('categories.slug', params.categorySlug);
   }
   
-  if (locationIds.length > 0) {
+  if (addressPrefixes) {
+    query = query.or(addressFilter(addressPrefixes));
+  } else if (locationIds.length > 0) {
     query = query.in('location_id', locationIds);
   } else if (params?.locationSlug && params.locationSlug !== 'all') {
     query = query.eq('locations.slug', params.locationSlug);
