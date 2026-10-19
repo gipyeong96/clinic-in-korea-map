@@ -1,11 +1,12 @@
 import { MetadataRoute } from 'next';
 import { mockClinics } from '@/lib/supabase';
 import { mockArticles } from '@/lib/articles';
+import { stationPages } from '@/lib/stations';
 import { SITE_URL, clinicPath } from '@/lib/site';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const departments = ['all', 'urology', 'dentistry', 'internal-medicine', 'dermatology', 'plastic-surgery'];
-  const locations = ['all', 'gangnam', 'seoul-station', 'gangnam-station', 'jamsil-station', 'jamsil', 'incheon', 'dongtan'];
+  const locations = ['all', 'gangnam', 'seoul-station', 'gangnam-station', 'jamsil-station', 'jamsil', 'incheon', 'dongtan', 'busan', 'daegu', 'daejeon', 'gwangju', 'ulsan', 'jeju'];
   return [
     { url: SITE_URL, changeFrequency: 'weekly', priority: 1 },
     { url: `${SITE_URL}/articles`, changeFrequency: 'monthly', priority: 0.6 },
@@ -14,6 +15,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'weekly' as const,
       priority: 0.8,
     }))),
+    ...stationPages.filter(s => !locations.includes(s.slug)).map(s => ({url: `${SITE_URL}/clinics/all/${s.slug}`, changeFrequency: 'monthly' as const, priority: 0.6})),
     ...mockClinics.map(clinic => ({ url: `${SITE_URL}${clinicPath(clinic)}`, priority: 0.7 })),
     ...mockArticles.map(article => ({
       url: `${SITE_URL}/articles/${article.slug}`,

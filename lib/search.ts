@@ -17,6 +17,9 @@ export function homeSearchPath(input: string) {
     [/\bgangnam\b/, 'gangnam'], [/\bjamsil\b/, 'jamsil'],
     [/\bincheon\b/, 'incheon'], [/\bdongtan\b/, 'dongtan'],
     [/\bseoul\b/, 'seoul'],
+    [/\bbusan\b/, 'busan'], [/\bdaegu\b/, 'daegu'],
+    [/\bdaejeon\b/, 'daejeon'], [/\bgwangju\b/, 'gwangju'],
+    [/\bulsan\b/, 'ulsan'], [/\bjeju\b/, 'jeju'],
   ];
   for (const [pattern, slug] of departments) {
     if (pattern.test(remaining)) { department = slug; remaining = remaining.replace(pattern, ' '); break; }

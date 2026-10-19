@@ -1,0 +1,383 @@
+[
+  {
+    "id": "902",
+    "filename": "김포골드라인_도시철도역사정보_20260630",
+    "title": "표준데이터 역사정보(김포골드라인 기관)",
+    "format": "xlsx",
+    "source_url": "https://data.kric.go.kr/rips/M_01_01/detail.do?id=902",
+    "sha256": "4dd3864b9d06602f1699ed36bdf4e919a46326663bc4d03c810e5274f14b6d93",
+    "included": true
+  },
+  {
+    "id": "39",
+    "filename": "서울9호선_도시철도역사정보_20250930",
+    "title": "표준데이터 역사정보(서울9호선 기관)",
+    "format": "xlsx",
+    "source_url": "https://data.kric.go.kr/rips/M_01_01/detail.do?id=39",
+    "sha256": "6fd91543565ba3c3ff06c8dac32afc212696787872a6054808de737608798467",
+    "included": true
+  },
+  {
+    "id": "45",
+    "filename": "한국철도공사_도시철도역사정보_20260228",
+    "title": "표준데이터 역사정보(코레일 기관)",
+    "format": "xlsx",
+    "source_url": "https://data.kric.go.kr/rips/M_01_01/detail.do?id=45",
+    "sha256": "c5fe310e0e3ad4b2b2b951926c3cce374c06d290af818261914f6bbb0816f727",
+    "included": true
+  },
+  {
+    "id": "905",
+    "filename": "남양주도시공사_도시철도역사정보_20240930",
+    "title": "표준데이터 역사정보(남양주도시공사 기관)",
+    "format": "xlsx",
+    "source_url": "https://data.kric.go.kr/rips/M_01_01/detail.do?id=905",
+    "sha256": "5d959620cf3baf2255aef3a6b54d5073f8cd7aabcc0430c03a856f12cf1e5077",
+    "included": true
+  },
+  {
+    "id": "90",
+    "filename": "대구교통공사_역사정보_20260531",
+    "title": "대구교통공사 역사정보",
+    "format": "xlsx",
+    "source_url": "https://data.kric.go.kr/rips/M_01_01/detail.do?id=90",
+    "sha256": "3958131e6f3c837180f9c67cdf1b6cb176748b46354480d44187aa43828ac66b",
+    "included": true
+  },
+  {
+    "id": "907",
+    "filename": "신림선(로템에스알에스)_도시철도역사정보_20241231",
+    "title": "표준데이터 역사정보(로템에스알에스 기관)",
+    "format": "xlsx",
+    "source_url": "https://data.kric.go.kr/rips/M_01_01/detail.do?id=907",
+    "sha256": "aebe3eaa3d55f773303d3b9f93f15cc4cb749a856600935494ff3edd60908a28",
+    "included": true
+  },
+  {
+    "id": "40",
+    "filename": "서울교통공사_도시철도역사정보_20251231",
+    "title": "표준데이터 역사정보(서울교통공사 기관)",
+    "format": "xlsx",
+    "source_url": "https://data.kric.go.kr/rips/M_01_01/detail.do?id=40",
+    "sha256": "61a37c2bf03079acca0ca31dfbcc2d33ab30367f99197a4b80cfc9f10024bd69",
+    "included": true
+  },
+  {
+    "id": "60",
+    "filename": "우이신설경전철_역사정보_20260630",
+    "title": "우이신설도시철도 역사정보",
+    "format": "xlsx",
+    "source_url": "https://data.kric.go.kr/rips/M_01_01/detail.do?id=60",
+    "sha256": "aa8655d2b9177e1e6890007e3a024fc7f15e621861d2df18576d15e7c5fd71bd",
+    "included": true
+  },
+  {
+    "id": "78",
+    "filename": "대전교통공사 역사정보_20260531",
+    "title": "대전교통공사 역사정보",
+    "format": "xlsx",
+    "source_url": "https://data.kric.go.kr/rips/M_01_01/detail.do?id=78",
+    "sha256": "f6344b2ac1758b8796d4c5a7d0971412558aaa43830cfa19ef3388c66e474af4",
+    "included": true
+  },
+  {
+    "id": "77",
+    "filename": "광주교통공사_역사정보_20240531",
+    "title": "광주교통공사 역사정보",
+    "format": "xlsx",
+    "source_url": "https://data.kric.go.kr/rips/M_01_01/detail.do?id=77",
+    "sha256": "294c40ad3399c74bae087ae20bbe20d4b365333a35769a0fe5041b438df6d4b2",
+    "included": true
+  },
+  {
+    "id": "34",
+    "filename": "광주교통공사_도시철도역사정보_20260701",
+    "title": "표준데이터 역사정보(광주교통공사 기관)",
+    "format": "xlsx",
+    "source_url": "https://data.kric.go.kr/rips/M_01_01/detail.do?id=34",
+    "sha256": "9832b577d67a749b4e96eea83be1615eb4527fd5d338d880a6323e5b164bfbb7",
+    "included": true
+  },
+  {
+    "id": "81",
+    "filename": "서울교통공사_역사정보_20260531",
+    "title": "서울교통공사 역사정보",
+    "format": "xlsx",
+    "source_url": "https://data.kric.go.kr/rips/M_01_01/detail.do?id=81",
+    "sha256": "b26e47566219f12a343f53ecc6e26c7990c79073c8582353ef4abbabc0ac96c1",
+    "included": true
+  },
+  {
+    "id": "37",
+    "filename": "부산교통공사_도시철도역사정보_20230106",
+    "title": "표준데이터 역사정보(부산교통공사 기관)",
+    "format": "xlsx",
+    "source_url": "https://data.kric.go.kr/rips/M_01_01/detail.do?id=37",
+    "sha256": "652bc1f2e4758034e546cf5094c733ee8dbecb8199594e1ac79fa0b7ddae3dcf",
+    "included": true
+  },
+  {
+    "id": "35",
+    "filename": "대구교통공사_도시철도역사정보_20251231",
+    "title": "표준데이터 역사정보(대구교통공사 기관)",
+    "format": "xlsx",
+    "source_url": "https://data.kric.go.kr/rips/M_01_01/detail.do?id=35",
+    "sha256": "a61df55cade2847fac95aaa90de31c38c0d169de06abbb378c881596e9587164",
+    "included": true
+  },
+  {
+    "id": "1188",
+    "filename": "남서울경전철_역사정보_20251231",
+    "title": "남서울경전철 역사정보",
+    "format": "xlsx",
+    "source_url": "https://data.kric.go.kr/rips/M_01_01/detail.do?id=1188",
+    "sha256": "584ac8731a3f25023b90d82721c0ec9504ac41ad02e93e1776a1d9468f2ee23a",
+    "included": true
+  },
+  {
+    "id": "80",
+    "filename": "서울메트로9호선_역사정보_20260531",
+    "title": "서울메트로9호선 역사정보",
+    "format": "xlsx",
+    "source_url": "https://data.kric.go.kr/rips/M_01_01/detail.do?id=80",
+    "sha256": "74f0c73b2174f52fa97f3cbc1ab97c9606c9940acfd3a53599fd338fb79e540c",
+    "included": true
+  },
+  {
+    "id": "64",
+    "filename": "신분당선_역사정보_20260531",
+    "title": "네오트랜스 역사정보",
+    "format": "xlsx",
+    "source_url": "https://data.kric.go.kr/rips/M_01_01/detail.do?id=64",
+    "sha256": "4e11613e8f846d642cacbe3f238a498355db724aff7c7963f5d7ca368a28f155",
+    "included": true
+  },
+  {
+    "id": "42",
+    "filename": "용인경전철_도시철도역사정보_20250331",
+    "title": "표준데이터 역사정보(용인경전철 기관)",
+    "format": "xlsx",
+    "source_url": "https://data.kric.go.kr/rips/M_01_01/detail.do?id=42",
+    "sha256": "f87d1521c6f01b24fd5bdd13e2196c292fca8d02e7507eebd6a7ff6bc59eadf8",
+    "included": true
+  },
+  {
+    "id": "1246",
+    "filename": "서해철도_역사정보_20260531",
+    "title": "서해철도 역사정보",
+    "format": "xlsx",
+    "source_url": "https://data.kric.go.kr/rips/M_01_01/detail.do?id=1246",
+    "sha256": "c00f514c800f1334f1282ec4da77a0bb4fd9d00475109ffa0479791425d12a51",
+    "included": true
+  },
+  {
+    "id": "89",
+    "filename": "부산김해경전철_역사정보_20260531",
+    "title": "부산김해경전철 역사정보",
+    "format": "xlsx",
+    "source_url": "https://data.kric.go.kr/rips/M_01_01/detail.do?id=89",
+    "sha256": "69677375de8af702ad092bfc8f15436884a7963eae0eccc6d72668ffdc3e3807",
+    "included": true
+  },
+  {
+    "id": "910",
+    "filename": "우이신설선_도시철도역사정보_20230106",
+    "title": "표준데이터 역사정보(우이신설선 기관)",
+    "format": "xlsx",
+    "source_url": "https://data.kric.go.kr/rips/M_01_01/detail.do?id=910",
+    "sha256": "a15fcd361c1348d4ed405fc4f9e18808fc30de2a8dc3780a3b80c93ca4047e31",
+    "included": true
+  },
+  {
+    "id": "61",
+    "filename": "의정부경량전철_역사정보_20260531",
+    "title": "의정부경량전철 역사정보",
+    "format": "xlsx",
+    "source_url": "https://data.kric.go.kr/rips/M_01_01/detail.do?id=61",
+    "sha256": "6b860523de0f75f3420143112c644901e0c987bb9dab6c0927275ef1dd4e9d0c",
+    "included": true
+  },
+  {
+    "id": "88",
+    "filename": "부산교통공사_역사정보_20260531",
+    "title": "부산교통공사 역사정보",
+    "format": "xlsx",
+    "source_url": "https://data.kric.go.kr/rips/M_01_01/detail.do?id=88",
+    "sha256": "2b916e5b162cb6af02bc8aa76d7c0934f6f7cea97a1850dc698036aee1af0982",
+    "included": true
+  },
+  {
+    "id": "65",
+    "filename": "공항철도공항철도_역사정보_20260531",
+    "title": "공항철도 역사정보",
+    "format": "xlsx",
+    "source_url": "https://data.kric.go.kr/rips/M_01_01/detail.do?id=65",
+    "sha256": "b9d040362ac23e2201549308bea9dcf9b727e6180aa00e44715458513f6a5d8a",
+    "included": true
+  },
+  {
+    "id": "1200",
+    "filename": "김포골드라인_역사정보_20260610",
+    "title": "김포골드라인 역사정보",
+    "format": "xlsx",
+    "source_url": "https://data.kric.go.kr/rips/M_01_01/detail.do?id=1200",
+    "sha256": "4ce2797e7a9012ddabb54d8a87251087ec89206385ab70648957b617c0be70b4",
+    "included": true
+  },
+  {
+    "id": "1213",
+    "filename": "남양주도시공사_역사정보_20260531",
+    "title": "남양주도시공사 역사정보",
+    "format": "xlsx",
+    "source_url": "https://data.kric.go.kr/rips/M_01_01/detail.do?id=1213",
+    "sha256": "750339c3650c68d570ed0986637dccdf2612f469164d6cb2fed4dda667047d55",
+    "included": true
+  },
+  {
+    "id": "85",
+    "filename": "경기철도신분당_역사정보_20220630",
+    "title": "경기철도 역사정보",
+    "format": "xlsx",
+    "source_url": "https://data.kric.go.kr/rips/M_01_01/detail.do?id=85",
+    "sha256": "5d3dfa83e4c1c1e5496d4a3f31bd674374955220b23e0aaae7a1c5e50b3e844a",
+    "included": true
+  },
+  {
+    "id": "87",
+    "filename": "용인경량전철_역사정보_20241230",
+    "title": "용인경량전철 역사정보",
+    "format": "xlsx",
+    "source_url": "https://data.kric.go.kr/rips/M_01_01/detail.do?id=87",
+    "sha256": "1d28f2f0332324f604bde4e54c799068181f811159af3fe19d9ea3e805ff33af",
+    "included": true
+  },
+  {
+    "id": "7",
+    "filename": "공항철도_도시철도운행정보_20251231",
+    "title": "표준데이터 역사정보(부산김해경전철 기관)",
+    "format": "xlsx",
+    "source_url": "https://data.kric.go.kr/rips/M_01_01/detail.do?id=7",
+    "sha256": "8e0b919c240ef5634c5129427cff13c68c212ba28cba13bf60805c9bf2f92cf9",
+    "included": false
+  },
+  {
+    "id": "36",
+    "filename": "대전교통공사_도시철도역사정보_20260630",
+    "title": "표준데이터 역사정보(대전교통공사 기관)",
+    "format": "xlsx",
+    "source_url": "https://data.kric.go.kr/rips/M_01_01/detail.do?id=36",
+    "sha256": "bb4a2be76699c66c50bfde5fb9adfe0437836874c081d6488a54c3b78e516ff8",
+    "included": true
+  },
+  {
+    "id": "84",
+    "filename": "인천교통공사_역사정보_20260531",
+    "title": "인천교통공사 역사정보",
+    "format": "xlsx",
+    "source_url": "https://data.kric.go.kr/rips/M_01_01/detail.do?id=84",
+    "sha256": "aee97aafa898e3be9ca21e51ec34843fb641d193770bb14facd7a235e8b4aabe",
+    "included": true
+  },
+  {
+    "id": "1294",
+    "filename": "전국 도시광역철도_역사정보_20260701",
+    "title": "전국 도시광역철도 역사정보",
+    "format": "xlsx",
+    "source_url": "https://data.kric.go.kr/rips/M_01_01/detail.do?id=1294",
+    "sha256": "39578ae9ffda7598766c05f7f13dc95f21f62755d1357e079cac1879e285c7fb",
+    "included": false
+  },
+  {
+    "id": "1279",
+    "filename": "GTX-A  역사정보",
+    "title": "GTX-A  역사정보",
+    "format": "xlsx",
+    "source_url": "https://data.kric.go.kr/rips/M_01_01/detail.do?id=1279",
+    "sha256": "9594ec488a1b92e6875c6d24c1640b8386d53bcb879002bc3c86aabc30525569",
+    "included": true
+  },
+  {
+    "id": "1222",
+    "filename": "남서울경전철_도시철도역사정보_20250930",
+    "title": "표준데이터 역사정보(남서울경전철 기관)",
+    "format": "xlsx",
+    "source_url": "https://data.kric.go.kr/rips/M_01_01/detail.do?id=1222",
+    "sha256": "632654e7b6dfa5d5d632dd5430920f7ad18409ef7f2e4e6314eda7ad3d1ef32e",
+    "included": true
+  },
+  {
+    "id": "43",
+    "filename": "의정부경전철_도시철도역사정보_20230912",
+    "title": "표준데이터 역사정보(의정부경전철 기관)",
+    "format": "xlsx",
+    "source_url": "https://data.kric.go.kr/rips/M_01_01/detail.do?id=43",
+    "sha256": "a5327852bc04567cc6d852e2404852b1dd016f0f1462d481f1a9f1b8da63a188",
+    "included": true
+  },
+  {
+    "id": "44",
+    "filename": "인천교통공사_도시철도역사정보_20250630",
+    "title": "표준데이터 역사정보(인천교통공사 기관)",
+    "format": "xlsx",
+    "source_url": "https://data.kric.go.kr/rips/M_01_01/detail.do?id=44",
+    "sha256": "579088db0661d4a0f96e51000f6c3258c7d4fc4903d034857f59cdee501668a3",
+    "included": true
+  },
+  {
+    "id": "41",
+    "filename": "신분당선_도시철도역사정보_20260630",
+    "title": "표준데이터 역사정보(네오트랜스 기관)",
+    "format": "xlsx",
+    "source_url": "https://data.kric.go.kr/rips/M_01_01/detail.do?id=41",
+    "sha256": "7e2e76f9e07c261e7bc372f6e4c8119415a81be63bd07793f7636580d20ac9d9",
+    "included": true
+  },
+  {
+    "id": "913",
+    "filename": "인천국제공항공사_도시철도역사정보_20230630",
+    "title": "표준데이터 역사정보(인천국제공항공사 기관)",
+    "format": "xlsx",
+    "source_url": "https://data.kric.go.kr/rips/M_01_01/detail.do?id=913",
+    "sha256": "963739c1450db276a5629d3d93609f61985a91abbcfc15e402ae620c5006b8a2",
+    "included": true
+  },
+  {
+    "id": "32",
+    "filename": "전체_도시철도역사정보_20260630",
+    "title": "표준데이터 역사정보(전체 기관)",
+    "format": "xlsx",
+    "source_url": "https://data.kric.go.kr/rips/M_01_01/detail.do?id=32",
+    "sha256": "cdf1d84a7e5c898b2aacd622783ba8ba9af35c40bee0561dc97d55ce8e063f94",
+    "included": false
+  },
+  {
+    "id": "1264",
+    "filename": "한국철도공사_역사정보_20241231",
+    "title": "코레일 역사정보",
+    "format": "xlsx",
+    "source_url": "https://data.kric.go.kr/rips/M_01_01/detail.do?id=1264",
+    "sha256": "2a861f44722bd3a26e58aef5767b9008a5d98d3474da31d2da8de63fd97d4166",
+    "included": true
+  },
+  {
+    "id": "33",
+    "filename": "공항철도_도시철도역사정보_20251231",
+    "title": "표준데이터 역사정보(공항철도 기관)",
+    "format": "xlsx",
+    "source_url": "https://data.kric.go.kr/rips/M_01_01/detail.do?id=33",
+    "sha256": "d3c95d576be0ea5b7100b2c5a86d3d670045bcc374b6931031c4836373c3155b",
+    "included": true
+  },
+  {
+    "id": "213",
+    "file": "213.xlsx",
+    "source_url": "https://data.kric.go.kr/rips/M_01_01/detail.do?id=213",
+    "sha256": "c0325e61f4311f50c57b78cc80bff1290156ab7f85caef437e5b8da8e46027c5"
+  },
+  {
+    "id": "mainline",
+    "file": "mainline.zip",
+    "source_url": "https://www.data.go.kr/data/15067652/fileData.do",
+    "sha256": "4a44a840d08aa942ed63eb7c73b711eb217c3aca177f05ca16a7f48edd0cee98"
+  }
+]

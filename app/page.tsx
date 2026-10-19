@@ -10,7 +10,7 @@ import { mockClinics } from '@/lib/supabase';
 import ClinicCard from '@/components/ClinicCard';
 import HomeSearch from '@/components/HomeSearch';
 import { MapPin, Stethoscope } from 'lucide-react';
-import { stationPages } from '@/lib/stations';
+import StationFinder from '@/components/StationFinder';
 
 interface HomePageProps {
   params: any;
@@ -32,6 +32,13 @@ export default function HomePage({ params }: HomePageProps) {
 
   const locations = [
     { slug: 'gangnam', name: 'Gangnam area' },
+    { slug: 'seoul', name: 'Seoul' },
+    { slug: 'busan', name: 'Busan' },
+    { slug: 'daegu', name: 'Daegu' },
+    { slug: 'daejeon', name: 'Daejeon' },
+    { slug: 'gwangju', name: 'Gwangju' },
+    { slug: 'ulsan', name: 'Ulsan' },
+    { slug: 'jeju', name: 'Jeju' },
     { slug: 'jamsil', name: dict.jamsil },
     { slug: 'incheon', name: dict.incheon },
     { slug: 'dongtan', name: dict.dongtan },
@@ -60,11 +67,11 @@ export default function HomePage({ params }: HomePageProps) {
       </section>
 
       {/* Grid of Browse Links */}
-      <section className="max-w-6xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-          <h2 className="text-lg font-bold text-slate-800 border-b border-slate-100 pb-2">Find by Station</h2>
+      <section className="max-w-6xl mx-auto px-4 grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="md:col-span-2 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+          <h2 id="station-search" className="text-lg font-bold text-slate-800 border-b border-slate-100 pb-2">Find by Station</h2>
           <p className="text-xs text-slate-500">Choose a station, then filter by distance and department.</p>
-          <div className="flex flex-col gap-2">{stationPages.map(station => <Link key={station.slug} href={`/clinics/all/${station.slug}`} className="text-sm font-semibold bg-slate-50 text-slate-700 py-3 px-4 rounded-lg border border-slate-200 hover:border-amber-500">{station.name_en}<span className="block text-xs font-normal text-slate-500">Seoul Metro · Line {station.stations.map(s => s.line).join(' / ')}</span></Link>)}</div>
+          <StationFinder />
         </div>
         
         {/* Locations */}

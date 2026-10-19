@@ -60,7 +60,12 @@ export default async function SearchPage({ params, searchParams }: Props) {
     <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(schema) }} />
     <div className="max-w-6xl mx-auto px-4 py-8 space-y-6">
       <h1 className="text-2xl md:text-3xl font-black">{dept} Clinics in {loc}</h1>
-      {station && <p className="text-sm text-slate-600">Within {radius.toLocaleString()} m · Nearest first · Straight-line distance from official station coordinates, not walking distance. For interchanges, the nearest listed line coordinate is used. <a className="underline" href={station.source_url} target="_blank" rel="noreferrer">Seoul Metro source</a> · Data as of {station.source_date}. Covers the listed Seoul Metro lines only.</p>}
+      {station && <div className="space-y-2 text-sm text-slate-600">
+        <p>{station.name_ko} · {station.city} · {station.stations.map(s => s.line).join(' / ')}</p>
+        <p>Within {radius.toLocaleString()} m · Nearest first · Straight-line distance, not walking distance. For interchanges, the nearest listed line coordinate is used.</p>
+        <details className="text-xs"><summary className="cursor-pointer underline">Official station sources and dates</summary><div className="space-y-1 py-2">{station.stations.map(s => <p key={s.id}>{s.line} · <a className="underline" href={s.source_url} target="_blank" rel="noreferrer">Official source</a> · Source record: {s.source_date}</p>)}<p>These are dated records, not a live timetable. Routes and train services may change. Source dates may be dataset or portal update dates.</p></div></details>
+        <a className="underline text-xs" href="/#station-search">Choose another station</a>
+      </div>}
       <form action={`/clinics/${params.department}/${params.location}`} method="get" className="flex flex-wrap items-end gap-3 bg-white p-4 rounded-xl border border-slate-200">
         <label className="flex-1 min-w-[180px] text-sm font-semibold">Clinic name or address
           <input name="q" defaultValue={query} maxLength={200} className="block border rounded-lg px-3 py-2 w-full mt-1" placeholder="Search names or addresses" />
