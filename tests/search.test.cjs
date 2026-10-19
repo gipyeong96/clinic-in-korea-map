@@ -13,6 +13,7 @@ function load(file, imports = {}) {
 }
 const search = load('lib/search.ts');
 const site = load('lib/site.ts');
+const evidence = load('lib/clinic-evidence.ts');
 const regions = load('lib/regions.ts');
 const stations = load('lib/stations.ts', { './stations.json': JSON.parse(fs.readFileSync(path.join(__dirname, '../lib/stations.json'), 'utf8')) });
 test('home search recognizes department/location but retains all other search terms', () => {
@@ -40,6 +41,7 @@ function database({ error = null, locations = [], data = [] } = {}) {
   const builder = {
     select(...args) { calls.push(['select', ...args]); return this; },
     eq(...args) { calls.push(['eq', ...args]); return this; },
+    contains(...args) { calls.push(['contains', ...args]); return this; },
     in(...args) { calls.push(['in', ...args]); return this; },
     or(...args) { calls.push(['or', ...args]); return this; },
     order() { return this; }, limit() { return this; },
@@ -52,8 +54,8 @@ function database({ error = null, locations = [], data = [] } = {}) {
 test('keyword and specialist constraints reach the database before the result limit', async () => {
   const { calls, api } = database();
   await api.getClinics({ query: 'Goldman 강남', specialist: true, categorySlug: 'urology' });
-  assert(calls.some(call => call[0] === 'eq' && call[1] === 'categories.slug' && call[2] === 'urology'));
-  assert(calls.some(call => call[0] === 'eq' && call[1] === 'has_specialist' && call[2] === true));
+  assert(calls.some(call => call[0] === 'contains' && call[1] === 'departments' && JSON.parse(call[2])[0].slug === 'urology'));
+  assert(calls.some(call => call[0] === 'contains' && call[1] === 'specialist_slugs' && call[2][0] === 'urology'));
   assert.equal(calls.filter(call => call[0] === 'or').length, 2);
   assert(calls.some(call => call[0] === 'or' && call[1].includes('name_en.ilike.%Goldman%')));
 });
@@ -90,4 +92,27 @@ test('station searches use official line coordinates and database radius sorting
 test('database failures are not silently presented as zero search results', async () => {
   const { api } = database({ error: { message: 'offline' } });
   await assert.rejects(api.getClinics(), /Unable to load clinics/);
+});
+
+test('registration requires a positive dated registry record and never implies language services', () => {
+  assert.equal(evidence.registeredEvidence({foreign_patient_registration:{status:'candidate',source_date:'2026-07-21'}}),null);
+  assert.equal(evidence.registeredEvidence({foreign_patient_registration:{status:'listed'}}),null);
+  const record={status:'listed',source_date:'2026-07-21'};
+  assert.equal(evidence.registeredEvidence({foreign_patient_registration:record}),record);
+  assert.equal(record.english_possible,undefined);
+});
+
+test('legacy priority classifications are not displayed as verified clinic focus', () => {
+  const clinic={categories:{name_en:'Urology'},is_premium:false};
+  assert.equal(evidence.clinicFocus(clinic),'Medical Clinic');
+  assert.equal(evidence.clinicFocus({...clinic,department_source:{provider:'HIRA'},categories:{name_en:'Pediatrics'}}),'Pediatrics');
+});
+
+test('specialist counts stay attached to the department that reported them', () => {
+  const list=evidence.groupedDepartments({departments:[
+    {code:'11',slug:'pediatrics',name_en:'Pediatrics',specialist_count:1},
+    {code:'15',slug:'urology',name_en:'Urology',specialist_count:0}
+  ]});
+  assert.equal(list.find(d=>d.slug==='urology').specialists,0);
+  assert.equal(list.find(d=>d.slug==='pediatrics').specialists,1);
 });

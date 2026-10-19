@@ -5,9 +5,11 @@ import { getClinics } from '@/lib/supabase';
 import { SITE_URL, clinicPath, serializeJsonLd } from '@/lib/site';
 import ClinicSearchClient from '@/components/ClinicSearchClient';
 import { stationForSlug, searchRadius } from '@/lib/stations';
+import departmentLabels from '@/lib/department-labels.json';
 
 export const dynamic = 'force-dynamic';
 const departments = ['all', 'urology', 'dentistry', 'internal-medicine', 'dermatology', 'plastic-surgery'];
+const supportedDepartments = new Set([...departments,...Object.keys(departmentLabels),'medical-clinic','general-hospital','long-term-care']);
 interface Props {
   params: { department: string; location: string };
   searchParams: { [key: string]: string | string[] | undefined };
@@ -16,7 +18,7 @@ function text(value: string | string[] | undefined) { return typeof value === 's
 function names(department: string, location: string) {
   const dict = getDictionary('en');
   return {
-    dept: department === 'all' ? 'Medical' : (dict as Record<string, string>)[department] || department,
+    dept: department === 'all' ? 'Medical' : (departmentLabels as Record<string,string>)[department] || (dict as Record<string, string>)[department] || department,
     loc: stationForSlug(location)?.name_en || (location === 'gangnam' ? 'Gangnam area (Gangnam-gu & Seocho-gu)' : location === 'all' ? 'Korea' : (dict as Record<string, string>)[location] || location.replace(/-/g, ' ')),
   };
 }
@@ -30,7 +32,7 @@ export function generateMetadata({ params, searchParams }: Props) {
   };
 }
 export default async function SearchPage({ params, searchParams }: Props) {
-  if (!departments.includes(params.department)) notFound();
+  if (!supportedDepartments.has(params.department)) notFound();
   const query = text(searchParams.q);
   const specialist = searchParams.specialist === '1';
   const station = stationForSlug(params.location);
@@ -64,7 +66,7 @@ export default async function SearchPage({ params, searchParams }: Props) {
           <input name="q" defaultValue={query} maxLength={200} className="block border rounded-lg px-3 py-2 w-full mt-1" placeholder="Search names or addresses" />
         </label>
         {station && <label className="text-sm font-semibold">Radius<select name="radius" defaultValue={String(radius)} className="block border rounded-lg px-3 py-2 mt-1"><option value="500">500 m</option><option value="1000">1 km</option><option value="2000">2 km</option></select></label>}
-        <label className="text-sm flex gap-2 py-2 items-center"><input type="checkbox" name="specialist" value="1" defaultChecked={specialist} /> Specialist recorded</label>
+        <label className="text-sm flex gap-2 py-2 items-center"><input type="checkbox" name="specialist" value="1" defaultChecked={specialist} /> {params.department==='all' ? 'Specialists reported' : `${dept} specialist reported`}</label>
         <button className="bg-slate-800 text-white rounded-lg px-4 py-2">Search</button>
       </form>
       <nav aria-label="Browse medical departments" className="flex flex-wrap gap-3 text-sm">
@@ -74,8 +76,8 @@ export default async function SearchPage({ params, searchParams }: Props) {
       <p className="text-sm text-slate-500" role={failed ? 'alert' : 'status'}>
         {failed ? 'Clinic information is temporarily unavailable. Please try again later.' : `Showing ${filteredClinics.length} clinic profiles${clinics.length === 100 ? ' from the first 100 matching records. Narrow your search for more specific results.' : '.'}`}
       </p>
-      <p className="text-xs text-slate-500">Specialist status reflects imported records and may concern a different department.</p>
-      {!failed && <ClinicSearchClient lang="en" filteredClinics={filteredClinics} mapCenter={mapCenter} />}
+      <p className="text-xs text-slate-500">Results use HIRA-reported departments. A reported department does not necessarily have a specialist. Clinic focus and full department details are shown separately.</p>
+      {!failed && <ClinicSearchClient lang="en" filteredClinics={filteredClinics} mapCenter={mapCenter} selectedDepartment={params.department} />}
     </div>
   </>;
 }

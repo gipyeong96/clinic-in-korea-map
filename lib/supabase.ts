@@ -150,7 +150,7 @@ export async function getClinics(params?: { categorySlug?: string, locationSlug?
   let query = supabase.from('clinics').select('*, categories!inner(*), locations!inner(*)');
   
   if (params?.categorySlug && params.categorySlug !== 'all') {
-    query = query.eq('categories.slug', params.categorySlug);
+    query = query.contains('departments', JSON.stringify([{slug:params.categorySlug}]));
   }
   
   if (addressPrefixes) {
@@ -168,7 +168,11 @@ export async function getClinics(params?: { categorySlug?: string, locationSlug?
   }
   // A nonempty query consisting only of punctuation cannot become an unfiltered search.
   if (params?.query?.trim() && terms.length === 0) return [];
-  if (params?.specialist) query = query.eq('has_specialist', true);
+  if (params?.specialist) {
+    query = params.categorySlug && params.categorySlug !== 'all'
+      ? query.contains('specialist_slugs', [params.categorySlug])
+      : query.eq('has_specialist', true).not('department_source','is',null);
+  }
 
   // Always bring premium first, then other clinics
   query = query.order('is_premium', { ascending: false }).order('id').limit(params?.limit || 100);

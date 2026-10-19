@@ -65,6 +65,9 @@ function toSlug(text) {
 async function main() {
   console.log("Loading merged clinics...");
   const data = JSON.parse(fs.readFileSync('./data/merged_clinics.json', 'utf8'));
+  // This legacy importer predates per-department evidence. It must not overwrite
+  // corrected classifications or specialist counts with its old priority model.
+  throw new Error('Legacy full-profile upload is disabled. Refresh department evidence with scripts/prepare-departments.py and db/apply-registry-departments.sql; preserve curated premium profiles.');
   
   // 1. Build Location Tree
   console.log("Building Location Tree...");

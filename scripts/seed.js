@@ -61,13 +61,10 @@ function getPrimaryCategory(clinicName, deptList) {
   if (clinicName.includes('성형')) return 5;
   
   if (deptList && deptList.length > 0) {
-    if (deptList.includes(1)) return 1;
-    if (deptList.includes(4)) return 4;
-    if (deptList.includes(5)) return 5;
-    if (deptList.includes(2)) return 2;
-    return deptList[0];
+    const unique = [...new Set(deptList)];
+    return unique.length === 1 ? unique[0] : null;
   }
-  return 3;
+  return null;
 }
 
 async function main() {
