@@ -7,6 +7,9 @@ CREATE TABLE IF NOT EXISTS public.foreign_patient_registry (
 );
 ALTER TABLE public.foreign_patient_registry ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.clinics ADD COLUMN IF NOT EXISTS foreign_patient_registration jsonb;
+ALTER TABLE public.clinics ADD COLUMN IF NOT EXISTS departments jsonb;
+ALTER TABLE public.clinics ADD COLUMN IF NOT EXISTS specialist_slugs text[];
+ALTER TABLE public.clinics ADD COLUMN IF NOT EXISTS department_source jsonb;
 
 CREATE TABLE IF NOT EXISTS public.rail_stations (
   id text PRIMARY KEY, name_ko text NOT NULL, line text NOT NULL,
@@ -33,8 +36,8 @@ CREATE OR REPLACE FUNCTION public.nearby_clinics(
       )))) FROM rail_stations s WHERE s.id = ANY(station_ids)) AS distance_m
     FROM clinics c JOIN categories cat ON cat.id=c.category_id
       JOIN locations loc ON loc.id=c.location_id
-    WHERE (category_slug='all' OR cat.slug=category_slug)
-      AND (NOT specialist_only OR c.has_specialist)
+    WHERE (category_slug='all' OR c.departments @> jsonb_build_array(jsonb_build_object('slug',category_slug)))
+      AND (NOT specialist_only OR CASE WHEN category_slug='all' THEN c.has_specialist AND c.department_source IS NOT NULL ELSE category_slug=ANY(c.specialist_slugs) END)
       AND NOT EXISTS (
         SELECT 1 FROM regexp_split_to_table(trim(search_query), '\s+') term
         WHERE term <> '' AND position(lower(term) IN lower(concat_ws(' ',c.name_en,c.name_ko,c.address_en,c.address_ko)))=0

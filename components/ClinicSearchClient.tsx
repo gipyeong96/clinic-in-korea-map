@@ -8,12 +8,14 @@ import MapContainer from '@/components/MapContainer';
 
 interface ClinicSearchClientProps {
   lang?: any;
+  selectedDepartment?: string;
   filteredClinics: any[];
   mapCenter: { lat: number; lng: number };
 }
 
 export default function ClinicSearchClient({
   lang,
+  selectedDepartment,
   filteredClinics,
   mapCenter: initialMapCenter
 }: ClinicSearchClientProps) {
@@ -87,7 +89,7 @@ export default function ClinicSearchClient({
                   : 'hover:scale-[1.005]'
               }`}
             >
-              <ClinicCard  clinic={clinic} />
+              <ClinicCard clinic={clinic} selectedDepartment={selectedDepartment} />
             </div>
           ))
         ) : (

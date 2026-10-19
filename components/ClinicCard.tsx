@@ -4,6 +4,8 @@
 import React from 'react';
 import Link from 'next/link';
 import { Phone, MapPin, Globe } from 'lucide-react';
+import { clinicFocus, groupedDepartments } from '@/lib/clinic-evidence';
+import RegistrationBadge from './RegistrationBadge';
 
 interface ClinicCardProps {
   clinic: {
@@ -22,12 +24,14 @@ interface ClinicCardProps {
   };
 }
 
-export default function ClinicCard({ clinic }: any) {
+export default function ClinicCard({ clinic, selectedDepartment='all' }: any) {
   const name = clinic.name_en || clinic.name_ko;
   const address = clinic.address_en || clinic.address_ko;
   const slogan = clinic.premium_data?.slogan_en;
   
-  const categoryName = clinic.categories?.name_en || clinic.category?.name_en || '';
+  const categoryName = clinicFocus(clinic);
+  const departments = groupedDepartments(clinic);
+  const selected = departments.find(d=>d.slug===selectedDepartment);
   const locationName = clinic.locations?.name_en || clinic.location?.name_en || '';
   const detailId = clinic.hira_code || clinic.id;
 
@@ -60,12 +64,15 @@ export default function ClinicCard({ clinic }: any) {
             {clinic.name_ko}
           </p>
         )}
+        <RegistrationBadge clinic={clinic} />
         {typeof clinic.distance_m === 'number' && <p className="text-sm font-semibold text-slate-700 mb-2">{clinic.station_name} · {Math.round(clinic.distance_m)} m <span className="text-xs font-normal">straight-line distance</span></p>}
         {(categoryName || locationName) && (
           <span className="text-xs text-slate-400 font-medium uppercase tracking-wider block mb-3">
             {categoryName} {categoryName && locationName ? '•' : ''} {locationName}
           </span>
         )}
+        {selected && <p className="text-xs text-slate-600 mb-2">{selected.name} reported · {selected.specialists>0 ? `${selected.specialists} specialist${selected.specialists===1?'':'s'} reported` : 'No specialist recorded in this department'}</p>}
+        {departments.length>0 && <p className="text-xs text-slate-500 mb-3">Reported departments: {departments.slice(0,3).map(d=>d.name).join(', ')}{departments.length>3 ? ` +${departments.length-3} more` : ''}</p>}
 
         {clinic.is_premium && slogan && (
           <p className="text-xs italic text-slate-600 mb-4 line-clamp-2">

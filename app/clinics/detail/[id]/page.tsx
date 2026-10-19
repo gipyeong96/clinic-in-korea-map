@@ -5,6 +5,8 @@ import { notFound } from 'next/navigation';
 import { getClinicById } from '@/lib/supabase';
 import { getDictionary } from '@/lib/translation';
 import { MapPin, Phone, Clock, Star, ShieldCheck, Info } from 'lucide-react';
+import { clinicFocus, groupedDepartments } from '@/lib/clinic-evidence';
+import RegistrationBadge from '@/components/RegistrationBadge';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -33,6 +35,9 @@ export default async function ClinicDetail({ params }: ClinicDetailProps) {
   const isPremium = clinic.is_premium;
   const pd = clinic.premium_data || {};
   const equip = clinic.public_equipment || [];
+  const departments = groupedDepartments(clinic);
+  const focus = clinicFocus(clinic);
+  const focusSlug = clinic.department_source || isPremium ? clinic.categories?.slug || 'all' : 'all';
   
   // MedicalClinic Schema (SEO/AEO/GEO)
   const medicalClinicSchema = {
@@ -41,7 +46,7 @@ export default async function ClinicDetail({ params }: ClinicDetailProps) {
     "@id": `${SITE_URL}${clinicPath(clinic)}`,
     "name": clinic.name_en,
     "alternateName": clinic.name_ko,
-    "medicalSpecialty": clinic.categories?.name_en,
+    "medicalSpecialty": departments.length ? departments.map(d=>d.name) : isPremium ? focus : undefined,
     "address": {
       "@type": "PostalAddress",
       "streetAddress": clinic.address_ko,
@@ -97,11 +102,11 @@ export default async function ClinicDetail({ params }: ClinicDetailProps) {
         <nav aria-label="Breadcrumb" className="text-xs text-slate-500 flex gap-2 font-medium">
           <Link href="/" className="hover:text-amber-500">Home</Link>
           <span>›</span>
-          <Link href={`/clinics/${clinic.categories?.slug || 'all'}/all`} className="hover:text-amber-500">
-            {clinic.categories?.name_en || 'Clinics'}
+          <Link href={`/clinics/${focusSlug}/all`} className="hover:text-amber-500">
+            {focus}
           </Link>
           <span>›</span>
-          <Link href={`/clinics/${clinic.categories?.slug || 'all'}/${clinic.locations?.slug || 'all'}`} className="hover:text-amber-500">
+          <Link href={`/clinics/${focusSlug}/${clinic.locations?.slug || 'all'}`} className="hover:text-amber-500">
             {clinic.locations?.name_en || 'Area'}
           </Link>
           <span>›</span>
@@ -114,22 +119,23 @@ export default async function ClinicDetail({ params }: ClinicDetailProps) {
             <div>
               <div className="flex items-center gap-3 mb-2">
                 <span className="text-xs font-bold px-2 py-1 bg-slate-100 text-slate-600 rounded">
-                  {clinic.categories?.name_en || 'Medical Clinic'}
+                  {focus}
                 </span>
                 {isPremium && (
                   <span className="flex items-center gap-1 text-xs font-bold px-2 py-1 bg-amber-100 text-amber-700 rounded">
                     <Star className="w-3 h-3" /> Premium Verified
                   </span>
                 )}
-                {clinic.has_specialist && (
+                {departments.some(d=>d.specialists>0) && (
                   <span className="flex items-center gap-1 text-xs font-bold px-2 py-1 bg-blue-50 text-blue-600 rounded border border-blue-100">
-                    <ShieldCheck className="w-3 h-3" /> Specialist
+                    <ShieldCheck className="w-3 h-3" /> Specialists reported — see departments below
                   </span>
                 )}
               </div>
               
               <h1 className="text-3xl font-black text-slate-900 mb-1">{clinic.name_en}</h1>
               <h2 className="text-sm font-medium text-slate-500">{clinic.name_ko}</h2>
+              <RegistrationBadge clinic={clinic} detailed />
             </div>
           </div>
           
@@ -151,6 +157,7 @@ export default async function ClinicDetail({ params }: ClinicDetailProps) {
           
           <table className="w-full text-sm text-left">
             <tbody className="divide-y divide-slate-100">
+              {departments.length>0 && <tr><th scope="row" className="px-6 py-4 font-semibold text-slate-700 bg-slate-50/50">Reported departments</th><td className="px-6 py-4"><ul className="space-y-2">{departments.map(d=><li key={d.slug}><span className="font-medium">{d.name}</span><span className="text-slate-500"> · {d.specialists} specialist{d.specialists===1?'':'s'} recorded</span></li>)}</ul><p className="mt-3 text-xs text-slate-500">Clinic focus is a directory classification; reported departments and specialist counts are listed separately.</p>{clinic.department_source?.provider==='HIRA' && <p className="mt-2 text-xs text-slate-500"><a className="underline" href="https://opendata.hira.or.kr/op/opc/selectOpenData.do?sno=11925" target="_blank" rel="noreferrer">HIRA official data</a> · As of {clinic.department_source.as_of} · Checked {clinic.department_source.checked_at}</p>}</td></tr>}
               <tr className="hover:bg-slate-50 transition-colors">
                 <th scope="row" className="px-6 py-4 font-semibold text-slate-700 bg-slate-50/50 w-1/3">Address</th>
                 <td className="px-6 py-4 font-medium text-slate-900">
