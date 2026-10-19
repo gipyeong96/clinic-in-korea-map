@@ -3,7 +3,7 @@
 import React from 'react';
 import { SITE_URL } from '@/lib/site';
 
-export const metadata = { alternates: { canonical: SITE_URL } };
+export const metadata = { title:'Find Clinics in Korea by Station, Region & Department | Korea Clinic Map', alternates: { canonical: SITE_URL } };
 import Link from 'next/link';
 import { getDictionary } from '@/lib/translation';
 import { mockClinics } from '@/lib/supabase';
