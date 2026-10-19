@@ -85,9 +85,29 @@ test('station searches use official line coordinates and database radius sorting
   assert.equal(call[1],'nearby_clinics');
   assert.equal(call[2].radius_m,500);
   assert.equal(call[2].category_slug,'dentistry');
-  assert.equal(call[2].station_ids.length,2);
+  assert.deepEqual(call[2].station_ids, stations.stationForSlug('seoul-station').stations.map(s=>s.id));
   assert.equal(search.homeSearchPath('Gangnam Station dentist'),'/clinics/dentistry/gangnam-station');
   assert.equal(stations.searchRadius('99999'),1000);
+});
+
+test('national stations retain provenance, distinct cities, stable URLs and valid coordinates', () => {
+  assert(stations.stationPages.length>1000);
+  assert.equal(new Set(stations.stationPages.map(s=>s.slug)).size,stations.stationPages.length);
+  for(const ko of ['서면역','반월당역','문화전당역','대전역']) assert(stations.stationPages.some(s=>s.name_ko===ko));
+  const jungang=stations.stationPages.filter(s=>s.name_ko==='중앙역');
+  assert(jungang.some(s=>s.city.includes('Busan')));
+  assert(jungang.some(s=>s.city.includes('Seoul')));
+  const busan=stations.stationPages.find(s=>s.name_ko==='서면역');
+  assert.equal(busan.stations.length,2);
+  assert(busan.stations.every(s=>s.latitude>35.15&&s.latitude<35.17&&s.longitude>129.05&&s.longitude<129.07));
+  for(const p of stations.stationPages) for(const s of p.stations){
+    assert(s.latitude>=33&&s.latitude<=39&&s.longitude>=124&&s.longitude<=132);
+    assert(/^https:\/\/(data.kric.go.kr|www.data.go.kr)\//.test(s.source_url));
+    assert(/^20\d\d-\d\d-\d\d$/.test(s.source_date));
+    assert(!['32','1294'].includes(s.source_id));
+  }
+  assert.equal(search.homeSearchPath('dentist Busan'),'/clinics/dentistry/busan');
+  assert.equal(search.homeSearchPath('Jeju'),'/clinics/all/jeju');
 });
 test('database failures are not silently presented as zero search results', async () => {
   const { api } = database({ error: { message: 'offline' } });
