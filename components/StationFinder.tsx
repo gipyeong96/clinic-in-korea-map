@@ -23,7 +23,8 @@ export default function StationFinder() {
       <label className="text-sm font-semibold">Line<select value={line} onChange={e => setLine(e.target.value)} className="block w-full border rounded-lg p-3 mt-1"><option value="">All lines</option>{lines.map(l => <option key={l}>{l}</option>)}</select></label>
     </div>
     <label className="block text-sm font-semibold">Station name<input value={query} onChange={e => setQuery(e.target.value)} placeholder="English or 한국어" className="block w-full border rounded-lg p-3 mt-1" /></label>
-    <p role="status" className="text-xs text-slate-500">{matches.length} stations · Choose a station to find nearby clinics.</p>
+    <p role="status" className="text-xs text-slate-500">{matches.length} station{matches.length===1?'':'s'} · Choose a station to find nearby clinics.</p>
+    <Link href="/stations" className="inline-block underline text-sm">Browse all stations by region</Link>
     <div className="grid sm:grid-cols-2 gap-2 max-h-80 overflow-y-auto">{matches.slice(0, 100).map(s => <Link key={s.slug} href={`/clinics/all/${s.slug}`} className="border rounded-lg p-3 hover:border-amber-500 focus-visible:ring-2 focus-visible:ring-amber-500"><span className="block font-semibold text-sm">{s.name_en} <span className="font-normal">· {s.name_ko}</span></span><span className="block text-xs text-slate-500">{s.city} · {s.stations.map(l => l.line).join(' / ')}</span></Link>)}</div>
     {matches.length > 100 && <p className="text-xs text-slate-500">Showing the first 100. Select a region or enter a station name to narrow your search.</p>}
     {!matches.length && <p className="text-sm">No matching station in the available official data. Try another name or <Link className="underline" href="/clinics/all/all">search clinics by address</Link>.</p>}

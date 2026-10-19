@@ -19,7 +19,7 @@ function names(department: string, location: string) {
   const dict = getDictionary('en');
   return {
     dept: department === 'all' ? 'Medical' : (departmentLabels as Record<string,string>)[department] || (dict as Record<string, string>)[department] || department,
-    loc: stationForSlug(location)?.name_en || (location === 'gangnam' ? 'Gangnam area (Gangnam-gu & Seocho-gu)' : location === 'all' ? 'Korea' : (dict as Record<string, string>)[location] || location.replace(/-/g, ' ')),
+    loc: stationForSlug(location) ? `${stationForSlug(location)!.name_en}, ${stationForSlug(location)!.city}` : (location === 'gangnam' ? 'Gangnam area (Gangnam-gu & Seocho-gu)' : location === 'all' ? 'Korea' : (dict as Record<string, string>)[location] || location.replace(/-/g, ' ').replace(/\b\w/g,c=>c.toUpperCase())),
   };
 }
 export function generateMetadata({ params, searchParams }: Props) {

@@ -2,6 +2,7 @@ import { MetadataRoute } from 'next';
 import { mockClinics } from '@/lib/supabase';
 import { mockArticles } from '@/lib/articles';
 import { stationPages } from '@/lib/stations';
+import { stationRegions } from '@/lib/station-regions';
 import { SITE_URL, clinicPath } from '@/lib/site';
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -9,6 +10,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const locations = ['all', 'gangnam', 'seoul-station', 'gangnam-station', 'jamsil-station', 'jamsil', 'incheon', 'dongtan', 'busan', 'daegu', 'daejeon', 'gwangju', 'ulsan', 'jeju'];
   return [
     { url: SITE_URL, changeFrequency: 'weekly', priority: 1 },
+    { url: `${SITE_URL}/stations`, changeFrequency: 'monthly', priority: 0.8 },
+    ...stationRegions.map(r=>({url:`${SITE_URL}/stations/${r.slug}`,changeFrequency:'monthly' as const,priority:0.7})),
     { url: `${SITE_URL}/articles`, changeFrequency: 'monthly', priority: 0.6 },
     ...departments.flatMap(department => locations.map(location => ({
       url: `${SITE_URL}/clinics/${department}/${location}`,

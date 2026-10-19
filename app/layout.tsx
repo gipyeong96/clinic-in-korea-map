@@ -8,7 +8,7 @@ export const metadata = {
   verification: {
     google: 'WNYvoNAI9IV16XsH5Q1TFZQStHHmO9yrUm6R5Q6pPUY',
   },
-  description: 'Find English-speaking clinics near you in Korea',
+  description: 'Find clinics and hospitals across Korea by station, region and medical department. Compare nearby options using official healthcare and railway records.',
 }
 
 export default function RootLayout({
@@ -73,7 +73,8 @@ export default function RootLayout({
           <footer className="bg-slate-900 text-slate-500 text-xs py-8 px-4 border-t border-slate-800 text-center space-y-4">
             <div className="max-w-6xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
               <p>© {new Date().getFullYear()} Korea Clinic Map. All rights reserved.</p>
-              <div className="flex gap-4">
+              <div className="flex flex-wrap justify-center gap-4">
+                <Link href="/stations" className="hover:text-slate-300">Stations across Korea</Link>
                 <Link href="/clinics/urology/gangnam" className="hover:text-slate-300">Urology Gangnam</Link>
                 <Link href="/clinics/urology/seoul-station" className="hover:text-slate-300">Urology Seoul Station</Link>
                 <Link href="/clinics/urology/jamsil" className="hover:text-slate-300">Urology Jamsil</Link>
