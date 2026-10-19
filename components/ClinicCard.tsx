@@ -60,6 +60,7 @@ export default function ClinicCard({ clinic }: any) {
             {clinic.name_ko}
           </p>
         )}
+        {typeof clinic.distance_m === 'number' && <p className="text-sm font-semibold text-slate-700 mb-2">{clinic.station_name} · {Math.round(clinic.distance_m)} m <span className="text-xs font-normal">straight-line distance</span></p>}
         {(categoryName || locationName) && (
           <span className="text-xs text-slate-400 font-medium uppercase tracking-wider block mb-3">
             {categoryName} {categoryName && locationName ? '•' : ''} {locationName}

@@ -5,7 +5,7 @@ import { SITE_URL, clinicPath } from '@/lib/site';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const departments = ['all', 'urology', 'dentistry', 'internal-medicine', 'dermatology', 'plastic-surgery'];
-  const locations = ['all', 'gangnam', 'seoul-station', 'jamsil', 'incheon', 'dongtan'];
+  const locations = ['all', 'gangnam', 'seoul-station', 'gangnam-station', 'jamsil-station', 'jamsil', 'incheon', 'dongtan'];
   return [
     { url: SITE_URL, changeFrequency: 'weekly', priority: 1 },
     { url: `${SITE_URL}/articles`, changeFrequency: 'monthly', priority: 0.6 },

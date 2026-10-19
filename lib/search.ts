@@ -11,6 +11,8 @@ export function homeSearchPath(input: string) {
     [/\bplastic(?:[ -]+surgery)?\b/, 'plastic-surgery'],
   ];
   const locations: [RegExp, string][] = [
+    [/\bgangnam[ -]+station\b/, 'gangnam-station'],
+    [/\bjamsil[ -]+station\b/, 'jamsil-station'],
     [/\bseoul[ -]+station\b/, 'seoul-station'],
     [/\bgangnam\b/, 'gangnam'], [/\bjamsil\b/, 'jamsil'],
     [/\bincheon\b/, 'incheon'], [/\bdongtan\b/, 'dongtan'],
