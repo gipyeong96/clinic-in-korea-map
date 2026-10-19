@@ -1,6 +1,6 @@
 # Nationwide station search
 
-The station directory contains 1,129 search pages and 1,283 line coordinate records. It is a directory of dated official records, not a live service map or timetable. It does not claim every currently operating railway station is present. Stations without verified coordinates or an English name are excluded. Regional rail entries are separate from urban rail and do not imply a particular train stops there today.
+The station directory contains 1,127 search pages and 1,281 line coordinate records. It is a directory of dated official records, not a live service map or timetable. It does not claim every currently operating railway station is present. Stations without verified coordinates or an English name are excluded. Regional rail entries are separate from urban rail and do not imply a particular train stops there today.
 
 ## Inputs
 

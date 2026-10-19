@@ -421,28 +421,6 @@
     "source_date": "2026-05-20"
   },
   {
-    "slug": "station-95d4c9b8f92c7a",
-    "name_ko": "국제금융센터·부산은행역",
-    "name_en": "Busan Int’l Finance Center·Busan Bank Station",
-    "city": "Busan · Ulsan · Gimhae",
-    "stations": [
-      {
-        "name_ko": "국제금융센터·부산은행역",
-        "name_en": "Busan Int’l Finance Center·Busan Bank Station",
-        "city": "Busan · Ulsan · Gimhae",
-        "line": "Line 2",
-        "latitude": 35.14583,
-        "longitude": 129.06672,
-        "source_date": "2022-11-30",
-        "source_url": "https://data.kric.go.kr/rips/M_01_01/detail.do?id=37",
-        "source_id": "37",
-        "id": "kric-4b0d563a7e81779e1d"
-      }
-    ],
-    "source_url": "https://data.kric.go.kr/rips/M_01_01/detail.do?id=37",
-    "source_date": "2022-11-30"
-  },
-  {
     "slug": "station-84568853835b45",
     "name_ko": "부산역",
     "name_en": "Busan Station",
@@ -465,13 +443,13 @@
     "source_date": "2026-05-31"
   },
   {
-    "slug": "station-94e585f0db641d",
-    "name_ko": "국제금융센터ㆍ부산은행역",
+    "slug": "station-95d4c9b8f92c7a",
+    "name_ko": "국제금융센터·부산은행역",
     "name_en": "BusanInt'l FinanceCenter·BusanBank Station",
     "city": "Busan · Ulsan · Gimhae",
     "stations": [
       {
-        "name_ko": "국제금융센터ㆍ부산은행역",
+        "name_ko": "국제금융센터·부산은행역",
         "name_en": "BusanInt'l FinanceCenter·BusanBank Station",
         "city": "Busan · Ulsan · Gimhae",
         "line": "Line 2",
@@ -480,7 +458,7 @@
         "source_date": "2026-05-31",
         "source_url": "https://data.kric.go.kr/rips/M_01_01/detail.do?id=88",
         "source_id": "88",
-        "id": "kric-5e037bfb0fd9097c98"
+        "id": "kric-4b0d563a7e81779e1d"
       }
     ],
     "source_url": "https://data.kric.go.kr/rips/M_01_01/detail.do?id=88",
@@ -2145,33 +2123,11 @@
   {
     "slug": "station-e1b1af111a462c",
     "name_ko": "경성대·부경대역",
-    "name_en": "Kyungsung Univ.·Pukyong Nat’l Univ. Station",
-    "city": "Busan · Ulsan · Gimhae",
-    "stations": [
-      {
-        "name_ko": "경성대·부경대역",
-        "name_en": "Kyungsung Univ.·Pukyong Nat’l Univ. Station",
-        "city": "Busan · Ulsan · Gimhae",
-        "line": "Line 2",
-        "latitude": 35.13757,
-        "longitude": 129.10055,
-        "source_date": "2022-11-30",
-        "source_url": "https://data.kric.go.kr/rips/M_01_01/detail.do?id=37",
-        "source_id": "37",
-        "id": "kric-36153322164788270e"
-      }
-    ],
-    "source_url": "https://data.kric.go.kr/rips/M_01_01/detail.do?id=37",
-    "source_date": "2022-11-30"
-  },
-  {
-    "slug": "station-2aedd423327e50",
-    "name_ko": "경성대ㆍ부경대역",
     "name_en": "KyungsungUnivㆍ·PukyongNat'lUniv. Station",
     "city": "Busan · Ulsan · Gimhae",
     "stations": [
       {
-        "name_ko": "경성대ㆍ부경대역",
+        "name_ko": "경성대·부경대역",
         "name_en": "KyungsungUnivㆍ·PukyongNat'lUniv. Station",
         "city": "Busan · Ulsan · Gimhae",
         "line": "Line 2",
@@ -2180,7 +2136,7 @@
         "source_date": "2026-05-31",
         "source_url": "https://data.kric.go.kr/rips/M_01_01/detail.do?id=88",
         "source_id": "88",
-        "id": "kric-5fae74599554ed42eb"
+        "id": "kric-36153322164788270e"
       }
     ],
     "source_url": "https://data.kric.go.kr/rips/M_01_01/detail.do?id=88",

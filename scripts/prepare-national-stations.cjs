@@ -6,7 +6,7 @@ const root = require('node:path').join(__dirname, '..');
 const manifest = JSON.parse(fs.readFileSync(`${root}/data/rail/manifest.json`, 'utf8').replace(/^\uFEFF/, ''));
 const issues = [];
 const clean = v => String(v ?? '').trim();
-const key = v => clean(v).replace(/\s/g, '').replace(/\([^)]*\)/g, '').replace(/역$/, '');
+const key = v => clean(v).replace(/\s/g, '').replace(/[ㆍ・]/g, '·').replace(/\([^)]*\)/g, '').replace(/역$/, '');
 function date(v, fallback) {
   if (typeof v === 'number' && v < 100000) { const d=xlsx.SSF.parse_date_code(v); return `${d.y}-${String(d.m).padStart(2,'0')}-${String(d.d).padStart(2,'0')}`; }
   const s=clean(v).replace(/[^0-9]/g,'');
