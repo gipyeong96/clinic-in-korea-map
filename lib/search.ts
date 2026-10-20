@@ -1,3 +1,11 @@
+import {extractRegion} from './regions';
+export function searchLink(department:string,location:string,options:{query?:string;specialist?:boolean;radius?:number}={}) {
+  const params=new URLSearchParams();
+  if(options.query)params.set('q',options.query);
+  if(options.specialist)params.set('specialist','1');
+  if(options.radius)params.set('radius',String(options.radius));
+  return `/clinics/${department}/${location}${params.size?'?'+params.toString():''}`;
+}
 // Match complete words and preserve unrecognized terms instead of silently dropping them.
 export function homeSearchPath(input: string) {
   let remaining = input.trim().toLowerCase().slice(0, 200);
@@ -24,7 +32,10 @@ export function homeSearchPath(input: string) {
   for (const [pattern, slug] of departments) {
     if (pattern.test(remaining)) { department = slug; remaining = remaining.replace(pattern, ' '); break; }
   }
+  const region=extractRegion(remaining);
+  if(region&&!/\bstation\b|역/.test(remaining)){location=region.slug;remaining=region.query;}
   for (const [pattern, slug] of locations) {
+    if(location!=='all')break;
     if (pattern.test(remaining)) { location = slug; remaining = remaining.replace(pattern, ' '); break; }
   }
   const query = remaining.trim().replace(/\s+/g, ' ');
