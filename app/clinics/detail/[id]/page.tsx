@@ -7,6 +7,8 @@ import { getDictionary } from '@/lib/translation';
 import { MapPin, Phone, Clock, Star, ShieldCheck, Info } from 'lucide-react';
 import { clinicFocus, groupedDepartments } from '@/lib/clinic-evidence';
 import RegistrationBadge from '@/components/RegistrationBadge';
+import ClinicContact from '@/components/ClinicContact';
+import {clinicName,clinicAddress,clinicPhone} from '@/lib/clinic-contact';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -20,7 +22,7 @@ export async function generateMetadata({ params }: ClinicDetailProps) {
   if (!clinic) return { title: 'Clinic Not Found' };
 
   return {
-    title: `${clinic.name_en} | Korea Clinic Map`,
+    title: `${clinicName(clinic)} | Korea Clinic Map`,
     description: `Contact information, operating hours, and medical equipment details for ${clinic.name_en} in ${clinic.locations?.name_en || 'Korea'}.`,
     alternates: {
       canonical: `${SITE_URL}${clinicPath(clinic)}`,
@@ -33,6 +35,7 @@ export default async function ClinicDetail({ params }: ClinicDetailProps) {
   if (!clinic) return notFound();
 
   const isPremium = clinic.is_premium;
+  const name=clinicName(clinic),address=clinicAddress(clinic),phone=clinicPhone(clinic.telephone);
   const pd = clinic.premium_data || {};
   const equip = clinic.public_equipment || [];
   const departments = groupedDepartments(clinic);
@@ -44,7 +47,7 @@ export default async function ClinicDetail({ params }: ClinicDetailProps) {
     "@context": "https://schema.org",
     "@type": "MedicalClinic",
     "@id": `${SITE_URL}${clinicPath(clinic)}`,
-    "name": clinic.name_en,
+    "name": name,
     "alternateName": clinic.name_ko,
     "medicalSpecialty": departments.length ? departments.map(d=>d.name) : isPremium ? focus : undefined,
     "address": {
@@ -52,7 +55,7 @@ export default async function ClinicDetail({ params }: ClinicDetailProps) {
       "streetAddress": clinic.address_ko,
       "addressCountry": "KR"
     },
-    "telephone": clinic.telephone,
+    "telephone": phone.href?phone.display:undefined,
     "geo": {
       "@type": "GeoCoordinates",
       "latitude": clinic.latitude,
@@ -79,7 +82,7 @@ export default async function ClinicDetail({ params }: ClinicDetailProps) {
         "name": `What is the phone number for ${clinic.name_en}?`,
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": `You can contact them at ${clinic.telephone}.`
+          "text": phone.href?`You can contact them at ${phone.display}.`:'A full telephone number is not provided. Confirm the number before calling.'
         }
       }
     ]
@@ -96,10 +99,10 @@ export default async function ClinicDetail({ params }: ClinicDetailProps) {
         dangerouslySetInnerHTML={{ __html: serializeJsonLd(faqSchema) }}
       />
       
-      <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
+      <div className="max-w-4xl mx-auto px-4 py-8 space-y-6 min-w-0 break-words">
         
         {/* Breadcrumb Navigation (Semantic AEO/SEO) */}
-        <nav aria-label="Breadcrumb" className="text-xs text-slate-500 flex gap-2 font-medium">
+        <nav aria-label="Breadcrumb" className="text-xs text-slate-500 flex flex-wrap gap-2 font-medium">
           <Link href="/" className="hover:text-amber-500">Home</Link>
           <span>›</span>
           <Link href={`/clinics/${focusSlug}/all`} className="hover:text-amber-500">
@@ -115,9 +118,9 @@ export default async function ClinicDetail({ params }: ClinicDetailProps) {
 
         {/* Header Section */}
         <section className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
-          <div className="flex justify-between items-start">
-            <div>
-              <div className="flex items-center gap-3 mb-2">
+          <div className="flex justify-between items-start min-w-0">
+            <div className="min-w-0 w-full">
+              <div className="flex flex-wrap items-center gap-2 mb-2">
                 <span className="text-xs font-bold px-2 py-1 bg-slate-100 text-slate-600 rounded">
                   {focus}
                 </span>
@@ -128,12 +131,12 @@ export default async function ClinicDetail({ params }: ClinicDetailProps) {
                 )}
                 {departments.some(d=>d.specialists>0) && (
                   <span className="flex items-center gap-1 text-xs font-bold px-2 py-1 bg-blue-50 text-blue-600 rounded border border-blue-100">
-                    <ShieldCheck className="w-3 h-3" /> Specialists reported — see departments below
+                    <ShieldCheck className="w-3 h-3 shrink-0" /><span className="min-w-0">Specialists reported — see departments below</span>
                   </span>
                 )}
               </div>
               
-              <h1 className="text-3xl font-black text-slate-900 mb-1">{clinic.name_en}</h1>
+              <h1 className="text-2xl sm:text-3xl font-black text-slate-900 mb-1 break-words">{name}</h1>
               <h2 className="text-sm font-medium text-slate-500">{clinic.name_ko}</h2>
               <RegistrationBadge clinic={clinic} detailed />
             </div>
@@ -146,6 +149,11 @@ export default async function ClinicDetail({ params }: ClinicDetailProps) {
           )}
         </section>
 
+        <section className="bg-white rounded-xl border p-4 space-y-3" aria-label="Plan your visit">
+          <p className="text-sm font-medium select-all">{address||'Address not provided'}</p>
+          <ClinicContact clinic={clinic} />
+        </section>
+
         {/* Semantic Table for AEO (AI bots easily parse tables) */}
         <section className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
           <div className="p-6 border-b border-slate-100">
@@ -155,7 +163,7 @@ export default async function ClinicDetail({ params }: ClinicDetailProps) {
             </h2>
           </div>
           
-          <table className="w-full text-sm text-left">
+          <table className="clinic-info-table w-full text-sm text-left">
             <tbody className="divide-y divide-slate-100">
               {departments.length>0 && <tr><th scope="row" className="px-6 py-4 font-semibold text-slate-700 bg-slate-50/50">Reported departments</th><td className="px-6 py-4"><ul className="space-y-2">{departments.map(d=><li key={d.slug}><span className="font-medium">{d.name}</span><span className="text-slate-500"> · {d.specialists} specialist{d.specialists===1?'':'s'} recorded</span></li>)}</ul><p className="mt-3 text-xs text-slate-500">Clinic focus is a directory classification; reported departments and specialist counts are listed separately.</p>{clinic.department_source?.provider==='HIRA' && <p className="mt-2 text-xs text-slate-500"><a className="underline" href="https://opendata.hira.or.kr/op/opc/selectOpenData.do?sno=11925" target="_blank" rel="noreferrer">HIRA official data</a> · As of {clinic.department_source.as_of} · Checked {clinic.department_source.checked_at}</p>}</td></tr>}
               <tr className="hover:bg-slate-50 transition-colors">
@@ -163,7 +171,7 @@ export default async function ClinicDetail({ params }: ClinicDetailProps) {
                 <td className="px-6 py-4 font-medium text-slate-900">
                   <div className="flex items-start gap-2">
                     <MapPin className="w-4 h-4 text-slate-400 mt-0.5 flex-shrink-0" />
-                    <span>{clinic.address_ko}</span>
+                    <span className="select-all">{address||'Not provided'}</span>
                   </div>
                 </td>
               </tr>
@@ -172,7 +180,7 @@ export default async function ClinicDetail({ params }: ClinicDetailProps) {
                 <td className="px-6 py-4 font-medium text-slate-900">
                   <div className="flex items-center gap-2">
                     <Phone className="w-4 h-4 text-slate-400 flex-shrink-0" />
-                    <span>{clinic.telephone || 'Not provided'}</span>
+                    {phone.href?<a className="underline min-h-11 inline-flex items-center" href={phone.href}>{phone.display}</a>:<span>{phone.display||'Not provided'}</span>}
                   </div>
                 </td>
               </tr>

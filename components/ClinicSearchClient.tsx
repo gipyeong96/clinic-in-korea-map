@@ -5,6 +5,7 @@ import { Locale, getDictionary } from '@/lib/translation';
 import ClinicCard from '@/components/ClinicCard';
 import { clinicPath } from '@/lib/site';
 import MapContainer from '@/components/MapContainer';
+import {clinicName,clinicAddress,hasClinicCoordinates} from '@/lib/clinic-contact';
 
 interface ClinicSearchClientProps {
   lang?: any;
@@ -23,21 +24,23 @@ export default function ClinicSearchClient({
   const [activeClinicId, setActiveClinicId] = useState<string | null>(null);
   const [currentMapCenter, setCurrentMapCenter] = useState(initialMapCenter);
   const [zoom, setZoom] = useState(13);
+  const [view,setView]=useState<'list'|'map'>('list');
 
   // Sync state if initial map center changes due to department/location dynamic updates
   useEffect(() => {
     setCurrentMapCenter(initialMapCenter);
     setActiveClinicId(null);
+    setView('list');
     setZoom(13);
   }, [initialMapCenter]);
 
   // Transform clinics to markers format
-  const mapMarkers = filteredClinics.map((c) => ({
+  const mapMarkers = filteredClinics.filter(hasClinicCoordinates).map((c) => ({
     id: c.id,
-    name: c.name_en,
+    name: clinicName(c),
     lat: c.latitude,
     lng: c.longitude,
-    address: c.address_en || c.address_ko,
+    address: clinicAddress(c),
     telephone: c.telephone,
     detailHref: clinicPath(c),
     isPremium: c.is_premium
@@ -45,51 +48,51 @@ export default function ClinicSearchClient({
 
   const handleMarkerClick = (id: string) => {
     setActiveClinicId(id);
+    setView('list');
     const clickedClinic = filteredClinics.find((c) => c.id === id);
     if (clickedClinic) {
       setCurrentMapCenter({ lat: clickedClinic.latitude, lng: clickedClinic.longitude });
       setZoom(15);
       
       // Scroll the matching card into view smoothly
-      setTimeout(() => {
+      requestAnimationFrame(() => {
         const element = document.getElementById(`clinic-card-${id}`);
         if (element) {
-          const list = element.parentElement;
-          if (list) {
-            list.scrollTo({
-              top: list.scrollTop + element.getBoundingClientRect().top - list.getBoundingClientRect().top,
-              behavior: 'smooth',
-            });
-          }
+          element.scrollIntoView({behavior:'smooth',block:'nearest'});
         }
-      }, 50);
+      });
     }
   };
 
   const handleCardFocus = (id: string, lat: number, lng: number) => {
+    setView('map');
     setActiveClinicId(id);
     setCurrentMapCenter({ lat, lng });
     setZoom(15);
+    requestAnimationFrame(()=>{if(window.matchMedia('(max-width:1023px)').matches)document.getElementById('clinic-results-map')?.scrollIntoView({behavior:'smooth',block:'start'});});
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 items-start">
+    <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 items-start min-w-0">
+      <div className="lg:hidden col-span-full flex gap-2 sticky top-14 z-20 bg-slate-50 py-2" role="group" aria-label="Results view">
+        <button type="button" aria-pressed={view==='list'} onClick={()=>setView('list')} className={`min-h-11 flex-1 border rounded-lg font-semibold ${view==='list'?'bg-slate-900 text-white':'bg-white'}`}>Clinic list</button>
+        <button type="button" aria-pressed={view==='map'} onClick={()=>setView('map')} className={`min-h-11 flex-1 border rounded-lg font-semibold ${view==='map'?'bg-slate-900 text-white':'bg-white'}`}>Map</button>
+      </div>
       {/* Clinic Cards List Column */}
-      <div className="lg:col-span-3 flex flex-col gap-4">
-        <div className="space-y-4 max-h-[700px] overflow-y-auto pr-2">
+      <div className={`lg:col-span-3 min-w-0 ${view==='map'?'hidden lg:block':''}`}>
+        <div className="space-y-4 lg:max-h-[700px] lg:overflow-y-auto lg:pr-2">
         {filteredClinics.length > 0 ? (
           filteredClinics.map((clinic) => (
             <div 
               key={clinic.id} 
               id={`clinic-card-${clinic.id}`}
-              onClick={() => handleCardFocus(clinic.id, clinic.latitude, clinic.longitude)}
-              className={`cursor-pointer rounded-xl transition-all duration-300 ${
+              className={`scroll-mt-28 rounded-xl transition-all duration-300 ${
                 activeClinicId === clinic.id 
                   ? 'ring-2 ring-amber-500 ring-offset-2 scale-[1.01] shadow-md' 
                   : 'hover:scale-[1.005]'
               }`}
             >
-              <ClinicCard clinic={clinic} selectedDepartment={selectedDepartment} />
+              <ClinicCard clinic={clinic} selectedDepartment={selectedDepartment} onShowMap={()=>handleCardFocus(clinic.id,clinic.latitude,clinic.longitude)} />
             </div>
           ))
         ) : (
@@ -102,7 +105,7 @@ export default function ClinicSearchClient({
       </div>
 
       {/* Google Maps Container Sticky Column */}
-      <div className="lg:col-span-2 lg:sticky lg:top-24 h-[500px] lg:h-[680px]">
+      <div id="clinic-results-map" className={`scroll-mt-28 lg:col-span-2 min-w-0 lg:sticky lg:top-24 h-[420px] lg:h-[680px] ${view==='list'?'hidden lg:block':''}`}>
         <MapContainer 
           apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}
           center={currentMapCenter}

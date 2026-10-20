@@ -1,3 +1,10 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@media (max-width: 639px) {
+  .clinic-info-table { table-layout: fixed; overflow-wrap: anywhere; }
+  .clinic-info-table tr, .clinic-info-table th, .clinic-info-table td { display: block; width: 100%; }
+  .clinic-info-table th { padding: 12px 16px 4px; }
+  .clinic-info-table td { padding: 8px 16px 16px; }
+}
