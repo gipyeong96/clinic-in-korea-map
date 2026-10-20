@@ -6,6 +6,9 @@ import Link from 'next/link';
 import { Phone, MapPin, Globe } from 'lucide-react';
 import { clinicFocus, groupedDepartments } from '@/lib/clinic-evidence';
 import RegistrationBadge from './RegistrationBadge';
+import ClinicContact from './ClinicContact';
+import {clinicName,clinicAddress,clinicPhone,hasClinicCoordinates} from '@/lib/clinic-contact';
+import {clinicPath} from '@/lib/site';
 
 interface ClinicCardProps {
   clinic: {
@@ -24,20 +27,21 @@ interface ClinicCardProps {
   };
 }
 
-export default function ClinicCard({ clinic, selectedDepartment='all' }: any) {
-  const name = clinic.name_en || clinic.name_ko;
-  const address = clinic.address_en || clinic.address_ko;
+export default function ClinicCard({ clinic, selectedDepartment='all', onShowMap }: any) {
+  const name = clinicName(clinic);
+  const address = clinicAddress(clinic);
+  const phone=clinicPhone(clinic.telephone);
   const slogan = clinic.premium_data?.slogan_en;
   
   const categoryName = clinicFocus(clinic);
   const departments = groupedDepartments(clinic);
   const selected = departments.find(d=>d.slug===selectedDepartment);
   const locationName = clinic.locations?.name_en || clinic.location?.name_en || '';
-  const detailId = clinic.hira_code || clinic.id;
+  const detailHref = clinicPath(clinic);
 
   return (
     <div 
-      className={`p-5 rounded-xl border transition shadow-sm hover:shadow-md flex flex-col justify-between ${
+      className={`min-w-0 break-words p-5 rounded-xl border transition shadow-sm hover:shadow-md flex flex-col justify-between ${
         clinic.is_premium 
           ? 'bg-amber-50/50 border-amber-300 ring-1 ring-amber-300/30' 
           : 'bg-white border-slate-200'
@@ -54,7 +58,7 @@ export default function ClinicCard({ clinic, selectedDepartment='all' }: any) {
           </span>
         </div>
 
-        <Link href={`/clinics/detail/${detailId}`}>
+        <Link href={detailHref}>
           <h3 className="text-lg font-bold text-slate-800 hover:text-emerald-600 transition mb-0.5 leading-snug">
             {name}
           </h3>
@@ -83,19 +87,19 @@ export default function ClinicCard({ clinic, selectedDepartment='all' }: any) {
         <div className="space-y-2 text-xs text-slate-500">
           <div className="flex items-start gap-2">
             <MapPin className="w-3.5 h-3.5 text-slate-400 mt-0.5 shrink-0" />
-            <span className="line-clamp-2">{address}</span>
+              <span className="line-clamp-2">{address || 'Address not provided'}</span>
           </div>
-          {clinic.telephone && (
-            <div className="flex items-center gap-2">
+          {phone.display && (
+            <div aria-label="Clinic telephone" className="flex items-center gap-2">
               <Phone className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-              <span>{clinic.telephone}</span>
+              <span>{phone.display}</span>
             </div>
           )}
         </div>
         
         {/* Public Facilities & Equipment Badges */}
         {((clinic.public_equipment?.length ?? 0) > 0 || (clinic.public_facilities?.inpatient_beds ?? 0) > 0) && (
-          <div className="mt-4 flex flex-wrap gap-1.5">
+          <div role="group" aria-label="Equipment and facilities" className="mt-4 border-t border-slate-100 pt-3 flex flex-wrap gap-1.5">
             {clinic.public_equipment?.map((eq: string) => (
               <span key={eq} className="px-1.5 py-0.5 bg-slate-100 text-slate-500 text-[10px] rounded border border-slate-200">
                 {eq}
@@ -115,10 +119,12 @@ export default function ClinicCard({ clinic, selectedDepartment='all' }: any) {
         )}
       </div>
 
-      <div className="mt-5 pt-3 border-t border-slate-100 flex gap-2">
+      <div className="mt-5 pt-3 border-t border-slate-100 space-y-2">
+        <ClinicContact clinic={clinic} compact />
+        <div className="flex gap-2">
         <Link 
-          href={`/clinics/detail/${detailId}`}
-          className={`flex-1 text-center py-2 rounded-lg text-xs font-semibold transition ${
+          href={detailHref}
+          className={`min-h-11 flex-1 inline-flex items-center justify-center text-center py-2 rounded-lg text-sm font-semibold transition ${
             clinic.is_premium
               ? 'bg-amber-500 hover:bg-amber-600 text-white'
             : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
@@ -126,6 +132,7 @@ export default function ClinicCard({ clinic, selectedDepartment='all' }: any) {
         >
           View Details
         </Link>
+        {onShowMap&&hasClinicCoordinates(clinic)&&<button type="button" onClick={onShowMap} className="min-h-11 border rounded-lg px-3 py-2 text-sm font-semibold">Show on map</button>}
         {clinic.is_premium && clinic.premium_data?.website && (
           <a
             href={clinic.premium_data.website}
@@ -137,6 +144,7 @@ export default function ClinicCard({ clinic, selectedDepartment='all' }: any) {
             <Globe className="w-4 h-4" />
           </a>
         )}
+        </div>
       </div>
     </div>
   );
