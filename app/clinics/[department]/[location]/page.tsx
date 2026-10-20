@@ -2,6 +2,7 @@ import React from 'react';
 import { notFound, redirect } from 'next/navigation';
 import { extractRegion, gyeonggiRegions } from '@/lib/regions';
 import { searchLink } from '@/lib/search';
+import { PAGE_SIZE, MAX_PAGE, searchPage } from '@/lib/pagination';
 import { getDictionary } from '@/lib/translation';
 import { getClinics } from '@/lib/supabase';
 import { SITE_URL, clinicPath, serializeJsonLd } from '@/lib/site';
@@ -40,16 +41,19 @@ export default async function SearchPage({ params, searchParams }: Props) {
   const specialist = searchParams.specialist === '1';
   const station = stationForSlug(params.location);
   const radius = searchRadius(searchParams.radius);
+  const page=searchPage(searchParams.page);
+  const offset=(page-1)*PAGE_SIZE;
   const region=params.location==='all'?extractRegion(query):null;
-  if(region)redirect(searchLink(params.department,region.slug,{query:region.query,specialist}));
+  if(region)redirect(searchLink(params.department,region.slug,{query:region.query,specialist,page}));
   let clinics: any[] = [];
   let failed = false;
   try {
-    clinics = await getClinics({ categorySlug: params.department, locationSlug: params.location, query, specialist, limit: 100, radius });
+    clinics = await getClinics({ categorySlug: params.department, locationSlug: params.location, query, specialist, limit: PAGE_SIZE+1, radius, offset });
   } catch { failed = true; }
   // Collapse repeated imported profiles in the displayed batch without modifying source data.
   const seen = new Set<string>();
-  const filteredClinics = clinics.filter(clinic => {
+  const hasNext=clinics.length>PAGE_SIZE;
+  const filteredClinics = clinics.slice(0,PAGE_SIZE).filter(clinic => {
     const key = JSON.stringify([clinic.name_ko, clinic.address_ko?.replace(/\s/g, ''), clinic.telephone?.replace(/[^0-9]/g, '')]);
     if (seen.has(key)) return false;
     seen.add(key);
@@ -59,8 +63,13 @@ export default async function SearchPage({ params, searchParams }: Props) {
   const mapCenter = station ? { lat: station.stations[0].latitude, lng: station.stations[0].longitude } : filteredClinics.length ? { lat: filteredClinics[0].latitude, lng: filteredClinics[0].longitude } : { lat: 37.5665, lng: 126.9780 };
   const schema = {
     '@context': 'https://schema.org', '@type': 'ItemList',
-    itemListElement: filteredClinics.map((clinic, i) => ({ '@type': 'ListItem', position: i + 1, url: `${SITE_URL}${clinicPath(clinic)}` })),
+    itemListElement: filteredClinics.map((clinic, i) => ({ '@type': 'ListItem', position: offset+i + 1, url: `${SITE_URL}${clinicPath(clinic)}` })),
   };
+  const pagination=<nav aria-label="Clinic result pages" className="flex flex-wrap items-center justify-between gap-3 rounded-xl border bg-white p-3 text-sm">
+    {page>1?<a rel="prev" className="min-h-11 inline-flex items-center px-4 rounded-lg border font-semibold" href={searchLink(params.department,params.location,{query,specialist,radius:station?radius:undefined,page:page-1})}>Previous page</a>:<span />}
+    <span aria-current="page">Page {page}</span>
+    {hasNext&&page<MAX_PAGE?<a rel="next" className="min-h-11 inline-flex items-center px-4 rounded-lg bg-slate-900 text-white font-semibold" href={searchLink(params.department,params.location,{query,specialist,radius:station?radius:undefined,page:page+1})}>Next page</a>:<span />}
+  </nav>;
   return <>
     <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(schema) }} />
     <div className="max-w-6xl mx-auto px-4 py-8 space-y-6">
@@ -84,10 +93,12 @@ export default async function SearchPage({ params, searchParams }: Props) {
         <a href="/" className="underline p-2">Browse locations</a>
       </nav>
       <p className="text-sm text-slate-500" role={failed ? 'alert' : 'status'}>
-        {failed ? 'Clinic information is temporarily unavailable. Please try again later.' : `Showing ${filteredClinics.length} clinic profiles${clinics.length === 100 ? ' from the first 100 matching records. Narrow your search for more specific results.' : '.'}`}
+        {failed ? 'Clinic information is temporarily unavailable. Please try again later.' : `Page ${page} · ${filteredClinics.length} clinic profiles on this page.${!filteredClinics.length&&page>1?' No further results. Use Previous page or change your search.':''}`}
       </p>
       <p className="text-xs text-slate-500">Results use HIRA-reported departments. A reported department does not necessarily have a specialist. Clinic focus and full department details are shown separately.</p>
+      {!failed&&pagination}
       {!failed && <ClinicSearchClient lang="en" filteredClinics={filteredClinics} mapCenter={mapCenter} selectedDepartment={params.department} />}
+      {!failed&&filteredClinics.length>0&&pagination}
     </div>
   </>;
 }

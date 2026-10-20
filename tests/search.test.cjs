@@ -16,6 +16,7 @@ const search = load('lib/search.ts',{'./regions':regions});
 const site = load('lib/site.ts');
 const evidence = load('lib/clinic-evidence.ts');
 const stations = load('lib/stations.ts', { './stations.json': JSON.parse(fs.readFileSync(path.join(__dirname, '../lib/stations.json'), 'utf8')) });
+const pagination=load('lib/pagination.ts');
 test('home search recognizes department/location but retains all other search terms', () => {
   assert.equal(search.homeSearchPath('Dentist Gangnam'), '/clinics/dentistry/gangnam');
   assert.equal(search.homeSearchPath('Goldman urology Seoul Station'), '/clinics/urology/seoul-station?q=goldman');
@@ -48,6 +49,28 @@ test('department links retain query, specialist constraint and station radius',(
   assert.equal(url.searchParams.get('specialist'),'1');assert.equal(url.searchParams.get('radius'),'500');
 });
 
+test('page links retain filters and reject invalid or unbounded page inputs',()=>{
+  for(const input of [undefined,'0','-1','2x','1.5',['2']])assert.equal(pagination.searchPage(input),1);
+  assert.equal(pagination.searchPage('5'),5);
+  assert.equal(pagination.searchPage('99999999999999999999'),pagination.MAX_PAGE);
+  const url=new URL(search.searchLink('urology','gangnam-station',{query:'Goldman',specialist:true,radius:500,page:5}),'https://example.com');
+  assert.equal(url.searchParams.get('page'),'5');assert.equal(url.searchParams.get('q'),'Goldman');assert.equal(url.searchParams.get('radius'),'500');assert.equal(url.searchParams.get('specialist'),'1');
+  assert(!search.searchLink('dentistry','uiwang',{query:'서울'}).includes('page='));
+});
+
+test('ordinary and station pages request the requested offset plus a lookahead row',async()=>{
+  const city=database();await city.api.getClinics({locationSlug:'uiwang',limit:26,offset:100});
+  assert.deepEqual(city.calls.find(c=>c[0]==='range'),['range',100,125]);
+  const station=database();await station.api.getClinics({locationSlug:'gangnam-station',limit:26,offset:100,radius:500,query:'Goldman',specialist:true});
+  const call=station.calls.find(c=>c[0]==='rpc');assert.equal(call[1],'nearby_clinics_page');assert.equal(call[2].result_offset,100);assert.equal(call[2].result_limit,26);assert.equal(call[2].radius_m,500);assert.equal(call[2].search_query,'Goldman');assert.equal(call[2].specialist_only,true);
+});
+
+test('major station shortcuts resolve to distinct official station pages',()=>{
+  const featured=load('lib/featured-stations.ts').featuredStationSlugs;
+  assert.equal(featured.length,8);assert.equal(new Set(featured).size,8);
+  for(const slug of featured)assert(stations.stationForSlug(slug),slug);
+});
+
 test('city terms constrain the province-qualified address before limiting results',async()=>{
   const {api,calls}=database();await api.getClinics({locationSlug:'all',query:'UIWANG Goldman'});
   assert(calls.some(c=>c[0]==='or'&&c[1].includes('경기도 의왕시 ')));
@@ -71,6 +94,7 @@ function database({ error = null, locations = [], data = [] } = {}) {
     in(...args) { calls.push(['in', ...args]); return this; },
     or(...args) { calls.push(['or', ...args]); return this; },
     order() { return this; }, limit() { return this; },
+    range(...args) { calls.push(['range',...args]); return this; },
     then(resolve) { return Promise.resolve({ data, error }).then(resolve); },
   };
   const client = { rpc: async (...args) => { calls.push(['rpc', ...args]); return {data,error}; }, from(table) { return table === 'locations' ? { select: async () => ({ data: locations }) } : builder; } };
