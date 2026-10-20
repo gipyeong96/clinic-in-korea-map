@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import { searchTerms } from './search';
-import { regionAddresses, addressFilter, locationIdsForSlug } from './regions';
+import { regionAddresses, addressFilter, locationIdsForSlug, extractRegion } from './regions';
 import { stationForSlug } from './stations';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://lgbiyvqwurtlqsfsdnyy.supabase.co';
@@ -122,6 +122,10 @@ export const mockClinics: any[] = [
 ];
 
 export async function getClinics(params?: { categorySlug?: string, locationSlug?: string, limit?: number, query?: string, specialist?: boolean, radius?: number }) {
+  if(!params?.locationSlug||params.locationSlug==='all'){
+    const region=extractRegion(params?.query||'');
+    if(region)params={...params,locationSlug:region.slug,query:region.query};
+  }
   if (params?.query?.trim() && searchTerms(params.query).length === 0) return [];
   const station = stationForSlug(params?.locationSlug || '');
   if (station) {

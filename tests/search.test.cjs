@@ -11,10 +11,10 @@ function load(file, imports = {}) {
   new Function('require', 'module', 'exports', source)((name) => imports[name] || require(name), module, module.exports);
   return module.exports;
 }
-const search = load('lib/search.ts');
+const regions = load('lib/regions.ts');
+const search = load('lib/search.ts',{'./regions':regions});
 const site = load('lib/site.ts');
 const evidence = load('lib/clinic-evidence.ts');
-const regions = load('lib/regions.ts');
 const stations = load('lib/stations.ts', { './stations.json': JSON.parse(fs.readFileSync(path.join(__dirname, '../lib/stations.json'), 'utf8')) });
 test('home search recognizes department/location but retains all other search terms', () => {
   assert.equal(search.homeSearchPath('Dentist Gangnam'), '/clinics/dentistry/gangnam');
@@ -27,6 +27,32 @@ test('home search recognizes department/location but retains all other search te
 test('text search does not accept PostgREST syntax or wildcard-only queries', () => {
   assert.deepEqual(search.searchTerms('%%_*,()."\\'), []);
   assert.deepEqual(search.searchTerms('강남 Goldman'), ['강남', 'Goldman']);
+});
+
+test('Gyeonggi city aliases preserve remaining words and distinguish homonyms',()=>{
+  for(const q of ['uiwang','UIWANG-SI','의왕','의왕시','Gyeonggi Uiwang'])assert.equal(search.homeSearchPath(q),'/clinics/all/uiwang');
+  assert.equal(search.homeSearchPath('dentist Uiwang Goldman'),'/clinics/dentistry/uiwang?q=goldman');
+  assert.equal(search.homeSearchPath('Gyeonggi Gwangju'),'/clinics/all/gyeonggi-gwangju');
+  assert.equal(search.homeSearchPath('Gwangju'),'/clinics/all/gwangju');
+  assert.equal(regions.extractRegion('notuiwang'),null);
+  assert.equal(regions.extractRegion('Suwon Uiwang'),null);
+  assert.equal(regions.extractRegion('의왕치과'),null);
+  assert.equal(regions.gyeonggiRegions.length,31);
+  for(const [slug,ko] of regions.gyeonggiRegions){assert.equal(regions.extractRegion(slug).slug,slug);assert(regions.regionAddresses[slug].includes(`경기도 ${ko} `));}
+});
+
+test('department links retain query, specialist constraint and station radius',()=>{
+  const url=new URL(search.searchLink('dentistry','gangnam-station',{query:'Goldman & clinic',specialist:true,radius:500}),'https://example.com');
+  assert.equal(url.pathname,'/clinics/dentistry/gangnam-station');
+  assert.equal(url.searchParams.get('q'),'Goldman & clinic');
+  assert.equal(url.searchParams.get('specialist'),'1');assert.equal(url.searchParams.get('radius'),'500');
+});
+
+test('city terms constrain the province-qualified address before limiting results',async()=>{
+  const {api,calls}=database();await api.getClinics({locationSlug:'all',query:'UIWANG Goldman'});
+  assert(calls.some(c=>c[0]==='or'&&c[1].includes('경기도 의왕시 ')));
+  assert(calls.some(c=>c[0]==='or'&&c[1].includes('name_en.ilike.%Goldman%')));
+  assert(!calls.some(c=>c[0]==='or'&&c[1].includes('%UIWANG%')));
 });
 test('clinic URLs use the real domain and a fallback ID; JSON-LD cannot close its script', () => {
   assert.equal(site.SITE_URL, 'https://map.clinicinkorea.com');

@@ -1,5 +1,7 @@
 import React from 'react';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
+import { extractRegion, gyeonggiRegions } from '@/lib/regions';
+import { searchLink } from '@/lib/search';
 import { getDictionary } from '@/lib/translation';
 import { getClinics } from '@/lib/supabase';
 import { SITE_URL, clinicPath, serializeJsonLd } from '@/lib/site';
@@ -17,9 +19,10 @@ interface Props {
 function text(value: string | string[] | undefined) { return typeof value === 'string' ? value.trim().slice(0, 200) : ''; }
 function names(department: string, location: string) {
   const dict = getDictionary('en');
+  const region=gyeonggiRegions.find(([slug])=>slug===location);
   return {
     dept: department === 'all' ? 'Medical' : (departmentLabels as Record<string,string>)[department] || (dict as Record<string, string>)[department] || department,
-    loc: stationForSlug(location) ? `${stationForSlug(location)!.name_en}, ${stationForSlug(location)!.city}` : (location === 'gangnam' ? 'Gangnam area (Gangnam-gu & Seocho-gu)' : location === 'all' ? 'Korea' : (dict as Record<string, string>)[location] || location.replace(/-/g, ' ').replace(/\b\w/g,c=>c.toUpperCase())),
+    loc: region ? `${region[0]==='gyeonggi-gwangju'?'Gwangju':region[0][0].toUpperCase()+region[0].slice(1)}, Gyeonggi` : stationForSlug(location) ? `${stationForSlug(location)!.name_en}, ${stationForSlug(location)!.city}` : (location === 'gangnam' ? 'Gangnam area (Gangnam-gu & Seocho-gu)' : location === 'all' ? 'Korea' : (dict as Record<string, string>)[location] || location.replace(/-/g, ' ').replace(/\b\w/g,c=>c.toUpperCase())),
   };
 }
 export function generateMetadata({ params, searchParams }: Props) {
@@ -37,6 +40,8 @@ export default async function SearchPage({ params, searchParams }: Props) {
   const specialist = searchParams.specialist === '1';
   const station = stationForSlug(params.location);
   const radius = searchRadius(searchParams.radius);
+  const region=params.location==='all'?extractRegion(query):null;
+  if(region)redirect(searchLink(params.department,region.slug,{query:region.query,specialist}));
   let clinics: any[] = [];
   let failed = false;
   try {
@@ -75,7 +80,7 @@ export default async function SearchPage({ params, searchParams }: Props) {
         <button className="bg-slate-800 text-white rounded-lg px-4 py-2">Search</button>
       </form>
       <nav aria-label="Browse medical departments" className="flex flex-wrap gap-3 text-sm">
-        {departments.map(dept => <a key={dept} aria-current={dept === params.department ? 'page' : undefined} className="underline p-2" href={`/clinics/${dept}/${params.location}${station ? `?radius=${radius}` : ''}`}>{dept === 'all' ? 'All departments' : names(dept, 'all').dept}</a>)}
+        {departments.map(dept => <a key={dept} aria-current={dept === params.department ? 'page' : undefined} className="underline p-2" href={searchLink(dept,params.location,{query,specialist,radius:station?radius:undefined})}>{dept === 'all' ? 'All departments' : names(dept, 'all').dept}</a>)}
         <a href="/" className="underline p-2">Browse locations</a>
       </nav>
       <p className="text-sm text-slate-500" role={failed ? 'alert' : 'status'}>
