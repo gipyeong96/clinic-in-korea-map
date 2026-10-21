@@ -79,7 +79,7 @@ export default async function SearchPage({ params, searchParams }: Props) {
   return <>
     <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(schema) }} />
     <div className="max-w-6xl mx-auto px-4 py-5 space-y-3 sm:py-8 sm:space-y-6">
-      <h1 className="text-2xl md:text-3xl font-black">{dept} Clinics in {loc}</h1>
+      <h1 className="text-2xl md:text-3xl font-black">{station ? `${params.department === 'all' ? 'Clinics' : `${dept} Clinics`} near ${station.name_en}` : `${dept} Clinics in ${loc}`}</h1>
       {station && <div className="space-y-2 text-sm text-slate-600">
         <p>{station.name_ko} · Within {radius.toLocaleString()} m · Nearest first</p>
         <details><summary className="cursor-pointer underline">Station and distance details</summary><div className="space-y-2 py-2"><p>{station.city} · {station.stations.map(s => s.line).join(' / ')}</p>
