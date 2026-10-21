@@ -5,6 +5,7 @@ import { searchLink } from '@/lib/search';
 import { PAGE_SIZE, MAX_PAGE, searchPage } from '@/lib/pagination';
 import { matchRegions,regionLabel } from '@/lib/national-regions';
 import { searchRecovery } from '@/lib/search-recovery';
+import {areaBrowseLink} from '@/lib/area-navigation';
 import {activeFilters} from '@/lib/active-filters';
 import { getDictionary } from '@/lib/translation';
 import { getClinics } from '@/lib/supabase';
@@ -99,7 +100,7 @@ export default async function SearchPage({ params, searchParams }: Props) {
       {currentFilters.filters.length>0&&<nav aria-label="Active search filters" className="flex flex-wrap items-center gap-2 text-sm"><span className="font-semibold">Your search:</span>{currentFilters.filters.map(filter=><a key={filter.action} href={filter.href} aria-label={`${filter.action}: ${filter.label}`} className="min-h-11 inline-flex max-w-full items-center gap-2 rounded-full border bg-white px-4 py-2 break-words"><span className="min-w-0">{filter.label}</span><span aria-hidden="true">{filter.action==='Change radius'?'↕':'×'}</span></a>)}<a href={currentFilters.clear} className="min-h-11 inline-flex items-center px-3 underline">Clear all filters</a></nav>}
       <nav aria-label="Browse medical departments" className="flex gap-1 overflow-x-auto whitespace-nowrap pb-1 text-sm sm:flex-wrap sm:gap-3">
         {departments.map(dept => <a key={dept} aria-current={dept === params.department ? 'page' : undefined} className="underline p-2 min-h-11 inline-flex items-center shrink-0" href={searchLink(dept,params.location,{query,specialist,radius:station?radius:undefined})}>{dept === 'all' ? 'All departments' : names(dept, 'all').dept}</a>)}
-        <a href="/" className="underline p-2 min-h-11 inline-flex items-center shrink-0">Browse locations</a>
+        <a href={areaBrowseLink(undefined,{department:params.department,query,specialist})} className="underline p-2 min-h-11 inline-flex items-center shrink-0">Choose area</a>
       </nav>
       <p className="text-sm text-slate-500" role={failed ? 'alert' : 'status'}>
         {failed ? 'Clinic information is temporarily unavailable. Please try again later.' : `Page ${page} · ${filteredClinics.length} clinic profiles on this page.${!filteredClinics.length&&page>1?' No further results. Use Previous page or change your search.':''}`}
