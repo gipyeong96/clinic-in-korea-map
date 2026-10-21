@@ -46,16 +46,16 @@ export default function HomePage({ params }: HomePageProps) {
   ];
 
   return (
-    <div className="space-y-12 pb-16">
+    <div className="space-y-6 sm:space-y-12 pb-16">
       {/* Hero Section */}
-      <section className="bg-slate-900 text-white py-20 px-4 text-center space-y-6 relative overflow-hidden">
+      <section className="bg-slate-900 text-white py-8 sm:py-20 px-4 text-center space-y-6 relative overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,#1e293b_0%,transparent_60%)]"></div>
         
-        <div className="relative z-10 max-w-3xl mx-auto space-y-6">
-          <h1 className="text-4xl md:text-5xl font-black tracking-tight leading-tight">
+        <div className="relative z-10 max-w-3xl mx-auto space-y-3 sm:space-y-6">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight leading-tight">
             {dict.title}
           </h1>
-          <p className="text-slate-400 text-lg max-w-xl mx-auto font-medium">
+          <p className="text-slate-400 text-base sm:text-lg max-w-xl mx-auto font-medium">
             {dict.subtitle}
           </p>
 
