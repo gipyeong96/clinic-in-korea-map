@@ -12,6 +12,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     { url: SITE_URL, changeFrequency: 'weekly', priority: 1 },
     {url:`${SITE_URL}/areas`,changeFrequency:'monthly',priority:0.8},
+    ...nationalProvinces.map(p=>({url:`${SITE_URL}/areas/${p.slug}`,changeFrequency:'monthly' as const,priority:0.7})),
     ...[...nationalProvinces,...nationalAreas].filter(a=>!locations.includes(a.slug)).map(a=>({url:`${SITE_URL}/clinics/all/${a.slug}`,changeFrequency:'monthly' as const,priority:0.6})),
     { url: `${SITE_URL}/stations`, changeFrequency: 'monthly', priority: 0.8 },
     ...stationRegions.map(r=>({url:`${SITE_URL}/stations/${r.slug}`,changeFrequency:'monthly' as const,priority:0.7})),

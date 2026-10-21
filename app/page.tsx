@@ -89,17 +89,11 @@ export default function HomePage({ params }: HomePageProps) {
             <MapPin className="w-5 h-5 text-amber-500" />
             Find by Area
           </h2>
-          <div className="grid grid-cols-2 gap-2">
-            {locations.map((loc) => (
-              <Link 
-                key={loc.slug}
-                href={`/clinics/all/${loc.slug}`}
-                className="text-xs font-semibold bg-slate-50 text-slate-700 py-2.5 px-4 rounded-lg border border-slate-200/60 hover:bg-amber-500 hover:text-white hover:border-amber-600 transition text-center"
-              >
-                {loc.name}
-              </Link>
-            ))}
-          </div>
+          <p className="text-xs text-slate-500">Choose a city or province, then narrow down to a district.</p>
+          <h3 className="text-sm font-bold">Cities & provinces</h3>
+          <div className="grid grid-cols-2 gap-2">{locations.filter(loc=>!['gangnam','jamsil','dongtan'].includes(loc.slug)).map(loc=><Link key={loc.slug} href={`/areas/${loc.slug}`} className="min-h-11 flex items-center justify-center rounded-lg border bg-slate-50 px-3 py-2 text-xs font-semibold hover:border-amber-500">{loc.name}</Link>)}</div>
+          <h3 className="text-sm font-bold">Popular areas</h3>
+          <div className="flex flex-wrap gap-2">{locations.filter(loc=>['gangnam','jamsil','dongtan'].includes(loc.slug)).map(loc=><Link key={loc.slug} href={`/clinics/all/${loc.slug}`} className="min-h-11 inline-flex items-center rounded-lg border px-3 py-2 text-xs font-semibold hover:border-amber-500">{loc.name}</Link>)}</div>
           <Link href="/areas" className="min-h-11 inline-flex items-center underline text-sm">Browse all provinces, cities and districts</Link>
         </div>
 
@@ -126,6 +120,7 @@ export default function HomePage({ params }: HomePageProps) {
         </div>
       </section>
 
+      <aside aria-label="Saving clinics" className="max-w-5xl mx-auto px-4"><div className="rounded-xl border bg-white p-4 text-sm text-slate-600"><p className="font-semibold text-slate-800">Save clinics on this device — no sign-up needed.</p><p className="mt-1">Choose “Save clinic” on a clinic card or profile, then find it in <Link href="/my-clinics" className="underline inline-flex min-h-11 items-center">My clinics</Link>. Saved clinics stay in this browser.</p></div></aside>
       {/* Featured Partner (Goldman) */}
       <section className="max-w-5xl mx-auto px-4 space-y-6">
         <div className="text-center space-y-2">
