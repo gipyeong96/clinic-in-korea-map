@@ -1,15 +1,16 @@
 'use strict';
 'use client';
-import {goldmanBranch,GOLDMAN_ENGLISH_URL} from '@/lib/goldman';
+import {goldmanBranch,goldmanLocationUrl,GOLDMAN_ENGLISH_URL} from '@/lib/goldman';
 
 
 import React from 'react';
+import {cardAddress} from '@/lib/card-location';
 import Link from 'next/link';
 import { Phone, MapPin, Globe } from 'lucide-react';
 import { clinicFocus, groupedDepartments } from '@/lib/clinic-evidence';
 import RegistrationBadge from './RegistrationBadge';
 import ClinicContact from './ClinicContact';
-import {clinicName,clinicAddress,clinicPhone,hasClinicCoordinates} from '@/lib/clinic-contact';
+import {clinicName,clinicPhone,hasClinicCoordinates} from '@/lib/clinic-contact';
 import {clinicPath} from '@/lib/site';
 import {clinicDetailLink} from '@/lib/detail-navigation';
 import {SaveClinic} from '@/components/ClinicLibrary';
@@ -34,7 +35,9 @@ interface ClinicCardProps {
 
 export default function ClinicCard({ clinic, selectedDepartment='all', onShowMap, returnTo }: any) {
   const name = clinicName(clinic);
-  const address = clinicAddress(clinic);
+  const address = cardAddress(clinic);
+  const branch=goldmanBranch(String(clinic.id));
+  const nearby=clinic.card_station;
   const phone=clinicPhone(clinic.telephone);
   const slogan = clinic.premium_data?.slogan_en;
   
@@ -75,6 +78,7 @@ export default function ClinicCard({ clinic, selectedDepartment='all', onShowMap
         )}
         <RegistrationBadge clinic={clinic} />
         {typeof clinic.distance_m === 'number' && <p className="text-sm font-semibold text-slate-700 mb-2">{clinic.station_name} · {Math.round(clinic.distance_m)} m <span className="text-xs font-normal">straight-line distance</span></p>}
+        {branch?<p className="text-sm text-slate-700 mb-2"><a href={goldmanLocationUrl(branch.tab)} target="_blank" rel="noopener noreferrer" className="underline">Station access: {branch.transit}</a><span className="block text-xs text-slate-500">Clinic’s published directions</span></p>:!(typeof clinic.distance_m==='number')&&nearby&&<p className="text-sm text-slate-700 mb-2"><Link href={`/clinics/${selectedDepartment}/${nearby.slug}`} className="underline">Nearby station: {nearby.name}</Link> · {Math.round(nearby.distance)} m<span className="block text-xs text-slate-500">Straight-line distance · official station coordinates</span></p>}
         {(categoryName || locationName) && (
           <span className="text-xs text-slate-400 font-medium uppercase tracking-wider block mb-3">
             {categoryName} {categoryName && locationName ? '•' : ''} {locationName}
@@ -83,7 +87,7 @@ export default function ClinicCard({ clinic, selectedDepartment='all', onShowMap
         {selected && <p className="text-xs text-slate-600 mb-2">{selected.name} reported · {selected.specialists>0 ? `${selected.specialists} specialist${selected.specialists===1?'':'s'} reported` : 'No specialist recorded in this department'}</p>}
         {departments.length>0 && <p className="text-xs text-slate-500 mb-3">Reported departments: {departments.slice(0,3).map(d=>d.name).join(', ')}{departments.length>3 ? ` +${departments.length-3} more` : ''}</p>}
 
-        {clinic.is_premium && slogan && (
+        {clinic.is_premium && slogan && slogan!==branch?.transit && (
           <p className="text-xs italic text-slate-600 mb-4 line-clamp-2">
             "{slogan}"
           </p>
@@ -92,8 +96,9 @@ export default function ClinicCard({ clinic, selectedDepartment='all', onShowMap
         <div className="space-y-2 text-xs text-slate-500">
           <div className="flex items-start gap-2">
             <MapPin className="w-3.5 h-3.5 text-slate-400 mt-0.5 shrink-0" />
-              <span className="line-clamp-2">{address || 'Address not provided'}</span>
+              <span className="break-words">{address.primary || 'Address not provided'}</span>
           </div>
+          {address.korean&&address.korean!==address.primary&&<details><summary className="cursor-pointer min-h-11 py-3 underline">Korean address for taxi / copy</summary><p className="select-all break-words pb-2">{address.korean}</p></details>}
           {phone.display && (
             <div aria-label="Clinic telephone" className="flex items-center gap-2">
               <Phone className="w-3.5 h-3.5 text-slate-400 shrink-0" />
