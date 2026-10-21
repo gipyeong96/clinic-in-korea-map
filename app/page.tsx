@@ -12,6 +12,7 @@ import {clinicRegion} from '@/lib/clinic-region';
 import HomeSearch from '@/components/HomeSearch';
 import { MapPin, Stethoscope } from 'lucide-react';
 import StationFinder from '@/components/StationFinder';
+import {areaBrowseLink} from '@/lib/area-navigation';
 import departmentLabels from '@/lib/department-labels.json';
 
 interface HomePageProps {
@@ -107,14 +108,14 @@ export default function HomePage({ params }: HomePageProps) {
             {departments.map((dept) => (
               <Link 
                 key={dept.slug}
-                href={`/clinics/${dept.slug}/all`}
+                href={areaBrowseLink(undefined,{department:dept.slug,query:'',specialist:false})}
                 className="text-xs font-semibold bg-slate-50 text-slate-700 py-2.5 px-4 rounded-lg border border-slate-200/60 hover:bg-amber-500 hover:text-white hover:border-amber-600 transition text-center"
               >
                 {dept.name}
               </Link>
             ))}
           </div>
-          <details className="border-t pt-2"><summary className="cursor-pointer min-h-11 py-3 text-sm font-semibold">Browse all medical departments</summary><div className="grid grid-cols-2 gap-2">{Object.entries(departmentLabels).filter(([slug])=>!['medical-clinic','general-hospital','long-term-care'].includes(slug)).map(([slug,label])=><Link key={slug} href={`/clinics/${slug}/all`} className="min-h-11 flex items-center rounded-lg border px-3 py-2 text-sm hover:border-amber-500">{label}</Link>)}</div></details>
+          <details className="border-t pt-2"><summary className="cursor-pointer min-h-11 py-3 text-sm font-semibold">Browse all medical departments</summary><div className="grid grid-cols-2 gap-2">{Object.entries(departmentLabels).filter(([slug])=>!['medical-clinic','general-hospital','long-term-care'].includes(slug)).map(([slug,label])=><Link key={slug} href={areaBrowseLink(undefined,{department:slug,query:'',specialist:false})} className="min-h-11 flex items-center rounded-lg border px-3 py-2 text-sm hover:border-amber-500">{label}</Link>)}</div></details>
         </div>
 
         </div>

@@ -262,3 +262,16 @@ test('expanded medical department searches keep location and non-department word
  assert.equal(search.homeSearchPath('ob-gyn'),'/clinics/ob-gyn/all');
  assert.equal(search.homeSearchPath('eye clinic'),'/clinics/ophthalmology/all');
 });
+
+const areaNavigation=load('lib/area-navigation.ts',{'./department-labels.json':JSON.parse(fs.readFileSync(path.join(__dirname,'../lib/department-labels.json'),'utf8')),'./search':search});
+test('area browsing keeps department, keywords and specialist constraint across province and district choices',()=>{
+ const context=areaNavigation.areaContext({department:'dentistry',q:'gentle clinic',specialist:'1',page:'3',radius:'500'});
+ assert.equal(areaNavigation.areaBrowseLink('seoul',context),'/areas/seoul?department=dentistry&q=gentle+clinic&specialist=1');
+ assert.equal(areaNavigation.areaClinicLink('area-seoul-mapo-gu',context),'/clinics/dentistry/area-seoul-mapo-gu?q=gentle+clinic&specialist=1');
+ assert.equal(areaNavigation.areaBrowseLink(undefined,{...context,department:'all'}),'/areas?q=gentle+clinic&specialist=1');
+});
+test('area context rejects unsupported department values and repeated query parameters',()=>{
+ assert.deepEqual(areaNavigation.areaContext({department:'../../bad',q:['a','b'],specialist:['1','0']}),{department:'all',query:'',specialist:false});
+ assert.equal(areaNavigation.areaContext({q:'x'.repeat(300)}).query.length,200);
+ assert.equal(areaNavigation.areaContext({department:'ent'}).department,'ent');
+});

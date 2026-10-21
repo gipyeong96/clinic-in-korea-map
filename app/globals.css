@@ -27,3 +27,9 @@
   header > div > div.flex { flex-wrap: nowrap; gap: 0.25rem; }
   header > div > div > a.min-h-11 { padding-left: 0.5rem; padding-right: 0.5rem; white-space: nowrap; }
 }
+
+/* Retire the legacy header promotion while keeping neutral navigation. */
+header a[href="/clinics/detail/goldman-gangnam"] { display: none; }
+@media (max-width: 639px) {
+  header > div > a > span:first-child { max-width: none; font-size: 1rem; line-height: 1.25rem; }
+}
