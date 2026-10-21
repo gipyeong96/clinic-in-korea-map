@@ -11,12 +11,14 @@ function load(file, imports = {}) {
   new Function('require', 'module', 'exports', source)((name) => imports[name] || require(name), module, module.exports);
   return module.exports;
 }
-const regions = load('lib/regions.ts');
+const national=load('lib/national-regions.ts',{'./national-areas.json':JSON.parse(fs.readFileSync(path.join(__dirname,'../lib/national-areas.json'),'utf8'))});
+const regions = load('lib/regions.ts',{'./national-regions':national});
 const search = load('lib/search.ts',{'./regions':regions});
 const site = load('lib/site.ts');
 const evidence = load('lib/clinic-evidence.ts');
 const stations = load('lib/stations.ts', { './stations.json': JSON.parse(fs.readFileSync(path.join(__dirname, '../lib/stations.json'), 'utf8')) });
 const pagination=load('lib/pagination.ts');
+const recovery=load('lib/search-recovery.ts',{'./search':search});
 test('home search recognizes department/location but retains all other search terms', () => {
   assert.equal(search.homeSearchPath('Dentist Gangnam'), '/clinics/dentistry/gangnam');
   assert.equal(search.homeSearchPath('Goldman urology Seoul Station'), '/clinics/urology/seoul-station?q=goldman');
@@ -28,6 +30,46 @@ test('home search recognizes department/location but retains all other search te
 test('text search does not accept PostgREST syntax or wildcard-only queries', () => {
   assert.deepEqual(search.searchTerms('%%_*,()."\\'), []);
   assert.deepEqual(search.searchTerms('강남 Goldman'), ['강남', 'Goldman']);
+});
+
+test('nationwide aliases use qualified jurisdictions and preserve other keywords',()=>{
+  assert.equal(national.nationalProvinces.length,17);assert.equal(national.nationalAreas.length,267);
+  assert.equal(new Set(national.nationalAreas.map(a=>a.slug)).size,267);
+  for(const [q,expected] of [['Chuncheon','area-gangwon-chuncheon-si'],['전주','area-jeonbuk-jeonju-si'],['Gimhae','area-gyeongnam-gimhae-si'],['Seoul Jung-gu','area-seoul-jung-gu'],['Gangwon Goseong','area-gangwon-goseong-gun'],['Gyeongnam 고성군','area-gyeongnam-goseong-gun'],['Bundang-gu','area-gyeonggi-seongnam-si-bundang-gu'],['Sejong','sejong']])assert.equal(regions.extractRegion(q)?.slug,expected,q);
+  for(const area of national.nationalAreas){
+    const parent='parent' in area?national.nationalAreas.find(p=>p.province===area.province&&p.ko===area.parent)?.en:'';
+    const q=`${area.province} ${parent||''} ${area.en}`;
+    const result=regions.extractRegion(q);assert.equal(result?.slug,area.slug,q);assert.equal(result?.query,'',q);
+    const korean=`${national.nationalProvinces.find(p=>p.slug===area.province).ko} ${'parent' in area?area.parent:''} ${area.ko}`;
+    assert.equal(regions.extractRegion(korean)?.slug,area.slug,korean);
+  }
+  assert.equal(regions.extractRegion('Gangwon Chuncheon Goldman')?.query,'Goldman');
+  assert.equal(regions.extractRegion('notchuncheon'),null);
+  assert.equal(regions.extractRegion('Chuncheon station'),null);
+});
+
+test('homonymous districts require a choice and Gwangju never includes all Jeonnam',()=>{
+  const goseong=national.matchRegions('Goseong clinic');assert.equal(goseong.options.length,2);assert.equal(goseong.query,'clinic');
+  assert(national.matchRegions('Jung-gu').options.length>2);
+  assert.equal(regions.extractRegion('Gwangju')?.slug,'gwangju');assert.equal(regions.extractRegion('Gyeonggi Gwangju-si')?.slug,'gyeonggi-gwangju');
+  assert(!regions.regionAddresses.gwangju.includes('전남광주통합특별시 '));
+  assert(regions.regionAddresses.gwangju.includes('전남광주통합특별시 광산구 '));
+  assert(!regions.regionAddresses.gwangju.some(x=>x.includes('목포')));
+  assert(regions.regionAddresses['area-jeonnam-mokpo-si'].includes('전남광주통합특별시 목포시 '));
+});
+
+test('empty result suggestions relax one condition and preserve all others',()=>{
+  const original={department:'dentistry',location:'gangnam-station',query:'Goldman',specialist:true,radius:500,page:3};
+  const links=recovery.searchRecovery(original);const url=label=>new URL(links.find(x=>x.label===label).href,'https://example.com');
+  assert.equal(url('Expand radius to 1 km').searchParams.get('radius'),'1000');
+  assert.equal(url('Expand radius to 1 km').searchParams.get('specialist'),'1');
+  assert.equal(url('Expand radius to 1 km').searchParams.get('q'),'Goldman');
+  assert(!url('Remove specialist filter').searchParams.has('specialist'));assert.equal(url('Remove specialist filter').searchParams.get('radius'),'500');
+  assert.equal(url('Search all departments').pathname,'/clinics/all/gangnam-station');assert.equal(url('Search all departments').searchParams.get('specialist'),'1');
+  assert(!url('Clear keyword').searchParams.has('q'));assert.equal(url('Clear keyword').searchParams.get('specialist'),'1');
+  for(const link of links)assert(!new URL(link.href,'https://example.com').searchParams.has('page'));
+  assert(!recovery.searchRecovery({...original,radius:2000}).some(x=>x.label.startsWith('Expand')));
+  assert.deepEqual(original,{department:'dentistry',location:'gangnam-station',query:'Goldman',specialist:true,radius:500,page:3});
 });
 
 test('Gyeonggi city aliases preserve remaining words and distinguish homonyms',()=>{

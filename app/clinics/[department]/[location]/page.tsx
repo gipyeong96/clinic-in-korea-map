@@ -1,8 +1,10 @@
 import React from 'react';
 import { notFound, redirect } from 'next/navigation';
-import { extractRegion, gyeonggiRegions } from '@/lib/regions';
+import { extractRegion } from '@/lib/regions';
 import { searchLink } from '@/lib/search';
 import { PAGE_SIZE, MAX_PAGE, searchPage } from '@/lib/pagination';
+import { matchRegions,regionLabel } from '@/lib/national-regions';
+import { searchRecovery } from '@/lib/search-recovery';
 import { getDictionary } from '@/lib/translation';
 import { getClinics } from '@/lib/supabase';
 import { SITE_URL, clinicPath, serializeJsonLd } from '@/lib/site';
@@ -20,10 +22,9 @@ interface Props {
 function text(value: string | string[] | undefined) { return typeof value === 'string' ? value.trim().slice(0, 200) : ''; }
 function names(department: string, location: string) {
   const dict = getDictionary('en');
-  const region=gyeonggiRegions.find(([slug])=>slug===location);
   return {
     dept: department === 'all' ? 'Medical' : (departmentLabels as Record<string,string>)[department] || (dict as Record<string, string>)[department] || department,
-    loc: region ? `${region[0]==='gyeonggi-gwangju'?'Gwangju':region[0][0].toUpperCase()+region[0].slice(1)}, Gyeonggi` : stationForSlug(location) ? `${stationForSlug(location)!.name_en}, ${stationForSlug(location)!.city}` : (location === 'gangnam' ? 'Gangnam area (Gangnam-gu & Seocho-gu)' : location === 'all' ? 'Korea' : (dict as Record<string, string>)[location] || location.replace(/-/g, ' ').replace(/\b\w/g,c=>c.toUpperCase())),
+    loc: regionLabel(location) || (stationForSlug(location) ? `${stationForSlug(location)!.name_en}, ${stationForSlug(location)!.city}` : (location === 'gangnam' ? 'Gangnam area (Gangnam-gu & Seocho-gu)' : location === 'all' ? 'Korea' : (dict as Record<string, string>)[location] || location.replace(/-/g, ' ').replace(/\b\w/g,c=>c.toUpperCase()))),
   };
 }
 export function generateMetadata({ params, searchParams }: Props) {
@@ -43,6 +44,8 @@ export default async function SearchPage({ params, searchParams }: Props) {
   const radius = searchRadius(searchParams.radius);
   const page=searchPage(searchParams.page);
   const offset=(page-1)*PAGE_SIZE;
+  const regionMatches=params.location==='all'?matchRegions(query):null;
+  if(regionMatches&&regionMatches.options.length>1)return <div className="max-w-3xl mx-auto p-4 py-8 space-y-5"><h1 className="text-2xl font-bold">Choose a region</h1><p>More than one region matches “{query}”. Select the province and city you mean.</p><nav aria-label="Matching regions" className="grid sm:grid-cols-2 gap-3">{regionMatches.options.map(option=><a key={option.slug} className="min-h-11 p-4 rounded-lg border bg-white break-words font-semibold" href={searchLink(params.department,option.slug,{query:regionMatches.query,specialist})}>{option.label}</a>)}</nav><a className="inline-block min-h-11 py-3 underline" href="/areas">Browse all regions</a></div>;
   const region=params.location==='all'?extractRegion(query):null;
   if(region)redirect(searchLink(params.department,region.slug,{query:region.query,specialist,page}));
   let clinics: any[] = [];
@@ -96,8 +99,10 @@ export default async function SearchPage({ params, searchParams }: Props) {
         {failed ? 'Clinic information is temporarily unavailable. Please try again later.' : `Page ${page} · ${filteredClinics.length} clinic profiles on this page.${!filteredClinics.length&&page>1?' No further results. Use Previous page or change your search.':''}`}
       </p>
       <p className="text-xs text-slate-500">Results use HIRA-reported departments. A reported department does not necessarily have a specialist. Clinic focus and full department details are shown separately.</p>
+      {failed&&<a className="inline-flex min-h-11 items-center px-4 rounded-lg border bg-white font-semibold" href={searchLink(params.department,params.location,{query,specialist,radius:station?radius:undefined,page})}>Try again</a>}
+      {!failed&&!filteredClinics.length&&<section aria-label="Search suggestions" className="rounded-xl border bg-white p-5 space-y-4"><h2 className="text-lg font-bold">Try a broader search</h2><p className="text-sm text-slate-600">No clinic profiles matched this search. Choose an option below to change a condition. Other conditions will be kept.</p><nav aria-label="Broaden your search" className="flex flex-wrap gap-3">{searchRecovery({department:params.department,location:params.location,query,specialist,radius:station?radius:undefined,page}).map(link=><a key={link.label} href={link.href} className="min-h-11 inline-flex items-center rounded-lg border px-4 py-2 text-sm font-semibold">{link.label}</a>)}</nav></section>}
       {!failed&&pagination}
-      {!failed && <ClinicSearchClient lang="en" filteredClinics={filteredClinics} mapCenter={mapCenter} selectedDepartment={params.department} />}
+      {!failed&&filteredClinics.length>0 && <ClinicSearchClient lang="en" filteredClinics={filteredClinics} mapCenter={mapCenter} selectedDepartment={params.department} />}
       {!failed&&filteredClinics.length>0&&pagination}
     </div>
   </>;
