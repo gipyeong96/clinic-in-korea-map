@@ -9,12 +9,15 @@ import { clinicFocus, groupedDepartments } from '@/lib/clinic-evidence';
 import RegistrationBadge from '@/components/RegistrationBadge';
 import ClinicContact from '@/components/ClinicContact';
 import {clinicName,clinicAddress,clinicPhone} from '@/lib/clinic-contact';
+import {clinicRegion} from '@/lib/clinic-region';
+import {searchReturnPath} from '@/lib/detail-navigation';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 interface ClinicDetailProps {
   params: { id: string };
+  searchParams: {returnTo?: string | string[]};
 }
 
 export async function generateMetadata({ params }: ClinicDetailProps) {
@@ -23,17 +26,19 @@ export async function generateMetadata({ params }: ClinicDetailProps) {
 
   return {
     title: `${clinicName(clinic)} | Korea Clinic Map`,
-    description: `Contact information, operating hours, and medical equipment details for ${clinic.name_en} in ${clinic.locations?.name_en || 'Korea'}.`,
+    description: `Contact information and medical equipment details for ${clinicName(clinic)} in ${clinicRegion(clinic)?.label || 'Korea'}.`,
     alternates: {
       canonical: `${SITE_URL}${clinicPath(clinic)}`,
     }
   };
 }
 
-export default async function ClinicDetail({ params }: ClinicDetailProps) {
+export default async function ClinicDetail({ params, searchParams }: ClinicDetailProps) {
   const clinic = await getClinicById(params.id);
   if (!clinic) return notFound();
 
+  const region=clinicRegion(clinic);
+  const returnTo=searchReturnPath(searchParams.returnTo);
   const isPremium = clinic.is_premium;
   const name=clinicName(clinic),address=clinicAddress(clinic),phone=clinicPhone(clinic.telephone);
   const pd = clinic.premium_data || {};
@@ -101,6 +106,7 @@ export default async function ClinicDetail({ params }: ClinicDetailProps) {
       
       <div className="max-w-4xl mx-auto px-4 py-8 space-y-6 min-w-0 break-words">
         
+        <Link href={returnTo || `/clinics/all/${region?.slug || 'all'}`} className="min-h-11 inline-flex items-center rounded-lg border bg-white px-4 py-2 text-sm font-semibold">{returnTo?'← Back to search results':'Browse clinics in this area'}</Link>
         {/* Breadcrumb Navigation (Semantic AEO/SEO) */}
         <nav aria-label="Breadcrumb" className="text-xs text-slate-500 flex flex-wrap gap-2 font-medium">
           <Link href="/" className="hover:text-amber-500">Home</Link>
@@ -109,8 +115,8 @@ export default async function ClinicDetail({ params }: ClinicDetailProps) {
             {focus}
           </Link>
           <span>›</span>
-          <Link href={`/clinics/${focusSlug}/${clinic.locations?.slug || 'all'}`} className="hover:text-amber-500">
-            {clinic.locations?.name_en || 'Area'}
+          <Link href={`/clinics/${focusSlug}/${region?.slug || 'all'}`} className="hover:text-amber-500">
+            {region?.label || 'All areas'}
           </Link>
           <span>›</span>
           <span className="text-slate-800" aria-current="page">{clinic.name_en}</span>

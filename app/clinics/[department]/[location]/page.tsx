@@ -9,6 +9,7 @@ import { getDictionary } from '@/lib/translation';
 import { getClinics } from '@/lib/supabase';
 import { SITE_URL, clinicPath, serializeJsonLd } from '@/lib/site';
 import ClinicSearchClient from '@/components/ClinicSearchClient';
+import {clinicRegion} from '@/lib/clinic-region';
 import { stationForSlug, searchRadius } from '@/lib/stations';
 import departmentLabels from '@/lib/department-labels.json';
 
@@ -102,7 +103,7 @@ export default async function SearchPage({ params, searchParams }: Props) {
       {failed&&<a className="inline-flex min-h-11 items-center px-4 rounded-lg border bg-white font-semibold" href={searchLink(params.department,params.location,{query,specialist,radius:station?radius:undefined,page})}>Try again</a>}
       {!failed&&!filteredClinics.length&&<section aria-label="Search suggestions" className="rounded-xl border bg-white p-5 space-y-4"><h2 className="text-lg font-bold">{page>1?'Continue your search':'Try a broader search'}</h2><p className="text-sm text-slate-600">{page>1?'There are no clinic profiles on this page. Return to the first page or adjust your search.':'No clinic profiles matched this search. Adjust one filter below, or choose another location.'}</p><nav aria-label="Broaden your search" className="flex flex-wrap gap-3">{searchRecovery({department:params.department,location:params.location,query,specialist,radius:station?radius:undefined,page}).map(link=><a key={link.label} href={link.href} className="min-h-11 inline-flex items-center rounded-lg border px-4 py-2 text-sm font-semibold">{link.label}</a>)}</nav></section>}
       {!failed&&pagination}
-      {!failed&&filteredClinics.length>0 && <ClinicSearchClient lang="en" filteredClinics={filteredClinics} mapCenter={mapCenter} selectedDepartment={params.department} />}
+      {!failed&&filteredClinics.length>0 && <ClinicSearchClient returnTo={searchLink(params.department,params.location,{query,specialist,radius:station?radius:undefined,page})} lang="en" filteredClinics={filteredClinics.map(clinic=>({...clinic,address_region:clinicRegion(clinic)}))} mapCenter={mapCenter} selectedDepartment={params.department} />}
       {!failed&&filteredClinics.length>0&&pagination}
     </div>
   </>;

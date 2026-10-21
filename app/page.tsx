@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { getDictionary } from '@/lib/translation';
 import { mockClinics } from '@/lib/supabase';
 import ClinicCard from '@/components/ClinicCard';
+import {clinicRegion} from '@/lib/clinic-region';
 import HomeSearch from '@/components/HomeSearch';
 import { MapPin, Stethoscope } from 'lucide-react';
 import StationFinder from '@/components/StationFinder';
@@ -134,7 +135,7 @@ export default function HomePage({ params }: HomePageProps) {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {featuredClinics.slice(0, 3).map((clinic) => (
-            <ClinicCard key={clinic.id} clinic={clinic} />
+            <ClinicCard key={clinic.id} clinic={{...clinic,address_region:clinicRegion(clinic)}} />
           ))}
         </div>
       </section>
