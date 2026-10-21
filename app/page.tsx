@@ -1,3 +1,4 @@
+import {metadata as rootMetadata} from './layout';
 import {nearbyStation} from '@/lib/card-location';
 import {stationPages} from '@/lib/stations';
 import {additionalGoldmanClinics} from '@/lib/goldman';
@@ -8,7 +9,7 @@ import {RecentClinicsHome} from '@/components/ClinicLibrary';
 import React from 'react';
 import { SITE_URL } from '@/lib/site';
 
-export const metadata = { title:'Find Clinics in Korea by Station, Region & Department | Korea Clinic Map', alternates: { canonical: SITE_URL } };
+export const metadata = { verification: { ...rootMetadata.verification, other: { 'naver-site-verification': '65fe601ba42fc61095a21a0ac4d1b5f1ac113b98', 'msvalidate.01': 'F7D1898AD3213866CD50BAFD9BBA766C' } }, title:'Find Clinics in Korea by Station, Region & Department | Korea Clinic Map', alternates: { canonical: SITE_URL } };
 import Link from 'next/link';
 import { getDictionary } from '@/lib/translation';
 import { mockClinics } from '@/lib/supabase';

@@ -1,3 +1,4 @@
+import {additionalGoldmanClinics} from '@/lib/goldman';
 import { MetadataRoute } from 'next';
 import { mockClinics } from '@/lib/supabase';
 import { mockArticles } from '@/lib/articles';
@@ -23,7 +24,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     }))),
     ...stationPages.filter(s => !locations.includes(s.slug)).map(s => ({url: `${SITE_URL}/clinics/all/${s.slug}`, changeFrequency: 'monthly' as const, priority: 0.6})),
-    ...mockClinics.map(clinic => ({ url: `${SITE_URL}${clinicPath(clinic)}`, priority: 0.7 })),
+    ...[...mockClinics,...additionalGoldmanClinics].map(clinic => ({ url: `${SITE_URL}${clinicPath(clinic)}`, priority: 0.7 })),
     ...mockArticles.map(article => ({
       url: `${SITE_URL}/articles/${article.slug}`,
       lastModified: article.published_at,
