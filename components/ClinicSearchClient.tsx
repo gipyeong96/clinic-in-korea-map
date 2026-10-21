@@ -89,7 +89,7 @@ export default function ClinicSearchClient({
             <div 
               key={clinic.id} 
               id={`clinic-card-${clinic.id}`}
-              className={`scroll-mt-28 rounded-xl transition-all duration-300 ${
+              className={`clinic-result-anchor rounded-xl transition-all duration-300 ${
                 activeClinicId === clinic.id 
                   ? 'ring-2 ring-amber-500 ring-offset-2 scale-[1.01] shadow-md' 
                   : 'hover:scale-[1.005]'
@@ -108,7 +108,7 @@ export default function ClinicSearchClient({
       </div>
 
       {/* Google Maps Container Sticky Column */}
-      <div id="clinic-results-map" className={`scroll-mt-28 lg:col-span-2 min-w-0 lg:sticky lg:top-24 h-[420px] lg:h-[680px] ${view==='list'?'hidden lg:block':''}`}>
+      <div id="clinic-results-map" className={`clinic-result-anchor lg:col-span-2 min-w-0 lg:sticky lg:top-24 h-[420px] lg:h-[680px] ${view==='list'?'hidden lg:block':''}`}>
         <MapContainer 
           apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}
           center={currentMapCenter}

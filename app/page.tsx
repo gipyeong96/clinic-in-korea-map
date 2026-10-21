@@ -72,14 +72,14 @@ export default function HomePage({ params }: HomePageProps) {
         <nav aria-label="Choose how to find a clinic" className="grid grid-cols-3 gap-2">{[['station-search','By station'],['area-search','By area'],['department-search','By department']].map(([id,label])=><a key={id} href={`#${id}`} className="min-h-11 flex items-center justify-center text-center rounded-lg border bg-white px-2 py-3 text-sm font-bold hover:border-amber-500">{label}</a>)}</nav>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
         <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-          <h2 id="station-search" className="scroll-mt-24 text-lg font-bold text-slate-800 border-b border-slate-100 pb-2">Find by Station</h2>
+          <h2 id="station-search" className="browse-anchor text-lg font-bold text-slate-800 border-b border-slate-100 pb-2">Find by Station</h2>
           <p className="text-xs text-slate-500">Choose a station, then filter by distance and department.</p>
           <StationFinder />
         </div>
         
         {/* Locations */}
         <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-          <h2 id="area-search" className="scroll-mt-24 text-lg font-bold text-slate-800 flex items-center gap-2 border-b border-slate-100 pb-2">
+          <h2 id="area-search" className="browse-anchor text-lg font-bold text-slate-800 flex items-center gap-2 border-b border-slate-100 pb-2">
             <MapPin className="w-5 h-5 text-amber-500" />
             Find by Area
           </h2>
@@ -99,7 +99,7 @@ export default function HomePage({ params }: HomePageProps) {
 
         {/* Departments */}
         <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-          <h2 id="department-search" className="scroll-mt-24 text-lg font-bold text-slate-800 flex items-center gap-2 border-b border-slate-100 pb-2">
+          <h2 id="department-search" className="browse-anchor text-lg font-bold text-slate-800 flex items-center gap-2 border-b border-slate-100 pb-2">
             <Stethoscope className="w-5 h-5 text-amber-500" />
             {dict.categories_title}
           </h2>

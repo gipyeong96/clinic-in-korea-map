@@ -3,7 +3,7 @@ export type Locale = 'en' | 'mn';
 export const dictionaries = {
   en: {
     title: "Korea Clinic Map",
-    subtitle: "Find English-speaking clinics near you in Korea",
+    subtitle: "Find clinics near you in Korea",
     search_placeholder: "Enter location or department...",
     search_btn: "Search",
     my_location: "Near Me",

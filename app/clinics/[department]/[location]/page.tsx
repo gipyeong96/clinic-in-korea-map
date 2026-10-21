@@ -78,12 +78,14 @@ export default async function SearchPage({ params, searchParams }: Props) {
   </nav>;
   return <>
     <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(schema) }} />
-    <div className="max-w-6xl mx-auto px-4 py-8 space-y-6">
+    <div className="max-w-6xl mx-auto px-4 py-5 space-y-3 sm:py-8 sm:space-y-6">
       <h1 className="text-2xl md:text-3xl font-black">{dept} Clinics in {loc}</h1>
       {station && <div className="space-y-2 text-sm text-slate-600">
-        <p>{station.name_ko} · {station.city} · {station.stations.map(s => s.line).join(' / ')}</p>
+        <p>{station.name_ko} · Within {radius.toLocaleString()} m · Nearest first</p>
+        <details><summary className="cursor-pointer underline">Station and distance details</summary><div className="space-y-2 py-2"><p>{station.city} · {station.stations.map(s => s.line).join(' / ')}</p>
         <p>Within {radius.toLocaleString()} m · Nearest first · Straight-line distance, not walking distance. For interchanges, the nearest listed line coordinate is used.</p>
         <details className="text-xs"><summary className="cursor-pointer underline">Official station sources and dates</summary><div className="space-y-1 py-2">{station.stations.map(s => <p key={s.id}>{s.line} · <a className="underline" href={s.source_url} target="_blank" rel="noreferrer">Official source</a> · Source record: {s.source_date}</p>)}<p>These are dated records, not a live timetable. Routes and train services may change. Source dates may be dataset or portal update dates.</p></div></details>
+        </div></details>
         <a className="underline text-xs" href="/#station-search">Choose another station</a>
       </div>}
       <form action={`/clinics/${params.department}/${params.location}`} method="get" className="flex flex-wrap items-end gap-3 bg-white p-4 rounded-xl border border-slate-200">
@@ -95,17 +97,17 @@ export default async function SearchPage({ params, searchParams }: Props) {
         <button className="bg-slate-800 text-white rounded-lg px-4 py-2">Search</button>
       </form>
       {currentFilters.filters.length>0&&<nav aria-label="Active search filters" className="flex flex-wrap items-center gap-2 text-sm"><span className="font-semibold">Your search:</span>{currentFilters.filters.map(filter=><a key={filter.action} href={filter.href} aria-label={`${filter.action}: ${filter.label}`} className="min-h-11 inline-flex max-w-full items-center gap-2 rounded-full border bg-white px-4 py-2 break-words"><span className="min-w-0">{filter.label}</span><span aria-hidden="true">{filter.action==='Change radius'?'↕':'×'}</span></a>)}<a href={currentFilters.clear} className="min-h-11 inline-flex items-center px-3 underline">Clear all filters</a></nav>}
-      <nav aria-label="Browse medical departments" className="flex flex-wrap gap-3 text-sm">
-        {departments.map(dept => <a key={dept} aria-current={dept === params.department ? 'page' : undefined} className="underline p-2" href={searchLink(dept,params.location,{query,specialist,radius:station?radius:undefined})}>{dept === 'all' ? 'All departments' : names(dept, 'all').dept}</a>)}
-        <a href="/" className="underline p-2">Browse locations</a>
+      <nav aria-label="Browse medical departments" className="flex gap-1 overflow-x-auto whitespace-nowrap pb-1 text-sm sm:flex-wrap sm:gap-3">
+        {departments.map(dept => <a key={dept} aria-current={dept === params.department ? 'page' : undefined} className="underline p-2 min-h-11 inline-flex items-center shrink-0" href={searchLink(dept,params.location,{query,specialist,radius:station?radius:undefined})}>{dept === 'all' ? 'All departments' : names(dept, 'all').dept}</a>)}
+        <a href="/" className="underline p-2 min-h-11 inline-flex items-center shrink-0">Browse locations</a>
       </nav>
       <p className="text-sm text-slate-500" role={failed ? 'alert' : 'status'}>
         {failed ? 'Clinic information is temporarily unavailable. Please try again later.' : `Page ${page} · ${filteredClinics.length} clinic profiles on this page.${!filteredClinics.length&&page>1?' No further results. Use Previous page or change your search.':''}`}
       </p>
-      <p className="text-xs text-slate-500">Results use HIRA-reported departments. A reported department does not necessarily have a specialist. Clinic focus and full department details are shown separately.</p>
+      <details className="text-xs text-slate-500"><summary className="cursor-pointer underline">About these results</summary><p className="pt-2">Results use HIRA-reported departments. A reported department does not necessarily have a specialist. Clinic focus and full department details are shown separately.</p></details>
       {failed&&<a className="inline-flex min-h-11 items-center px-4 rounded-lg border bg-white font-semibold" href={searchLink(params.department,params.location,{query,specialist,radius:station?radius:undefined,page})}>Try again</a>}
       {!failed&&!filteredClinics.length&&<section aria-label="Search suggestions" className="rounded-xl border bg-white p-5 space-y-4"><h2 className="text-lg font-bold">{page>1?'Continue your search':'Try a broader search'}</h2><p className="text-sm text-slate-600">{page>1?'There are no clinic profiles on this page. Return to the first page or adjust your search.':'No clinic profiles matched this search. Adjust one filter below, or choose another location.'}</p><nav aria-label="Broaden your search" className="flex flex-wrap gap-3">{searchRecovery({department:params.department,location:params.location,query,specialist,radius:station?radius:undefined,page}).map(link=><a key={link.label} href={link.href} className="min-h-11 inline-flex items-center rounded-lg border px-4 py-2 text-sm font-semibold">{link.label}</a>)}</nav></section>}
-      {!failed&&pagination}
+      {!failed&&(page>1||!filteredClinics.length)&&pagination}
       {!failed&&filteredClinics.length>0 && <ClinicSearchClient returnTo={searchLink(params.department,params.location,{query,specialist,radius:station?radius:undefined,page})} lang="en" filteredClinics={filteredClinics.map(clinic=>({...clinic,address_region:clinicRegion(clinic)}))} mapCenter={mapCenter} selectedDepartment={params.department} />}
       {!failed&&filteredClinics.length>0&&pagination}
     </div>
