@@ -1,3 +1,4 @@
+import AreaQuickFind from '@/components/AreaQuickFind';
 import Link from 'next/link';
 import {notFound} from 'next/navigation';
 import {nationalAreas,nationalProvinces,regionLabel} from '@/lib/national-regions';
@@ -17,7 +18,8 @@ export default function ProvinceAreas({params,searchParams={}}:Props){
  <h1 className="text-2xl sm:text-3xl font-bold">Choose an area in {province.en}</h1><p className="text-sm text-slate-600">{province.ko} · Step 2: choose a city or district. Cities with smaller districts can be expanded below.</p>
  <Link href={areaClinicLink(province.slug,context)} className="min-h-11 inline-flex items-center rounded-lg bg-slate-900 px-4 py-3 text-white font-semibold">{context.department==='all'?'All clinics':'Selected clinics'} in {province.en}</Link>
  <AreaDepartmentFilter context={context} province={province.slug}/>
- <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 items-start">{roots.map(area=>{const children=areas.filter(a=>'parent' in a&&a.parent===area.ko);return <section key={area.slug} aria-label={regionLabel(area.slug)!} className="rounded-xl border bg-white p-4 space-y-2"><Link href={areaClinicLink(area.slug,context)} className="min-h-11 flex items-center font-semibold underline">{area.en} · {area.ko}</Link>{children.length>0&&<details><summary className="cursor-pointer min-h-11 py-3 text-sm">Choose a district in {area.en}</summary><nav aria-label={`Districts in ${area.en}`} className="space-y-2">{children.map(child=><Link key={child.slug} href={areaClinicLink(child.slug,context)} className="min-h-11 flex items-center rounded-lg border px-3 py-2 text-sm">{child.en} · {child.ko}</Link>)}</nav></details>}</section>;})}</div>
+ <AreaQuickFind label="Find a city or district" items={roots.map(area=>({id:area.slug,en:area.en,ko:area.ko,href:areaClinicLink(area.slug,context),children:areas.filter(a=>'parent' in a&&a.parent===area.ko).map(child=>({id:child.slug,en:child.en,ko:child.ko,href:areaClinicLink(child.slug,context)}))}))}/>
+
  {!roots.length&&<p className="text-sm text-slate-600">No smaller areas are listed in the current directory. Use “All clinics” above.</p>}
  </div>;
 }

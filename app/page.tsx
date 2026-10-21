@@ -1,3 +1,4 @@
+import {RecentClinicsHome} from '@/components/ClinicLibrary';
 'use strict';
 
 import React from 'react';
@@ -73,6 +74,8 @@ export default function HomePage({ params }: HomePageProps) {
           />
         </div>
       </section>
+
+      <RecentClinicsHome />
 
       {/* Grid of Browse Links */}
       <section className="max-w-6xl mx-auto px-4 space-y-4">
