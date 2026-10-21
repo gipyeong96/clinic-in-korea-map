@@ -1,3 +1,4 @@
+import {additionalGoldmanClinic} from '@/lib/goldman';
 import GoldmanVisitGuide from '@/components/GoldmanVisitGuide';
 import React from 'react';
 import { SITE_URL, clinicPath, serializeJsonLd } from '@/lib/site';
@@ -24,7 +25,7 @@ interface ClinicDetailProps {
 }
 
 export async function generateMetadata({ params }: ClinicDetailProps) {
-  const clinic = await getClinicById(params.id);
+  const clinic = additionalGoldmanClinic(params.id) || await getClinicById(params.id);
   if (!clinic) return { title: 'Clinic Not Found' };
 
   return {
@@ -37,7 +38,7 @@ export async function generateMetadata({ params }: ClinicDetailProps) {
 }
 
 export default async function ClinicDetail({ params, searchParams }: ClinicDetailProps) {
-  const clinic = await getClinicById(params.id);
+  const clinic = additionalGoldmanClinic(params.id) || await getClinicById(params.id);
   if (!clinic) return notFound();
 
   const region=clinicRegion(clinic);

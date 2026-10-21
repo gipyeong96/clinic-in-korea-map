@@ -1,3 +1,4 @@
+import {additionalGoldmanClinics} from '@/lib/goldman';
 import GoldmanVisitGuide from '@/components/GoldmanVisitGuide';
 import {RecentClinicsHome} from '@/components/ClinicLibrary';
 'use strict';
@@ -25,7 +26,7 @@ export default function HomePage({ params }: HomePageProps) {
   const dict = getDictionary('en');
 
   // Filter premium (Goldman) clinics to feature on the homepage
-  const featuredClinics = mockClinics.filter((c) => c.is_premium);
+  const featuredClinics = [...mockClinics.filter((c) => c.is_premium),...additionalGoldmanClinics];
 
   const departments = [
     { slug: 'urology', name: dict.urology },
@@ -141,7 +142,7 @@ export default function HomePage({ params }: HomePageProps) {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {featuredClinics.slice(0, 3).map((clinic) => (
+          {featuredClinics.map((clinic) => (
             <ClinicCard key={clinic.id} clinic={{...clinic,address_region:clinicRegion(clinic)}} />
           ))}
         </div>
