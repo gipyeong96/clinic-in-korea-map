@@ -46,6 +46,7 @@ export default function HomePage({ params }: HomePageProps) {
   const locations = [
     { slug: 'gangnam', name: 'Gangnam area' },
     { slug: 'seoul', name: 'Seoul' },
+    { slug: 'gyeonggi', name: 'Gyeonggi' },
     { slug: 'busan', name: 'Busan' },
     { slug: 'daegu', name: 'Daegu' },
     { slug: 'daejeon', name: 'Daejeon' },
