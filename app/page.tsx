@@ -1,3 +1,4 @@
+import GoldmanVisitGuide from '@/components/GoldmanVisitGuide';
 import {RecentClinicsHome} from '@/components/ClinicLibrary';
 'use strict';
 
@@ -144,6 +145,7 @@ export default function HomePage({ params }: HomePageProps) {
             <ClinicCard key={clinic.id} clinic={{...clinic,address_region:clinicRegion(clinic)}} />
           ))}
         </div>
+        <details className="rounded-xl border bg-white p-4"><summary className="cursor-pointer min-h-11 py-3 font-semibold">Visit Goldman: all 5 branches, hours & phone numbers</summary><GoldmanVisitGuide /></details>
       </section>
     </div>
   );

@@ -1,5 +1,7 @@
 'use strict';
 'use client';
+import {goldmanBranch,GOLDMAN_ENGLISH_URL} from '@/lib/goldman';
+
 
 import React from 'react';
 import Link from 'next/link';
@@ -139,13 +141,15 @@ export default function ClinicCard({ clinic, selectedDepartment='all', onShowMap
         {onShowMap&&hasClinicCoordinates(clinic)&&<button type="button" onClick={onShowMap} className="min-h-11 border rounded-lg px-3 py-2 text-sm font-semibold">Show on map</button>}
         {clinic.is_premium && clinic.premium_data?.website && (
           <a
-            href={clinic.premium_data.website}
+            href={goldmanBranch(String(clinic.id))?GOLDMAN_ENGLISH_URL:clinic.premium_data.website}
             target="_blank"
             rel="noopener noreferrer"
-            className="p-2 bg-white border border-amber-300 text-amber-600 rounded-lg hover:bg-amber-100 transition"
-            title="Website"
+            className="min-h-11 inline-flex items-center justify-center gap-1 px-2 py-2 bg-white border border-amber-300 text-amber-700 rounded-lg hover:bg-amber-100 transition text-xs font-semibold"
+            title={goldmanBranch(String(clinic.id))?'Official English website':'Website'}
+            aria-label={goldmanBranch(String(clinic.id))?`Official English website for ${name}`:`Website for ${name}`}
           >
-            <Globe className="w-4 h-4" />
+            <Globe className="w-4 h-4 shrink-0" />
+            {goldmanBranch(String(clinic.id))&&<span>English site</span>}
           </a>
         )}
         </div>

@@ -1,3 +1,4 @@
+import GoldmanVisitGuide from '@/components/GoldmanVisitGuide';
 import React from 'react';
 import { SITE_URL, clinicPath, serializeJsonLd } from '@/lib/site';
 import Link from 'next/link';
@@ -164,6 +165,8 @@ export default async function ClinicDetail({ params, searchParams }: ClinicDetai
           <p className="text-sm font-medium select-all">{address||'Address not provided'}</p>
           <ClinicContact clinic={clinic} />
         </section>
+
+        <GoldmanVisitGuide clinicId={String(clinic.id)} />
 
         {/* Semantic Table for AEO (AI bots easily parse tables) */}
         <section className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
