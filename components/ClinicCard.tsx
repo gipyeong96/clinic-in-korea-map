@@ -9,6 +9,7 @@ import RegistrationBadge from './RegistrationBadge';
 import ClinicContact from './ClinicContact';
 import {clinicName,clinicAddress,clinicPhone,hasClinicCoordinates} from '@/lib/clinic-contact';
 import {clinicPath} from '@/lib/site';
+import {clinicDetailLink} from '@/lib/detail-navigation';
 
 interface ClinicCardProps {
   clinic: {
@@ -27,7 +28,7 @@ interface ClinicCardProps {
   };
 }
 
-export default function ClinicCard({ clinic, selectedDepartment='all', onShowMap }: any) {
+export default function ClinicCard({ clinic, selectedDepartment='all', onShowMap, returnTo }: any) {
   const name = clinicName(clinic);
   const address = clinicAddress(clinic);
   const phone=clinicPhone(clinic.telephone);
@@ -36,8 +37,8 @@ export default function ClinicCard({ clinic, selectedDepartment='all', onShowMap
   const categoryName = clinicFocus(clinic);
   const departments = groupedDepartments(clinic);
   const selected = departments.find(d=>d.slug===selectedDepartment);
-  const locationName = clinic.locations?.name_en || clinic.location?.name_en || '';
-  const detailHref = clinicPath(clinic);
+  const locationName = clinic.address_region?.label || '';
+  const detailHref = clinicDetailLink(clinicPath(clinic),returnTo,clinic.id);
 
   return (
     <div 

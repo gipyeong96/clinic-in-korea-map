@@ -4,18 +4,21 @@ import React, { useState, useEffect } from 'react';
 import { Locale, getDictionary } from '@/lib/translation';
 import ClinicCard from '@/components/ClinicCard';
 import { clinicPath } from '@/lib/site';
+import {clinicDetailLink} from '@/lib/detail-navigation';
 import MapContainer from '@/components/MapContainer';
 import {clinicName,clinicAddress,hasClinicCoordinates} from '@/lib/clinic-contact';
 
 interface ClinicSearchClientProps {
   lang?: any;
   selectedDepartment?: string;
+  returnTo?: string;
   filteredClinics: any[];
   mapCenter: { lat: number; lng: number };
 }
 
 export default function ClinicSearchClient({
   lang,
+  returnTo,
   selectedDepartment,
   filteredClinics,
   mapCenter: initialMapCenter
@@ -42,7 +45,7 @@ export default function ClinicSearchClient({
     lng: c.longitude,
     address: clinicAddress(c),
     telephone: c.telephone,
-    detailHref: clinicPath(c),
+    detailHref: clinicDetailLink(clinicPath(c),returnTo,c.id),
     isPremium: c.is_premium
   }));
 
@@ -92,7 +95,7 @@ export default function ClinicSearchClient({
                   : 'hover:scale-[1.005]'
               }`}
             >
-              <ClinicCard clinic={clinic} selectedDepartment={selectedDepartment} onShowMap={()=>handleCardFocus(clinic.id,clinic.latitude,clinic.longitude)} />
+              <ClinicCard returnTo={returnTo} clinic={clinic} selectedDepartment={selectedDepartment} onShowMap={()=>handleCardFocus(clinic.id,clinic.latitude,clinic.longitude)} />
             </div>
           ))
         ) : (
