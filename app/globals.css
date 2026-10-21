@@ -21,9 +21,9 @@
 }
 
 @media (max-width: 639px) {
-  header > div { flex-wrap: nowrap; }
+  header > div.flex { flex-wrap: nowrap; }
   header > div > a { flex-shrink: 0; }
   header > div > a > span:first-child { max-width: 6rem; font-size: 0.875rem; line-height: 1.125rem; }
-  header > div > div { flex-wrap: nowrap; gap: 0.25rem; }
-  header > div > div > a { padding-left: 0.5rem; padding-right: 0.5rem; white-space: nowrap; }
+  header > div > div.flex { flex-wrap: nowrap; gap: 0.25rem; }
+  header > div > div > a.min-h-11 { padding-left: 0.5rem; padding-right: 0.5rem; white-space: nowrap; }
 }
