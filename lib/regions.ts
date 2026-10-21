@@ -1,3 +1,4 @@
+import {matchRegions,nationalAreas,nationalProvinces} from './national-regions';
 // Address constraints are applied before limiting results. Legacy location IDs may
 // contain homonymous neighbourhoods merged by the original import.
 // English names: https://english.gg.go.kr/31-si-gun-shortcut/ (checked 2026-10-20).
@@ -12,25 +13,17 @@ export const gyeonggiRegions = [
   ['yeoncheon','연천군'],['gapyeong','가평군'],['yangpyeong','양평군'],
 ];
 export function extractRegion(input:string) {
-  if(/\bstation\b|역(?:\s|$)/i.test(input))return null;
-  const matches=gyeonggiRegions.map(([slug,ko])=>{
-    const en=slug==='gyeonggi-gwangju'?'(?:gyeonggi(?:-do)?[ -]+gwangju|gwangju[ ,]+gyeonggi(?:-do)?)':`${slug}(?:[ -](?:si|gun)| city)?`;
-    const korean=slug==='gyeonggi-gwangju'?'경기(?:도)?\\s*광주시?':`${ko.slice(0,-1)}(?:${ko.slice(-1)})?`;
-    const pattern=new RegExp(`(?<![\\p{L}\\p{N}])(?:${en}|${korean})(?![\\p{L}\\p{N}])`,'iu');
-    return {slug,pattern,match:input.match(pattern)};
-  }).filter(x=>x.match);
-  if(matches.length!==1)return null;
-  const {slug,pattern}=matches[0];
-  return {slug,query:input.replace(pattern,' ').replace(/(?:^|\s)gyeonggi(?:-do)?(?=\s|$)/ig,' ').replace(/(?:^|\s)경기도?(?=\s|$)/g,' ').trim().replace(/\s+/g,' ')};
+  const result=matchRegions(input);
+  return result.options.length===1?{slug:result.options[0].slug,query:result.query}:null;
 }
 export const regionAddresses: Record<string, string[]> = {
-  ...Object.fromEntries(gyeonggiRegions.map(([slug,ko])=>[slug,[`경기도 ${ko} `,`경기 ${ko} `]])),
+  ...Object.fromEntries([...nationalProvinces,...nationalAreas].map(a=>[a.slug,a.prefixes])),
   gangnam: ['서울특별시 강남구 ', '서울 강남구 ', '서울특별시 서초구 ', '서울 서초구 '],
   seoul: ['서울특별시 ', '서울 '],
   busan: ['부산광역시 ', '부산 '],
   daegu: ['대구광역시 ', '대구 '],
   daejeon: ['대전광역시 ', '대전 '],
-  gwangju: ['광주광역시 ', '광주 ', '전남광주통합특별시 '],
+  gwangju: nationalProvinces.find(p=>p.slug==='gwangju')!.prefixes,
   ulsan: ['울산광역시 ', '울산 '],
   jeju: ['제주특별자치도 ', '제주도 ', '제주 '],
   incheon: ['인천광역시 ', '인천 '],

@@ -93,6 +93,7 @@ export default function HomePage({ params }: HomePageProps) {
               </Link>
             ))}
           </div>
+          <Link href="/areas" className="min-h-11 inline-flex items-center underline text-sm">Browse all provinces, cities and districts</Link>
         </div>
 
         {/* Departments */}
