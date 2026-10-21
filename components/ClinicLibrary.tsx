@@ -25,7 +25,7 @@ function useLibrary(){
 export function SaveClinic({clinic}:{clinic:LibraryClinic}){
   const {library,ready,error,change}=useLibrary();
   const saved=library.saved.some(c=>c.id===clinic.id);
-  return <div><button type="button" disabled={!ready} aria-pressed={saved} aria-label={`${saved?'Unsave':'Save'} ${clinic.name}`} onClick={()=>change(clinic,'save')} className="min-h-11 border rounded-lg px-3 py-2 text-sm font-semibold bg-white disabled:opacity-50">{saved?'★ Saved':'☆ Save clinic'}</button>{error&&<p role="status" className="text-xs text-rose-700 mt-1">{error}</p>}</div>;
+  return <div><button type="button" disabled={!ready} aria-pressed={saved} aria-label={`${saved?'Unsave':'Save'} ${clinic.name}`} title="Save in this browser on this device. No sign-up needed." onClick={()=>change(clinic,'save')} className="min-h-11 border rounded-lg px-3 py-2 text-sm font-semibold bg-white disabled:opacity-50">{saved?'★ Saved':'☆ Save clinic'}</button>{error&&<p role="status" className="text-xs text-rose-700 mt-1">{error}</p>}</div>;
 }
 
 export function RecordClinicVisit({clinic}:{clinic:LibraryClinic}){
@@ -37,6 +37,7 @@ export default function ClinicLibraryPage(){
   const {library,ready,error,change}=useLibrary();
   return <div className="max-w-4xl mx-auto px-4 py-8 space-y-6 min-w-0 break-words">
     <h1 className="text-3xl font-bold">My clinics</h1>
+    <p className="font-semibold">Save clinics on this device — no sign-up needed.</p>
     <p className="text-sm text-slate-600">Saved clinics and the last 20 clinic profiles you viewed are stored only in this browser on this device. They are not synced to an account. Clearing browser data removes this list.</p>
     {error&&<p role="status" className="text-sm text-rose-700">{error}</p>}
     {!ready?<p role="status">Loading your clinics…</p>:<>{(['saved','recent'] as const).map(kind=><section key={kind} className="space-y-3" aria-label={kind==='saved'?'Saved clinics':'Recently viewed clinics'}>
