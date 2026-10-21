@@ -11,6 +11,8 @@ import ClinicContact from '@/components/ClinicContact';
 import {clinicName,clinicAddress,clinicPhone} from '@/lib/clinic-contact';
 import {clinicRegion} from '@/lib/clinic-region';
 import {searchReturnPath} from '@/lib/detail-navigation';
+import {SaveClinic,RecordClinicVisit} from '@/components/ClinicLibrary';
+import {clinicSnapshot} from '@/lib/clinic-library';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -38,6 +40,7 @@ export default async function ClinicDetail({ params, searchParams }: ClinicDetai
   if (!clinic) return notFound();
 
   const region=clinicRegion(clinic);
+  const snapshot=clinicSnapshot({...clinic,address_region:region});
   const returnTo=searchReturnPath(searchParams.returnTo);
   const isPremium = clinic.is_premium;
   const name=clinicName(clinic),address=clinicAddress(clinic),phone=clinicPhone(clinic.telephone);
@@ -105,6 +108,7 @@ export default async function ClinicDetail({ params, searchParams }: ClinicDetai
       />
       
       <div className="max-w-4xl mx-auto px-4 py-8 space-y-6 min-w-0 break-words">
+        <RecordClinicVisit clinic={snapshot}/>
         
         <Link href={returnTo || `/clinics/all/${region?.slug || 'all'}`} className="min-h-11 inline-flex items-center rounded-lg border bg-white px-4 py-2 text-sm font-semibold">{returnTo?'← Back to search results':'Browse clinics in this area'}</Link>
         {/* Breadcrumb Navigation (Semantic AEO/SEO) */}
@@ -156,6 +160,7 @@ export default async function ClinicDetail({ params, searchParams }: ClinicDetai
         </section>
 
         <section className="bg-white rounded-xl border p-4 space-y-3" aria-label="Plan your visit">
+          <SaveClinic clinic={snapshot}/>
           <p className="text-sm font-medium select-all">{address||'Address not provided'}</p>
           <ClinicContact clinic={clinic} />
         </section>
