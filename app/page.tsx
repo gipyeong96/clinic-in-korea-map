@@ -12,6 +12,7 @@ import {clinicRegion} from '@/lib/clinic-region';
 import HomeSearch from '@/components/HomeSearch';
 import { MapPin, Stethoscope } from 'lucide-react';
 import StationFinder from '@/components/StationFinder';
+import departmentLabels from '@/lib/department-labels.json';
 
 interface HomePageProps {
   params: any;
@@ -29,6 +30,11 @@ export default function HomePage({ params }: HomePageProps) {
     { slug: 'internal-medicine', name: dict['internal-medicine'] },
     { slug: 'dermatology', name: dict.dermatology },
     { slug: 'plastic-surgery', name: dict['plastic-surgery'] },
+    { slug: 'ent', name: 'ENT (Ear, Nose & Throat)' },
+    { slug: 'pediatrics', name: 'Pediatrics (Children)' },
+    { slug: 'ob-gyn', name: 'Obstetrics & Gynecology' },
+    { slug: 'orthopedics', name: 'Orthopedics (Bones & Joints)' },
+    { slug: 'ophthalmology', name: 'Ophthalmology (Eyes)' },
   ];
 
   const locations = [
@@ -114,6 +120,7 @@ export default function HomePage({ params }: HomePageProps) {
               </Link>
             ))}
           </div>
+          <details className="border-t pt-2"><summary className="cursor-pointer min-h-11 py-3 text-sm font-semibold">Browse all medical departments</summary><div className="grid grid-cols-2 gap-2">{Object.entries(departmentLabels).filter(([slug])=>!['medical-clinic','general-hospital','long-term-care'].includes(slug)).map(([slug,label])=><Link key={slug} href={`/clinics/${slug}/all`} className="min-h-11 flex items-center rounded-lg border px-3 py-2 text-sm hover:border-amber-500">{label}</Link>)}</div></details>
         </div>
 
         </div>
