@@ -1,3 +1,5 @@
+import {nearbyStation} from '@/lib/card-location';
+import {stationPages} from '@/lib/stations';
 import {additionalGoldmanClinics} from '@/lib/goldman';
 import GoldmanVisitGuide from '@/components/GoldmanVisitGuide';
 import {RecentClinicsHome} from '@/components/ClinicLibrary';
@@ -77,11 +79,15 @@ export default function HomePage({ params }: HomePageProps) {
         </div>
       </section>
 
+      <div className="max-w-6xl mx-auto px-4">
+        <nav aria-label="Choose how to find a clinic" className="grid grid-cols-3 gap-2">{[['station-search','By station'],['area-search','By area'],['department-search','By department']].map(([id,label])=><a key={id} href={`#${id}`} className="min-h-11 flex items-center justify-center text-center rounded-lg border bg-white px-2 py-3 text-sm font-bold hover:border-amber-500">{label}</a>)}</nav>
+      </div>
+
       <RecentClinicsHome />
 
       {/* Grid of Browse Links */}
       <section className="max-w-6xl mx-auto px-4 space-y-4">
-        <nav aria-label="Choose how to find a clinic" className="grid grid-cols-3 gap-2">{[['station-search','By station'],['area-search','By area'],['department-search','By department']].map(([id,label])=><a key={id} href={`#${id}`} className="min-h-11 flex items-center justify-center text-center rounded-lg border bg-white px-2 py-3 text-sm font-bold hover:border-amber-500">{label}</a>)}</nav>
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
         <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
           <h2 id="station-search" className="browse-anchor text-lg font-bold text-slate-800 border-b border-slate-100 pb-2">Find by Station</h2>
@@ -143,7 +149,7 @@ export default function HomePage({ params }: HomePageProps) {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {featuredClinics.map((clinic) => (
-            <ClinicCard key={clinic.id} clinic={{...clinic,address_region:clinicRegion(clinic)}} />
+            <ClinicCard key={clinic.id} clinic={{...clinic,address_region:clinicRegion(clinic),card_station:nearbyStation(clinic,stationPages)}} />
           ))}
         </div>
         <details className="rounded-xl border bg-white p-4"><summary className="cursor-pointer min-h-11 py-3 font-semibold">Visit Goldman: all 5 branches, hours & phone numbers</summary><GoldmanVisitGuide /></details>
