@@ -242,3 +242,23 @@ test('specialist counts stay attached to the department that reported them', () 
   assert.equal(list.find(d=>d.slug==='urology').specialists,0);
   assert.equal(list.find(d=>d.slug==='pediatrics').specialists,1);
 });
+
+const suggestions=load('lib/home-suggestions.ts',{'./stations':stations,'./national-regions':national,'./search':search});
+test('home station suggestions distinguish nearby clinics and preserve department and extra terms',()=>{
+ assert.equal(suggestions.homeSuggestions('Hongdae dentist').stations[0].href,'/clinics/dentistry/station-86b835f49957a6');
+ assert.equal(suggestions.homeSuggestions('홍대').stations[0].label,'Hongik Univ. Station');
+ const result=suggestions.homeSuggestions('Hongdae dentist gentle').stations[0];
+ assert.equal(new URL(result.href,'https://example.com').searchParams.get('q'),'gentle');
+ assert.equal(suggestions.homeSuggestions('x').stations.length,0);
+ assert.equal(suggestions.homeSuggestions('unrelatedstationname').stations.length,0);
+ assert.ok(suggestions.homeSuggestions('Seoul').stations.length>0);
+ assert.ok(suggestions.homeSuggestions('Seoul').regions.some(r=>r.href==='/clinics/all/seoul'));
+ assert.ok(suggestions.homeSuggestions('Jung-gu').regions.length>1);
+});
+test('expanded medical department searches keep location and non-department words',()=>{
+ assert.equal(search.homeSearchPath('ENT Busan'),'/clinics/ent/busan');
+ assert.equal(search.homeSearchPath('pediatrician seoul'),'/clinics/pediatrics/seoul');
+ assert.equal(search.homeSearchPath('orthopedics Busan evening'),'/clinics/orthopedics/busan?q=evening');
+ assert.equal(search.homeSearchPath('ob-gyn'),'/clinics/ob-gyn/all');
+ assert.equal(search.homeSearchPath('eye clinic'),'/clinics/ophthalmology/all');
+});

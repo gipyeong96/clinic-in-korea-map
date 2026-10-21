@@ -18,6 +18,11 @@ export function homeSearchPath(input: string) {
     [/\binternal(?:[ -]+medicine)?\b/, 'internal-medicine'],
     [/\b(?:dermatology|dermatologist)\b/, 'dermatology'],
     [/\bplastic(?:[ -]+surgery)?\b/, 'plastic-surgery'],
+    [/\b(?:ent|ear nose throat|otolaryngology)\b/, 'ent'],
+    [/\b(?:pediatrics|pediatrician|paediatrics)\b/, 'pediatrics'],
+    [/\b(?:ob[ -]?gyn|gynecology|gynaecology|obstetrics)\b/, 'ob-gyn'],
+    [/\b(?:orthopedics|orthopaedics|orthopedist)\b/, 'orthopedics'],
+    [/\b(?:ophthalmology|ophthalmologist|eye clinic)\b/, 'ophthalmology'],
   ];
   const locations: [RegExp, string][] = [
     [/\bgangnam[ -]+station\b/, 'gangnam-station'],
