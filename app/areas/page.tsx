@@ -1,3 +1,4 @@
+import AreaQuickFind from '@/components/AreaQuickFind';
 import {nationalAreas,nationalProvinces,regionLabel} from '@/lib/national-regions';
 import AreaDepartmentFilter from '@/components/AreaDepartmentFilter';
 import {areaContext,areaBrowseLink} from '@/lib/area-navigation';
@@ -13,5 +14,6 @@ export default function Areas({searchParams={}}:{searchParams?:Record<string,str
     <button className="self-end min-h-11 px-5 py-3 rounded-lg bg-slate-900 text-white">Search</button>
   </form>
   <p className="text-xs text-slate-500">Names and address scopes checked 21 October 2026. <a className="underline" href="https://www.studyinkorea.go.kr/ko/life/regionsIntro.do" target="_blank" rel="noreferrer">Government regional directory</a>. Older province names in source addresses are supported.</p>
-  <nav aria-label="Choose city or province" className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">{nationalProvinces.map(p=><a key={p.slug} href={areaBrowseLink(p.slug,context)} className="bg-white rounded-xl border p-4 min-h-11 hover:border-amber-500"><span className="block font-bold">{p.en} · {p.ko}</span><span className="block text-sm text-slate-500 mt-1">Choose a city or district →</span></a>)}</nav>
+  <AreaQuickFind label="Find a city or province" items={nationalProvinces.map(p=>({id:p.slug,en:p.en,ko:p.ko,href:areaBrowseLink(p.slug,context)}))}/>
+
 </div>;}

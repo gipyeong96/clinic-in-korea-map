@@ -52,3 +52,14 @@ export default function ClinicLibraryPage(){
     <Link href="/" className="inline-flex min-h-11 items-center underline">Find more clinics</Link>
   </div>;
 }
+
+export function RecentClinicsHome(){
+ const {library,ready,error}=useLibrary();
+ if(!ready||error||!library.recent.length)return null;
+ return <section aria-labelledby="continue-heading" className="max-w-6xl mx-auto px-4 space-y-3">
+ <h2 id="continue-heading" className="text-xl font-bold">Continue browsing</h2>
+ <p className="text-sm text-slate-600">Recently viewed in this browser on this device.</p>
+ <ul className="grid sm:grid-cols-3 gap-3">{library.recent.slice(0,3).map(clinic=><li key={clinic.id}><Link href={clinic.path} className="block rounded-xl border bg-white p-4 min-h-11 hover:border-amber-500"><span className="block font-semibold">{clinic.name}</span><span className="block mt-1 text-sm text-slate-600">{clinic.region}</span></Link></li>)}</ul>
+ <Link href="/my-clinics" className="inline-flex min-h-11 items-center underline text-sm">View all in My clinics</Link>
+ </section>;
+}
