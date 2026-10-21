@@ -5,6 +5,7 @@ import { searchLink } from '@/lib/search';
 import { PAGE_SIZE, MAX_PAGE, searchPage } from '@/lib/pagination';
 import { matchRegions,regionLabel } from '@/lib/national-regions';
 import { searchRecovery } from '@/lib/search-recovery';
+import {activeFilters} from '@/lib/active-filters';
 import { getDictionary } from '@/lib/translation';
 import { getClinics } from '@/lib/supabase';
 import { SITE_URL, clinicPath, serializeJsonLd } from '@/lib/site';
@@ -65,6 +66,7 @@ export default async function SearchPage({ params, searchParams }: Props) {
   });
   const { dept, loc } = names(params.department, params.location);
   const mapCenter = station ? { lat: station.stations[0].latitude, lng: station.stations[0].longitude } : filteredClinics.length ? { lat: filteredClinics[0].latitude, lng: filteredClinics[0].longitude } : { lat: 37.5665, lng: 126.9780 };
+  const currentFilters=activeFilters({department:params.department,location:params.location,query,specialist,radius:station?radius:undefined,departmentLabel:dept,locationLabel:loc});
   const schema = {
     '@context': 'https://schema.org', '@type': 'ItemList',
     itemListElement: filteredClinics.map((clinic, i) => ({ '@type': 'ListItem', position: offset+i + 1, url: `${SITE_URL}${clinicPath(clinic)}` })),
@@ -88,10 +90,11 @@ export default async function SearchPage({ params, searchParams }: Props) {
         <label className="flex-1 min-w-[180px] text-sm font-semibold">Clinic name or address
           <input name="q" defaultValue={query} maxLength={200} className="block border rounded-lg px-3 py-2 w-full mt-1" placeholder="Search names or addresses" />
         </label>
-        {station && <label className="text-sm font-semibold">Radius<select name="radius" defaultValue={String(radius)} className="block border rounded-lg px-3 py-2 mt-1"><option value="500">500 m</option><option value="1000">1 km</option><option value="2000">2 km</option></select></label>}
+        {station && <label className="text-sm font-semibold">Radius<select id="search-radius" name="radius" defaultValue={String(radius)} className="scroll-mt-28 block border rounded-lg px-3 py-2 mt-1"><option value="500">500 m</option><option value="1000">1 km</option><option value="2000">2 km</option></select></label>}
         <label className="text-sm flex gap-2 py-2 items-center"><input type="checkbox" name="specialist" value="1" defaultChecked={specialist} /> {params.department==='all' ? 'Specialists reported' : `${dept} specialist reported`}</label>
         <button className="bg-slate-800 text-white rounded-lg px-4 py-2">Search</button>
       </form>
+      {currentFilters.filters.length>0&&<nav aria-label="Active search filters" className="flex flex-wrap items-center gap-2 text-sm"><span className="font-semibold">Your search:</span>{currentFilters.filters.map(filter=><a key={filter.action} href={filter.href} aria-label={`${filter.action}: ${filter.label}`} className="min-h-11 inline-flex max-w-full items-center gap-2 rounded-full border bg-white px-4 py-2 break-words"><span className="min-w-0">{filter.label}</span><span aria-hidden="true">{filter.action==='Change radius'?'↕':'×'}</span></a>)}<a href={currentFilters.clear} className="min-h-11 inline-flex items-center px-3 underline">Clear all filters</a></nav>}
       <nav aria-label="Browse medical departments" className="flex flex-wrap gap-3 text-sm">
         {departments.map(dept => <a key={dept} aria-current={dept === params.department ? 'page' : undefined} className="underline p-2" href={searchLink(dept,params.location,{query,specialist,radius:station?radius:undefined})}>{dept === 'all' ? 'All departments' : names(dept, 'all').dept}</a>)}
         <a href="/" className="underline p-2">Browse locations</a>

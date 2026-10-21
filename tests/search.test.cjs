@@ -19,6 +19,20 @@ const evidence = load('lib/clinic-evidence.ts');
 const stations = load('lib/stations.ts', { './stations.json': JSON.parse(fs.readFileSync(path.join(__dirname, '../lib/stations.json'), 'utf8')) });
 const pagination=load('lib/pagination.ts');
 const recovery=load('lib/search-recovery.ts',{'./search':search});
+const active=load('lib/active-filters.ts',{'./search':search});
+
+test('active filter removals preserve unrelated conditions and reset pagination',()=>{
+ const {filters,clear}=active.activeFilters({department:'dentistry',location:'seoul-station',query:'치과',specialist:true,radius:1000,departmentLabel:'Dentistry',locationLabel:'Seoul Station'});
+ assert.equal(filters.length,5);assert.equal(clear,'/clinics/all/all');
+ const byAction=action=>new URL(filters.find(f=>f.action===action).href,'https://example.com');
+ assert.equal(byAction('Remove department').pathname,'/clinics/all/seoul-station');assert.equal(byAction('Remove department').searchParams.get('specialist'),'1');assert.equal(byAction('Remove department').searchParams.get('q'),'치과');
+ assert.equal(byAction('Remove keyword').searchParams.get('q'),null);assert.equal(byAction('Remove keyword').searchParams.get('radius'),'1000');
+ assert.equal(byAction('Remove specialist filter').searchParams.get('specialist'),null);assert.equal(byAction('Remove specialist filter').searchParams.get('q'),'치과');
+ assert.equal(byAction('Remove location').pathname,'/clinics/dentistry/all');assert.equal(byAction('Remove location').searchParams.get('radius'),null);
+ assert.equal(filters.find(f=>f.action==='Change radius').href,'#search-radius');
+ for(const f of filters)assert.equal(new URL(f.href,'https://example.com').searchParams.has('page'),false);
+ assert.equal(active.activeFilters({department:'all',location:'all',query:'',specialist:false,departmentLabel:'Medical',locationLabel:'Korea'}).filters.length,0);
+});
 test('home search recognizes department/location but retains all other search terms', () => {
   assert.equal(search.homeSearchPath('Dentist Gangnam'), '/clinics/dentistry/gangnam');
   assert.equal(search.homeSearchPath('Goldman urology Seoul Station'), '/clinics/urology/seoul-station?q=goldman');

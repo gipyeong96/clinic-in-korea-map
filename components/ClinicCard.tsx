@@ -10,6 +10,8 @@ import ClinicContact from './ClinicContact';
 import {clinicName,clinicAddress,clinicPhone,hasClinicCoordinates} from '@/lib/clinic-contact';
 import {clinicPath} from '@/lib/site';
 import {clinicDetailLink} from '@/lib/detail-navigation';
+import {SaveClinic} from '@/components/ClinicLibrary';
+import {clinicSnapshot} from '@/lib/clinic-library';
 
 interface ClinicCardProps {
   clinic: {
@@ -121,6 +123,7 @@ export default function ClinicCard({ clinic, selectedDepartment='all', onShowMap
       </div>
 
       <div className="mt-5 pt-3 border-t border-slate-100 space-y-2">
+        <SaveClinic clinic={clinicSnapshot(clinic)} />
         <ClinicContact clinic={clinic} compact />
         <div className="flex gap-2">
         <Link 
