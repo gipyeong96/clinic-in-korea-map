@@ -8,3 +8,10 @@ test('five official branches keep distinct verified numbers, source tabs and bra
  assert.match(goldmanBranch('goldman-dongtan').weekday,/closed Wednesdays/);assert.match(goldmanBranch('goldman-dongtan').saturday,/15:00/);
  assert.deepEqual(goldmanBranches.filter(b=>b.stone24).map(b=>b.name),['Gangnam','Seoul Station','Jamsil']);assert.equal(goldmanBranch('unrelated-clinic'),undefined);
 });
+
+test('Dongtan and Jamsil homepage cards retain source phones and resolvable stable detail IDs',()=>{
+ const {additionalGoldmanClinics,additionalGoldmanClinic}=load('lib/goldman.ts');
+ assert.deepEqual(additionalGoldmanClinics.map(c=>c.id),['goldman-dongtan','goldman-jamsil']);
+ for(const c of additionalGoldmanClinics){assert.equal(c.telephone,goldmanBranch(c.id).phone);assert.equal(additionalGoldmanClinic(c.id),c);assert.equal(c.latitude,undefined);assert.equal(c.categories.slug,'urology');}
+ assert.equal(additionalGoldmanClinic('goldman-incheon'),undefined);
+});

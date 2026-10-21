@@ -10,3 +10,14 @@ export const goldmanBranches=[
 ];
 export function goldmanBranch(id:string){return goldmanBranches.find(branch=>branch.id===id);}
 export function goldmanLocationUrl(tab:number){return `${GOLDMAN_ENGLISH_URL}support/location?tab=${tab}`;}
+
+// Additional homepage profiles reuse the verified branch directory; no estimated coordinates.
+export const additionalGoldmanClinics=goldmanBranches.filter(b=>['goldman-dongtan','goldman-jamsil'].includes(b.id)).map(branch=>({
+ id:branch.id,name_en:`Goldman Urology Clinic ${branch.name}`,
+ name_ko:branch.id==='goldman-dongtan'?'골드만비뇨의학과의원 동탄점':'골드만비뇨의학과의원 잠실점',
+ telephone:branch.phone,address_en:branch.address,
+ address_ko:branch.id==='goldman-dongtan'?'경기 화성시 동탄대로 489, 9층':'서울 송파구 올림픽로35길 137, 3층',
+ category:{slug:'urology',name_en:'Urology'},categories:{slug:'urology',name_en:'Urology'},
+ is_premium:true,premium_data:{website:GOLDMAN_ENGLISH_URL,slogan_en:branch.transit},
+}));
+export function additionalGoldmanClinic(id:string){return additionalGoldmanClinics.find(clinic=>clinic.id===id);}
