@@ -1,0 +1,11 @@
+# Near-me search handoff
+
+- Home recognizes complete-word `near me`, `near-me`, `nearby` and `around me`. Supported existing department aliases are retained. Additional words remain as an editable clinic-name/address keyword; generic clinic/hospital nouns are removed only for near-me intent. Ordinary text and station/area searches remain unchanged.
+- Home suggestions offer a nearby entry rather than the misleading raw clinic-name search for the near-me phrase. Submitting the home form navigates to /nearby; it never requests geolocation.
+- Existing result URLs whose keyword includes near-me intent redirect to the consent page before database lookup. Explicit result departments override inferred departments. Specialist/registration and station radius are preserved; page and old location are discarded.
+- The results-page nearby action is a GET submit button inside the existing search form, so even checkbox or keyword changes not yet submitted with Search carry over. It carries department, keyword, specialist, registration, and station radius. No coordinates appear in the destination URL.
+- /nearby validates URL options, ignores repeated/invalid parameters, defaults to 1 km, and starts at page 1 with no position. It remounts when initial options change during client navigation to prevent stale filters/location from a previous search. No location restoration from URLs or storage.
+- Nearby keyword filtering uses the existing RPC search_query before pagination. Meta-characters use the same literal token handling as standard search; punctuation-only input produces an empty result instead of broadening to all clinics. No SQL/schema/data updates.
+- Nearby keyword changes require Apply keyword; other filters retain the previous immediate-update behavior once a position has been provided. Area fallback carries the current department and filters.
+
+Validation: regression tests cover near-me boundaries, department/extra-term preservation, URL input validation, pagination/coordinate reset and RPC keyword/filter intersection. Browser QA should cover home submit/suggestion, unsaved result filter handoff, ordinary regional search, mobile layout and consent-only initial state. Actual device GPS is not needed to validate navigation and must not be requested automatically.

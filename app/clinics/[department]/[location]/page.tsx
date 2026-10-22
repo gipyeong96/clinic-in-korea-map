@@ -5,7 +5,7 @@ import {stationPages} from '@/lib/stations';
 import React from 'react';
 import { notFound, redirect } from 'next/navigation';
 import { extractRegion } from '@/lib/regions';
-import { searchLink } from '@/lib/search';
+import { searchLink,hasNearMeIntent,homeSearchPath,nearbySearchLink } from '@/lib/search';
 import { PAGE_SIZE, MAX_PAGE, searchPage } from '@/lib/pagination';
 import { matchRegions,regionLabel } from '@/lib/national-regions';
 import { searchRecovery } from '@/lib/search-recovery';
@@ -50,6 +50,10 @@ export default async function SearchPage({ params, searchParams }: Props) {
   const registered = searchParams.registered === '1';
   const station = stationForSlug(params.location);
   const radius = searchRadius(searchParams.radius);
+  if(hasNearMeIntent(query)){
+    const parsed=new URL(homeSearchPath(query),SITE_URL);
+    redirect(nearbySearchLink(params.department==='all'?(parsed.searchParams.get('department')||'all'):params.department,{query:parsed.searchParams.get('q')||'',specialist,registered,radius:station?radius:undefined}));
+  }
   const page=searchPage(searchParams.page);
   const offset=(page-1)*PAGE_SIZE;
   const regionMatches=params.location==='all'?matchRegions(query):null;
@@ -101,6 +105,8 @@ export default async function SearchPage({ params, searchParams }: Props) {
         {station && <label className="text-sm font-semibold">Radius<select id="search-radius" name="radius" defaultValue={String(radius)} className="scroll-mt-28 block border rounded-lg px-3 py-2 mt-1"><option value="500">500 m</option><option value="1000">1 km</option><option value="2000">2 km</option></select></label>}
         <fieldset className="basis-full flex flex-wrap gap-x-5 gap-y-2"><legend className="text-sm font-semibold mb-1">Filter clinics</legend><label className="text-sm flex gap-2 min-h-11 items-center"><input type="checkbox" name="specialist" value="1" defaultChecked={specialist} /> {params.department==='all' ? 'Specialists reported' : `${dept} specialist reported`}</label><label className="text-sm flex gap-2 min-h-11 items-center"><input type="checkbox" name="registered" value="1" defaultChecked={registered} /> Registered for international patients</label><p className="basis-full text-xs text-slate-500">Select either or both. Registration is from the official KHIDI registry and does not confirm English or interpretation support.</p></fieldset>
         <button className="bg-slate-800 text-white rounded-lg px-4 py-2">Search</button>
+        <button type="submit" formAction="/nearby" name="department" value={params.department} className="min-h-11 rounded-lg border border-slate-800 px-4 py-2 text-sm font-semibold">Find clinics near me</button>
+        <p className="basis-full text-xs text-slate-500">Use your current location with these search options. Location access starts only when you choose “Use my location” on the next screen.</p>
       </form>
       {currentFilters.filters.length>0&&<nav aria-label="Active search filters" className="flex flex-wrap items-center gap-2 text-sm"><span className="font-semibold">Your search:</span>{currentFilters.filters.map(filter=><a key={filter.action} href={filter.href} aria-label={`${filter.action}: ${filter.label}`} className="min-h-11 inline-flex max-w-full items-center gap-2 rounded-full border bg-white px-4 py-2 break-words"><span className="min-w-0">{filter.label}</span><span aria-hidden="true">{filter.action==='Change radius'?'↕':'×'}</span></a>)}<a href={currentFilters.clear} className="min-h-11 inline-flex items-center px-3 underline">Clear all filters</a></nav>}
       <ResultDepartmentPicker department={params.department} location={params.location} options={{query,specialist,registered,radius:station?radius:undefined}} />

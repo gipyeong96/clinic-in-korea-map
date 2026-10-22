@@ -41,6 +41,17 @@ test('home search recognizes department/location but retains all other search te
   assert.equal(search.homeSearchPath(''), '/clinics/all/all');
   assert.equal(search.homeSearchPath('Gangnam unknownword'), '/clinics/all/gangnam?q=unknownword');
 });
+
+test('near-me intent routes to explicit location consent with department and extra terms intact',()=>{
+ assert.equal(search.homeSearchPath('UROLOGY NEAR ME'),'/nearby?department=urology');
+ assert.equal(search.homeSearchPath('dentist near-me'),'/nearby?department=dentistry');
+ assert.equal(search.homeSearchPath('clinics around me'),'/nearby');
+ assert.equal(search.homeSearchPath('Goldman urologist near me'),'/nearby?department=urology&q=goldman');
+ assert.equal(search.homeSearchPath('nearby dermatology'),'/nearby?department=dermatology');
+ for(const phrase of ['Near Memorial Clinic','near medicine','nearmeadow'])assert.equal(search.hasNearMeIntent(phrase),false);
+ const handoff=new URL(search.nearbySearchLink('ent',{query:'서울 & clinic',specialist:true,registered:true,radius:500,page:4}),'https://example.com');
+ assert.equal(handoff.pathname,'/nearby');assert.equal(handoff.searchParams.get('q'),'서울 & clinic');assert.equal(handoff.searchParams.get('department'),'ent');assert.equal(handoff.searchParams.get('specialist'),'1');assert.equal(handoff.searchParams.get('registered'),'1');assert.equal(handoff.searchParams.get('radius'),'500');assert(!handoff.searchParams.has('page'));assert(!handoff.searchParams.has('location'));assert(!handoff.searchParams.has('latitude'));
+});
 test('text search does not accept PostgREST syntax or wildcard-only queries', () => {
   assert.deepEqual(search.searchTerms('%%_*,()."\\'), []);
   assert.deepEqual(search.searchTerms('강남 Goldman'), ['강남', 'Goldman']);
@@ -246,6 +257,7 @@ test('specialist counts stay attached to the department that reported them', () 
 
 const suggestions=load('lib/home-suggestions.ts',{'./stations':stations,'./national-regions':national,'./search':search});
 test('home station suggestions distinguish nearby clinics and preserve department and extra terms',()=>{
+ assert.deepEqual(suggestions.homeSuggestions('Seoul urology near me'),{stations:[],regions:[]});
  assert.equal(suggestions.homeSuggestions('Hongdae dentist').stations[0].href,'/clinics/dentistry/station-86b835f49957a6');
  assert.equal(suggestions.homeSuggestions('홍대').stations[0].label,'Hongik Univ. Station');
  const result=suggestions.homeSuggestions('Hongdae dentist gentle').stations[0];

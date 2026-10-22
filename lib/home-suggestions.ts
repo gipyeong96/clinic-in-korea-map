@@ -1,6 +1,6 @@
 import {stationPages} from './stations';
 import {matchRegions,nationalProvinces,nationalAreas,regionLabel} from './national-regions';
-import {homeSearchPath,searchLink} from './search';
+import {homeSearchPath,searchLink,hasNearMeIntent} from './search';
 
 export type HomeSuggestion={label:string;detail:string;href:string};
 const normalize=(s:string)=>s.toLowerCase().replace(new RegExp('[^\\p{L}\\p{N}]','gu'),'');
@@ -14,7 +14,7 @@ function occurrence(input:string,alias:string){
 }
 export function homeSuggestions(input:string){
  const query=input.trim().slice(0,200),key=normalize(query);
- if(key.length<2)return {stations:[] as HomeSuggestion[],regions:[] as HomeSuggestion[]};
+ if(key.length<2||hasNearMeIntent(query))return {stations:[] as HomeSuggestion[],regions:[] as HomeSuggestion[]};
  const stations=stationIndex.map(({station,aliases})=>{
    const alias=[...aliases].sort((a,b)=>b.length-a.length).find(a=>occurrence(query,a)!==null);
    const partial=!alias&&aliases.some(a=>normalize(a).startsWith(key));
