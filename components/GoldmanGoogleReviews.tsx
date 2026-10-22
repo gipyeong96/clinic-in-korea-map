@@ -14,17 +14,18 @@ function ReviewWidget({placeId,apiKey}:{placeId:string;apiKey:string}){
  useEffect(()=>{
   if(!isLoaded)return;
   let active=true;
+  let failedAlready=false;
   const container=host.current;
   const element=document.createElement('gmp-place-details');
   const ready=()=>{clearTimeout(timeout);if(active)setState('ready');};
-  const failed=()=>{if(active)setState('error');};
+  const failed=()=>{failedAlready=true;clearTimeout(timeout);if(active)setState('error');};
   const timeout=window.setTimeout(failed,20000);
   element.addEventListener('gmp-load',ready);
   element.addEventListener('gmp-error',failed);
   (async()=>{
    await google.maps.importLibrary('places');
    await customElements.whenDefined('gmp-place-details');
-   if(!active)return;
+   if(!active||failedAlready)return;
    const request=document.createElement('gmp-place-details-place-request');
    request.setAttribute('place',placeId);
    const config=document.createElement('gmp-place-content-config');
@@ -59,3 +60,4 @@ export default function GoldmanGoogleReviews({clinicId}:{clinicId:string}){
   <p className="text-xs text-slate-500">When you show reviews, your browser connects to Google. We do not copy reviews into our clinic database. <Link href="/privacy" className="underline">Privacy</Link> · <Link href="/terms" className="underline">Terms</Link></p>
  </section>;
 }
+
