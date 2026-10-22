@@ -1,3 +1,4 @@
+import {uniqueClinicProfiles} from '@/lib/site';
 import ResultDepartmentPicker from '@/components/ResultDepartmentPicker';
 import StationFinder from '@/components/StationFinder';
 import {nearbyStation} from '@/lib/card-location';
@@ -68,12 +69,12 @@ export default async function SearchPage({ params, searchParams }: Props) {
   // Collapse repeated imported profiles in the displayed batch without modifying source data.
   const seen = new Set<string>();
   const hasNext=clinics.length>PAGE_SIZE;
-  const filteredClinics = clinics.slice(0,PAGE_SIZE).filter(clinic => {
+  const filteredClinics = uniqueClinicProfiles(clinics.slice(0,PAGE_SIZE).filter(clinic => {
     const key = JSON.stringify([clinic.name_ko, clinic.address_ko?.replace(/\s/g, ''), clinic.telephone?.replace(/[^0-9]/g, '')]);
     if (seen.has(key)) return false;
     seen.add(key);
     return true;
-  });
+  }));
   const { dept, loc } = names(params.department, params.location);
   const mapCenter = station ? { lat: station.stations[0].latitude, lng: station.stations[0].longitude } : filteredClinics.length ? { lat: filteredClinics[0].latitude, lng: filteredClinics[0].longitude } : { lat: 37.5665, lng: 126.9780 };
   const currentFilters=activeFilters({department:params.department,location:params.location,query,specialist,registered,radius:station?radius:undefined,departmentLabel:dept,locationLabel:loc});

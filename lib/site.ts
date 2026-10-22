@@ -9,8 +9,25 @@ export const unifiedClinicRecords=[
  {id:'goldman-dongtan',aliases:['58364127-19b7-4f35-bacf-4f62a0d4ef7e','6f05a9f6-9d3a-4a8e-98a1-ce1a211f4c55','bd44562e-af8c-407a-8c0b-22b95c8e81ee'],hira:'JDU4MTI3MSM1MSMkMiMkMCMkMDAkNTgxMzUxIzExIyQxIyQ3IyQ4OSQzNjEwMDIjNzEjJDEjJDgjJDgz'},
  {id:'goldman-jamsil',aliases:['c1072301-45cc-4fe4-9d88-0538511d3df8','0018c959-9e0a-4858-b27c-9f19a803a15a','3327f0c8-252b-4c3f-99ef-ab6fee61ec79'],hira:'JDQ4MTg4MSM1MSMkMiMkOCMkMDAkMzgxMzUxIzMxIyQyIyQ3IyQwMCQyNjEyMjIjNjEjJDEjJDAjJDgz'},
 ];
-export function unifiedClinicRecord(id:string){return unifiedClinicRecords.find(c=>c.id===id||c.hira===id||c.aliases.includes(id.toLowerCase()));}
+export function unifiedClinicRecord(id:string){if(typeof id!=='string')return undefined;return unifiedClinicRecords.find(c=>c.id===id||c.hira===id||c.aliases.includes(id.toLowerCase()));}
 export function canonicalClinicId(id:string){return unifiedClinicRecord(id)?.id||id;}
+
+// Deduplicate only verified branch identities within the already paginated page.
+// Keep the first result's anchor/order, preferring public evidence over managed data.
+export function uniqueClinicProfiles(clinics:any[]){
+  const result:any[]=[],positions=new Map<string,number>();
+  for(const clinic of clinics){
+    const record=unifiedClinicRecord(clinic.id)||unifiedClinicRecord(clinic.hira_code||'');
+    if(!record){result.push(clinic);continue;}
+    const position=positions.get(record.id);
+    if(position===undefined){positions.set(record.id,result.length);result.push(clinic);continue;}
+    const first=result[position];
+    if(clinic.department_source?.provider==='HIRA'&&first.department_source?.provider!=='HIRA'){
+      result[position]={...clinic,id:first.id,name_en:first.name_en,name_ko:first.name_ko};
+    }
+  }
+  return result;
+}
 
 export function clinicPath(clinic: { hira_code?: string | null; id: string }) {
   const record=unifiedClinicRecord(clinic.id)||unifiedClinicRecord(clinic.hira_code||'');

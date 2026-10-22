@@ -19,3 +19,10 @@ test('all known detail identifiers resolve the same public evidence and verified
  }
  fail=true;const fallback=await api.getClinicById('goldman-gangnam');assert.equal(fallback.department_source,undefined);assert.equal(fallback.departments,undefined);assert.equal(fallback.telephone,'02-556-7533');
 });
+
+test('same-page dedup prefers HIRA evidence while preserving first anchor, order, other clinics and source input',()=>{
+ const record=site.unifiedClinicRecords[0],managed={id:record.aliases[0],name_en:'Gangnam',department_source:{provider:'Clinic-managed profile'},departments:[{specialist_count:2}]},publicRecord={id:record.aliases[2],hira_code:record.hira,name_en:'Generic',department_source:{provider:'HIRA'},departments:[{specialist_count:4}]},other={id:'other'};
+ const raw=[managed,other,publicRecord];const before=JSON.stringify(raw);const rows=site.uniqueClinicProfiles(raw);
+ assert.equal(rows.length,2);assert.equal(rows[0].id,managed.id);assert.equal(rows[0].name_en,'Gangnam');assert.equal(rows[0].departments[0].specialist_count,4);assert.equal(rows[1],other);assert.equal(JSON.stringify(raw),before);
+ assert.equal(site.uniqueClinicProfiles([publicRecord,managed])[0].department_source.provider,'HIRA');assert.equal(site.uniqueClinicProfiles([managed,{id:'goldman-jamsil'}]).length,2);
+});
