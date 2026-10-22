@@ -12,8 +12,9 @@ test('premium marketing fields never become verified department or registration 
  assert.deepEqual(profile.departments,[]);assert.equal(profile.departmentSource,null);assert.equal(profile.registration,null);assert.equal(profile.phone.href,null);
 });
 test('confirmed department-specific counts and registry dates survive projection without unrelated data',()=>{
- const p=comparison.comparisonProfile({id:'clinic',name_en:'Clinic',department_source:'HIRA',departments:[{slug:'urology',name_en:'Urology',specialist_count:2},{slug:'dermatology',name_en:'Dermatology',specialist_count:0}],foreign_patient_registration:{status:'listed',source_date:'2026-01-01',checked_at:'2026-10-01'},telephone:'02-555-7900',secret:'never send'});
+ const p=comparison.comparisonProfile({id:'clinic',name_en:'Clinic',department_source:{provider:'HIRA',as_of:'2026-07-01',checked_at:'2026-10-01'},departments:[{slug:'urology',name_en:'Urology',specialist_count:2},{slug:'dermatology',name_en:'Dermatology',specialist_count:0}],foreign_patient_registration:{status:'listed',source_date:'2026-01-01',checked_at:'2026-10-01'},telephone:'02-555-7900',secret:'never send'});
  assert.deepEqual(p.departments,[{name:'Urology',specialists:2},{name:'Dermatology',specialists:0}]);assert.equal(p.registration.date,'2026-01-01');assert.equal(p.phone.href,'tel:+8225557900');assert.equal(p.secret,undefined);
+ assert.equal(p.departmentSource,'HIRA · As of 2026-07-01 · Checked 2026-10-01');
 });
 test('comparison validates before lookup and preserves partial failures, order and no-store',async()=>{
  const calls=[];const api=load('app/api/clinics/compare/route.ts',{'@/lib/clinic-comparison':comparison,'@/lib/goldman':{additionalGoldmanClinic:()=>null},'@/lib/supabase':{getClinicById:async id=>{calls.push(id);if(id==='error')throw Error();return id==='missing'?null:{id,name_en:id};}},'next/server':{NextResponse:{json:(body,options)=>({body,...options})}}});

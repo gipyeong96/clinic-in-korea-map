@@ -11,11 +11,13 @@ export function comparisonIds(value:unknown):string[]|null{
 export function comparisonProfile(clinic:any){
  const departments=clinic.department_source?groupedDepartments(clinic):[];
  const record=registeredEvidence(clinic);
+ const source=clinic.department_source;
+ const departmentSource=source?.provider==='HIRA'?['HIRA',source.as_of&&`As of ${cleanText(source.as_of)}`,source.checked_at&&`Checked ${cleanText(source.checked_at)}`].filter(Boolean).join(' · '):cleanText(source)||null;
  return {
   name:clinicName(clinic),nameKo:cleanText(clinic.name_ko),path:clinicPath(clinic),address:clinicAddress(clinic),
   phone:clinicPhone(clinic.telephone),directions:clinicDirections(clinic),
   departments:departments.map(d=>({name:cleanText(d.name),specialists:Number.isFinite(d.specialists)&&d.specialists>0?d.specialists:0})),
-  departmentSource:clinic.department_source?cleanText(clinic.department_source):null,
+  departmentSource,
   registration:record?{date:record.source_date,checked:cleanText(record.checked_at)}:null,
  };
 }
