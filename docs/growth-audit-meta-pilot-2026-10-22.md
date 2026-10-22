@@ -1,4 +1,6 @@
-# Growth baseline, measurement audit and Meta pilot — 22 October 2026
+# 성장 측정·검색 색인 점검과 메타 실험안 — 2026년 10월 22일
+
+요약: 검색 색인 보고서는 색인 369개·제외 48개(10월 16일 기준)이며, 두 사이트맵은 성공 상태입니다. 강남 비뇨기과 선택 가이드는 Google 미등록으로 확인되어 색인 요청을 접수했습니다. 측정 코드는 개인정보를 담지 않는 페이지 유형·행동 집계와 내부 브라우저 제외 기능으로 준비했으며 PR 배포 승인이 필요합니다. 메타 광고는 기존 코코 릴스를 활용한 7일·총 7만원 검토안이고 집행하지 않았습니다.
 
 ## Verified accounts and source windows
 
@@ -13,6 +15,7 @@
 - /nearby is intentionally noindex, follow. It is an interactive location tool, so organic near-me entry should be measured on the home/guide landing and its onward use, not assumed to rank at /nearby.
 - Duplicate examples include /clinics/dentistry/seocheoneup and imported detail IDs. Crawled-but-unindexed examples include /clinics/urology/gyodong and /clinics/urology/mullaedong3ga plus imported detail IDs.
 - Live /clinics/urology/gyodong ultimately returned zero profiles with a self-canonical (one earlier request showed a temporary data error). This is a weak legacy dong-only landing, not evidence that no local clinics exist. Do not redirect ambiguous dong names to a guessed city or delete hospital profiles.
+- URL inspection on 22 October: /guides/choose-urology-clinic-gangnam was unknown to Google with no detected referring sitemap or crawl. A single indexing request completed and Google confirmed addition to the priority crawl queue; acceptance is not indexing or a ranking guarantee.
 - Next SEO work: inspect Google-selected canonicals for the ten duplicates, resolve legacy locations only with unambiguous official mappings, and review unique source-backed profile content. Check priority home/guide/area URLs individually before requesting indexing. No blanket validation or mass indexing request was submitted in this audit.
 
 ## Measurement changes and deployment gate
