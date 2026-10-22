@@ -166,7 +166,7 @@ function database({ error = null, locations = [], data = [] } = {}) {
     then(resolve) { return Promise.resolve({ data, error }).then(resolve); },
   };
   const client = { rpc: async (...args) => { calls.push(['rpc', ...args]); return {data,error}; }, from(table) { return table === 'locations' ? { select: async () => ({ data: locations }) } : builder; } };
-  const api = load('lib/supabase.ts', { './search': search, './regions': regions, './stations': stations, '@supabase/supabase-js': { createClient: () => client } });
+  const api = load('lib/supabase.ts', { './search': search, './regions': regions, './stations': stations, './site':site, './goldman':load('lib/goldman.ts',{'./site':site}), '@supabase/supabase-js': { createClient: () => client } });
   return { calls, api };
 }
 test('keyword and specialist constraints reach the database before the result limit', async () => {

@@ -1,3 +1,4 @@
+import {canonicalClinicId} from './site';
 // Place IDs obtained with Google's public Place ID Finder, checked 2026-10-22.
 // Identity checked against official branch contact details; no ratings or review text stored.
 const places:Record<string,{placeId:string}>={
@@ -7,5 +8,5 @@ const places:Record<string,{placeId:string}>={
  'goldman-dongtan':{placeId:'ChIJwStJkeNFezURXvhiklLTKZU'},
  'goldman-jamsil':{placeId:'ChIJb_GGHhylfDURVBg8h7-m-Ts'},
 };
-export function goldmanGooglePlace(id:string){return Object.prototype.hasOwnProperty.call(places,id)?places[id]:undefined;}
+export function goldmanGooglePlace(id:string){const key=canonicalClinicId(id);return Object.prototype.hasOwnProperty.call(places,key)?places[key]:undefined;}
 export function googlePlaceUrl(placeId:string,name:string){return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name)}&query_place_id=${encodeURIComponent(placeId)}`;}

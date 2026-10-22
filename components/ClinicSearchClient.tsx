@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Locale, getDictionary } from '@/lib/translation';
+import {SavedComparisonNotice} from '@/components/ClinicLibrary';
 import ClinicCard from '@/components/ClinicCard';
 import { clinicPath } from '@/lib/site';
 import {clinicDetailLink} from '@/lib/detail-navigation';
@@ -76,7 +77,8 @@ export default function ClinicSearchClient({
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 items-start min-w-0">
+    <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 items-start min-w-0 pb-28">
+      {view==='list'&&<SavedComparisonNotice/>}
       <div className="lg:hidden col-span-full flex gap-2 sticky top-20 z-20 bg-slate-50 py-2" role="group" aria-label="Results view">
         <button type="button" aria-pressed={view==='list'} onClick={()=>setView('list')} className={`min-h-11 flex-1 border rounded-lg font-semibold ${view==='list'?'bg-slate-900 text-white':'bg-white'}`}>Clinic list</button>
         <button type="button" aria-pressed={view==='map'} onClick={()=>setView('map')} className={`min-h-11 flex-1 border rounded-lg font-semibold ${view==='map'?'bg-slate-900 text-white':'bg-white'}`}>Map</button>

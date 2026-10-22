@@ -1,5 +1,5 @@
 const {test}=require('node:test');const assert=require('node:assert/strict');const fs=require('node:fs');const ts=require('typescript');
-function load(file){const m={exports:{}};new Function('module','exports',ts.transpileModule(fs.readFileSync(file,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText)(m,m.exports);return m.exports;}
+function load(file){const m={exports:{}};new Function('module','exports','require',ts.transpileModule(fs.readFileSync(file,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText)(m,m.exports,n=>n==='./site'?load('lib/site.ts'):require(n));return m.exports;}
 const {goldmanBranches,goldmanBranch,goldmanLocationUrl}=load('lib/goldman.ts');const {clinicPhone}=load('lib/clinic-contact.ts');
 test('five official branches keep distinct verified numbers, source tabs and branch-specific schedules',()=>{
  const expected=['+8225567533','+8227737522','+82322211911','+82313737532','+8224217511'];

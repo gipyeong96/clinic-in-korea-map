@@ -1,11 +1,13 @@
 const {test}=require('node:test');const assert=require('node:assert/strict');const fs=require('node:fs');const ts=require('typescript');
 function load(file,imports={}){const m={exports:{}};new Function('module','exports','require',ts.transpileModule(fs.readFileSync(file,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,esModuleInterop:true}}).outputText)(m,m.exports,n=>imports[n]||require(n));return m.exports;}
 const contact=load('lib/clinic-contact.ts'),evidence=load('lib/clinic-evidence.ts');
-const comparison=load('lib/clinic-comparison.ts',{'./clinic-contact':contact,'./clinic-evidence':evidence,'./site':{clinicPath:c=>`/clinics/detail/${encodeURIComponent(c.hira_code||c.id)}`}});
+const comparison=load('lib/clinic-comparison.ts',{'./clinic-contact':contact,'./clinic-evidence':evidence,'./site':load('lib/site.ts')});
 test('comparison accepts only two or three distinct bounded provider identifiers',()=>{
  for(const ids of [['a','b'],['goldman-jamsil','hira_123','UUID-3']])assert.deepEqual(comparison.comparisonIds({ids}),ids);
  for(const ids of [[],['a'],['a','b','c','d'],['a','a'],['a','../b'],['a','b%2fc'],['a',4],['a','x'.repeat(201)]])assert.equal(comparison.comparisonIds({ids}),null);
  for(const value of [null,[],{},'a'])assert.equal(comparison.comparisonIds(value),null);
+ assert.equal(comparison.comparisonIds({ids:['goldman-gangnam','85ed27c9-0b6e-45c6-81ee-5d81fe36a2fc']}),null);
+ assert.deepEqual(comparison.comparisonIds({ids:['85ed27c9-0b6e-45c6-81ee-5d81fe36a2fc','other']}),['goldman-gangnam','other']);
 });
 test('premium marketing fields never become verified department or registration evidence',()=>{
  const profile=comparison.comparisonProfile({id:'premium',name_en:'Clinic',is_premium:true,specialist_count:10,departments:[{slug:'urology',name_en:'Urology',specialist_count:10}],foreign_patient_registration:{status:'listed'},telephone:'javascript:alert(1)'});

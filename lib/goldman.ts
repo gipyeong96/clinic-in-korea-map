@@ -1,3 +1,4 @@
+import {canonicalClinicId} from './site';
 // Source: official Goldman English branch tabs, checked 2026-10-21.
 export const GOLDMAN_ENGLISH_URL='https://www.gold-man.com/ennew/';
 export const GOLDMAN_CHECKED='2026-10-21';
@@ -8,7 +9,7 @@ export const goldmanBranches=[
  {id:'goldman-dongtan',name:'Dongtan',tab:7,phone:'031-373-7532',address:'9F, 489 Dongtan-daero, Hwaseong-si, Gyeonggi-do',transit:'Dongtan Station (SRT / GTX-A), Exit 2; 300 m.',weekday:'Monday, Tuesday, Thursday, Friday 09:00–18:00; closed Wednesdays',saturday:'09:00–15:00 (no lunch break)',lunch:'13:00–14:00 on weekdays',stone24:false},
  {id:'goldman-jamsil',name:'Jamsil',tab:6,phone:'02-421-7511',address:'3F, Korea Advertising Culture Center, 137 Olympic-ro 35-gil, Songpa-gu, Seoul',transit:'Jamsil Station (Lines 2 and 8), Exit 7.',weekday:'Monday–Friday 09:00–18:00',saturday:'09:00–16:00',lunch:'13:00–14:00, including Saturday',stone24:true},
 ];
-export function goldmanBranch(id:string){return goldmanBranches.find(branch=>branch.id===id);}
+export function goldmanBranch(id:string){return goldmanBranches.find(branch=>branch.id===canonicalClinicId(id));}
 export function goldmanLocationUrl(tab:number){return `${GOLDMAN_ENGLISH_URL}support/location?tab=${tab}`;}
 
 // Additional homepage profiles reuse the verified branch directory; no estimated coordinates.
