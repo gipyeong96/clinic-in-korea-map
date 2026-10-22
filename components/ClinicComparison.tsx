@@ -1,6 +1,7 @@
 'use client';
 import {useEffect,useRef,useState} from 'react';
 import Link from 'next/link';
+import {measure} from '@/lib/measurement';
 import type {LibraryClinic} from '@/lib/clinic-library';
 import type {ComparisonProfile,ComparisonRow} from '@/lib/clinic-comparison';
 
@@ -18,6 +19,7 @@ export default function ClinicComparison({selected}:{selected:LibraryClinic[]}){
  const controller=useRef<AbortController|null>(null),ticket=useRef(0);
  useEffect(()=>()=>{ticket.current++;controller.current?.abort();},[]);
  async function compare(){
+  measure('compare_request');
   controller.current?.abort();const abort=new AbortController();controller.current=abort;const current=++ticket.current;setBusy(true);setError('');
   try{
    const ids=selected.map(c=>decodeURIComponent(c.path.split('/').pop()!));
