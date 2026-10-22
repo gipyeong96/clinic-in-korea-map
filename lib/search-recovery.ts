@@ -5,7 +5,7 @@ export function searchRecovery(input:{department:string;location:string;query:st
   const {department,location,query,specialist,registered,radius,page}=input;
   const options={query,specialist,registered,radius};
   const links:{label:string;href:string;title?:string;description:string}[]=[];
-  const departmentName=input.departmentLabel||(labels as Record<string,string>)[department]||'All departments';
+  const departmentName=department==='all'?'All departments':input.departmentLabel||(labels as Record<string,string>)[department]||'All departments';
   const place=location==='all'?'across Korea':`in ${input.locationLabel||'this area'}`;
   if(page>1)links.push({label:'Back to the first page',href:searchLink(department,location,options),description:'Keep these search options and return to page 1.'});
   const parsed=new URL(homeSearchPath(query),'https://example.com');
