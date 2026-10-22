@@ -77,9 +77,9 @@ export function SavedComparisonNotice(){
  const [dismissed,setDismissed]=useState('');
  const signature=library.saved.map(c=>c.id).join('|');
  if(!ready||error||!library.saved.length||dismissed===signature)return null;
- return <aside aria-label="Saved clinics comparison shortcut" className="fixed bottom-3 left-3 right-3 z-40 max-w-2xl mx-auto rounded-xl border border-slate-300 bg-white shadow-lg p-3 flex items-center gap-3">
-  <div className="min-w-0 flex-1"><p role="status" className="text-sm font-bold">{library.saved.length} saved {library.saved.length===1?'clinic':'clinics'}</p><p className="text-xs text-slate-600">{library.saved.length===1?'Save one more clinic to compare.':'Choose two or three in My clinics to compare.'}</p></div>
-  <Link href="/my-clinics#compare-heading" className="min-h-11 inline-flex items-center rounded-lg bg-slate-900 text-white px-3 py-2 text-sm font-semibold">{library.saved.length===1?'View saved':'Compare clinics'}</Link>
+ return <aside aria-label="Saved clinics comparison shortcut" className="fixed bottom-3 left-3 right-3 z-40 max-w-2xl mx-auto rounded-xl border border-slate-300 bg-white shadow-lg p-3 flex items-center gap-3 max-[360px]:flex-wrap max-[360px]:gap-2">
+  <div className="min-w-0 flex-1 max-[360px]:basis-full"><p role="status" className="text-sm font-bold">{library.saved.length} saved {library.saved.length===1?'clinic':'clinics'}</p><p className="text-xs text-slate-600">{library.saved.length===1?'Save one more clinic to compare.':'Choose two or three in My clinics to compare.'}</p></div>
+  <Link href="/my-clinics#compare-heading" className="min-h-11 max-[360px]:flex-1 justify-center inline-flex items-center rounded-lg bg-slate-900 text-white px-3 py-2 text-sm font-semibold">{library.saved.length===1?'View saved':'Compare clinics'}</Link>
   <button type="button" aria-label="Dismiss saved clinics shortcut" onClick={()=>setDismissed(signature)} className="min-h-11 min-w-11 text-xl">×</button>
  </aside>;
 }
