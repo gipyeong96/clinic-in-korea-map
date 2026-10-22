@@ -13,6 +13,7 @@ export default function ClinicContact({clinic,compact=false}:{clinic:any;compact
       {!compact&&address&&<button type="button" onClick={copyAddress} className="min-h-11 inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold">Copy address</button>}
     </div>
     {!phone.href&&<p className="text-xs text-slate-500">{phone.reason==='missing'?'Phone number not provided.':phone.reason==='area-code-missing'?'Phone area code is missing. Confirm the full number before calling.':'Phone number needs confirmation.'}</p>}
+    {phone.note&&<p className="text-xs text-slate-500">{phone.note}</p>}
     {copyStatus&&<p role="status" className="text-xs text-slate-600">{copyStatus}</p>}
   </section>;
 }

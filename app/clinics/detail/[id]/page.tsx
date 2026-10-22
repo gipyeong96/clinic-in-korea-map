@@ -18,6 +18,8 @@ import {clinicRegion} from '@/lib/clinic-region';
 import {searchReturnPath} from '@/lib/detail-navigation';
 import {SaveClinic,RecordClinicVisit} from '@/components/ClinicLibrary';
 import {clinicSnapshot} from '@/lib/clinic-library';
+import {nearbyStation} from '@/lib/card-location';
+import {stationPages} from '@/lib/stations';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -59,6 +61,7 @@ export default async function ClinicDetail({ params, searchParams }: ClinicDetai
   const departments = groupedDepartments(clinic);
   const focus = clinicFocus(clinic);
   const focusSlug = clinic.department_source || isPremium ? clinic.categories?.slug || 'all' : 'all';
+  const nearest=nearbyStation(clinic,stationPages);
   
   // MedicalClinic Schema (SEO/AEO/GEO)
   const medicalClinicSchema = {
@@ -172,6 +175,7 @@ export default async function ClinicDetail({ params, searchParams }: ClinicDetai
         <section className="bg-white rounded-xl border p-4 space-y-3" aria-label="Plan your visit">
           <SaveClinic clinic={snapshot}/>
           <p className="text-sm font-medium select-all">{address||'Address not provided'}</p>
+          {nearest&&<div className="rounded-lg bg-slate-50 p-3 space-y-1 text-sm"><Link href={`/clinics/${focusSlug}/${nearest.slug}`} className="inline-flex min-h-11 items-center underline font-semibold">Nearby station: {nearest.name}</Link><p>{Math.round(nearest.distance).toLocaleString()} m straight-line distance · official station coordinates</p><p className="text-xs text-slate-500">Distance is measured from the station coordinates, not an exit or walking route. <Link className="underline" href={`/clinics/${focusSlug}/${nearest.slug}`}>Find clinics near this station</Link>.</p></div>}
           <ClinicContact clinic={clinic} />
           <Link href={clinicCorrectionLink(clinic.hira_code||String(clinic.id))} className="inline-flex min-h-11 items-center underline text-sm">Report incorrect information for this clinic</Link>
         </section>
