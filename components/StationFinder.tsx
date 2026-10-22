@@ -5,6 +5,7 @@ import Link from 'next/link';
 import {searchLink} from '@/lib/search';
 import { stationPages } from '@/lib/stations';
 import { featuredStationSlugs } from '@/lib/featured-stations';
+import {areaBrowseLink} from '@/lib/area-navigation';
 
 function regionFor(city: string) {
   if (['Seoul', 'Gyeonggi'].includes(city)) return 'Seoul · Incheon · Gyeonggi';
@@ -35,7 +36,7 @@ export default function StationFinder({department='all',searchOptions={},compact
     <p role="status" className="text-xs text-slate-500">{hasFilter?`${matches.length} station${matches.length===1?'':'s'} · Choose a station to find nearby clinics.`:'Select a region or enter a station name to see matches.'}</p>
     {hasFilter&&<div className="grid sm:grid-cols-2 gap-2 max-h-80 overflow-y-auto">{matches.slice(0, 100).map(s => <Link key={s.slug} href={searchLink(department,s.slug,searchOptions)} className="border rounded-lg p-3 hover:border-amber-500 focus-visible:ring-2 focus-visible:ring-amber-500"><span className="block font-semibold text-sm">{s.name_en} <span className="font-normal">· {s.name_ko}</span></span><span className="block text-xs text-slate-500">{s.city} · {s.stations.map(l => l.line).join(' / ')}</span></Link>)}</div>}
     {hasFilter&&matches.length > 100 && <p className="text-xs text-slate-500">Showing the first 100. Select a region or enter a station name to narrow your search.</p>}
-    {hasFilter&&!matches.length && <p className="text-sm">No matching station in the available official data. Try another name or <Link className="underline" href="/clinics/all/all">search clinics by address</Link>.</p>}
+    {hasFilter&&!matches.length && <section aria-label="Station search alternatives" className="rounded-lg bg-slate-50 p-3 space-y-2 text-sm"><p>No matching station in the available official data.</p><div className="flex flex-wrap gap-2">{query.trim()&&<button type="button" onClick={()=>setQuery('')} className="min-h-11 rounded-lg border bg-white px-3 py-2">Clear station name</button>}<button type="button" onClick={()=>{setCity('');setLine('');setQuery('');}} className="min-h-11 rounded-lg border bg-white px-3 py-2">Reset station filters</button><Link className="min-h-11 inline-flex items-center underline" href={searchLink(department,'all',searchOptions)}>Search clinics by name / address</Link><Link className="min-h-11 inline-flex items-center underline" href={areaBrowseLink(undefined,{department,query:searchOptions.query||'',specialist:!!searchOptions.specialist,registered:searchOptions.registered})}>Choose an area instead</Link></div><p className="text-xs text-slate-600">Clinic searches keep your department, clinic keyword and clinic filters. The station name is not used as a clinic keyword. A station radius applies only when a station is selected.</p></section>}
     </div></details>
     {!compact&&<Link href="/stations" className="inline-block min-h-11 py-3 underline text-sm">Browse stations by region</Link>}
   </div>;

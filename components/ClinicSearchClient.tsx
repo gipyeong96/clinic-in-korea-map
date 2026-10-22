@@ -13,6 +13,8 @@ interface ClinicSearchClientProps {
   lang?: any;
   selectedDepartment?: string;
   returnTo?: string;
+  mapPage: {page:number;previous?:string;next?:string};
+  initialMapView?:boolean;
   filteredClinics: any[];
   mapCenter: { lat: number; lng: number };
 }
@@ -21,6 +23,8 @@ export default function ClinicSearchClient({
   lang,
   returnTo,
   selectedDepartment,
+  mapPage,
+  initialMapView=false,
   filteredClinics,
   mapCenter: initialMapCenter
 }: ClinicSearchClientProps) {
@@ -28,15 +32,15 @@ export default function ClinicSearchClient({
   const [activeClinicId, setActiveClinicId] = useState<string | null>(null);
   const [currentMapCenter, setCurrentMapCenter] = useState(initialMapCenter);
   const [zoom, setZoom] = useState(13);
-  const [view,setView]=useState<'list'|'map'>('list');
+  const [view,setView]=useState<'list'|'map'>(initialMapView?'map':'list');
 
   // Sync state if initial map center changes due to department/location dynamic updates
   useEffect(() => {
     setCurrentMapCenter(initialMapCenter);
     setActiveClinicId(null);
-    setView('list');
+    setView(initialMapView?'map':'list');
     setZoom(13);
-  }, [initialMapCenter]);
+  }, [initialMapCenter,initialMapView]);
 
   // Transform clinics to markers format
   const mapMarkers = filteredClinics.filter(hasClinicCoordinates).map((c) => ({
@@ -110,6 +114,7 @@ export default function ClinicSearchClient({
 
       {/* Google Maps Container Sticky Column */}
       <div id="clinic-results-map" className={`clinic-result-anchor lg:col-span-2 min-w-0 lg:sticky lg:top-24 space-y-3 ${view==='list'?'hidden lg:block':''}`}>
+        <section aria-label="Map result coverage" className="rounded-xl border bg-white p-3 space-y-2 text-sm"><p role="status" className="font-semibold">Page {mapPage.page} · {mapMarkers.length} of {filteredClinics.length} clinic profiles on this page have map locations.</p><p className="text-xs text-slate-600">The map covers this page only, not all search results.{mapMarkers.length<filteredClinics.length?' Profiles without usable coordinates remain in the clinic list.':''}</p><nav aria-label="Map result pages" className="flex flex-wrap items-center gap-3">{mapPage.previous&&<a href={mapPage.previous} rel="prev" className="min-h-11 inline-flex items-center rounded-lg border px-3 font-semibold">Previous map page</a>}{mapPage.next?<a href={mapPage.next} rel="next" className="min-h-11 inline-flex items-center rounded-lg border px-3 font-semibold">Next map page</a>:<span className="text-xs text-slate-500">No further result page.</span>}</nav></section>
         <section aria-label="Selected clinic on map" aria-live="polite" className="rounded-xl border border-slate-300 bg-white p-4 space-y-2 break-words">
           {selectedClinic?<><p className="text-xs font-semibold text-slate-500">Selected clinic</p><h2 className="font-bold text-slate-900">{selectedClinic.name}</h2><p className="text-sm text-slate-600">{selectedClinic.address||'Address not provided'}</p><div className="flex flex-wrap gap-2"><a href={selectedClinic.detailHref} className="min-h-11 inline-flex items-center rounded-lg bg-slate-900 px-3 py-2 text-sm font-semibold text-white">View clinic details</a><button type="button" onClick={showSelectedCard} className="min-h-11 rounded-lg border px-3 py-2 text-sm font-semibold">Show in clinic list</button><button type="button" onClick={()=>setActiveClinicId(null)} className="min-h-11 px-2 py-2 text-sm underline">Clear selection</button></div></>:<p className="text-sm text-slate-600">Choose a marker or “Show on map” on a clinic card to see its name, address and details here.</p>}
         </section>
