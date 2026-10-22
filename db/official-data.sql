@@ -30,11 +30,13 @@ CREATE OR REPLACE FUNCTION public.nearby_clinics(
   search_query text DEFAULT '', specialist_only boolean DEFAULT false, result_limit integer DEFAULT 100
 ) RETURNS SETOF jsonb LANGUAGE sql STABLE SECURITY INVOKER SET search_path = public SET jit = off AS $$
   WITH station_points AS MATERIALIZED (SELECT * FROM rail_stations WHERE id=ANY(station_ids)), nearby_candidates AS MATERIALIZED (
-    SELECT c.* FROM clinics c WHERE EXISTS (
-      SELECT 1 FROM station_points s
-      WHERE c.latitude BETWEEN s.latitude-least(greatest(radius_m,100),3000)/110000.0 AND s.latitude+least(greatest(radius_m,100),3000)/110000.0
-      AND c.longitude BETWEEN s.longitude-least(greatest(radius_m,100),3000)/(110000.0*cos(radians(s.latitude))) AND s.longitude+least(greatest(radius_m,100),3000)/(110000.0*cos(radians(s.latitude)))
-    )
+    SELECT c.* FROM clinics c
+    WHERE c.latitude BETWEEN
+      (SELECT min(latitude)-least(greatest(radius_m,100),3000)/110000.0 FROM station_points)
+      AND (SELECT max(latitude)+least(greatest(radius_m,100),3000)/110000.0 FROM station_points)
+    AND c.longitude BETWEEN
+      (SELECT min(longitude-least(greatest(radius_m,100),3000)/(110000.0*cos(radians(latitude)))) FROM station_points)
+      AND (SELECT max(longitude+least(greatest(radius_m,100),3000)/(110000.0*cos(radians(latitude)))) FROM station_points)
   ), distances AS MATERIALIZED (
     SELECT c.*, to_jsonb(cat) AS categories, to_jsonb(loc) AS locations,
       (SELECT min(6371008.8 * 2 * asin(sqrt(least(1.0,
@@ -43,12 +45,7 @@ CREATE OR REPLACE FUNCTION public.nearby_clinics(
       )))) FROM station_points s) AS distance_m
     FROM nearby_candidates c JOIN categories cat ON cat.id=c.category_id
       JOIN locations loc ON loc.id=c.location_id
-    WHERE EXISTS (
-        SELECT 1 FROM rail_stations s WHERE s.id=ANY(station_ids)
-          AND c.latitude BETWEEN s.latitude-least(greatest(radius_m,100),3000)/110000.0 AND s.latitude+least(greatest(radius_m,100),3000)/110000.0
-          AND c.longitude BETWEEN s.longitude-least(greatest(radius_m,100),3000)/(110000.0*cos(radians(s.latitude))) AND s.longitude+least(greatest(radius_m,100),3000)/(110000.0*cos(radians(s.latitude)))
-      )
-      AND (category_slug='all' OR c.departments @> jsonb_build_array(jsonb_build_object('slug',category_slug)))
+    WHERE (category_slug='all' OR c.departments @> jsonb_build_array(jsonb_build_object('slug',category_slug)))
       AND (NOT specialist_only OR CASE WHEN category_slug='all' THEN c.has_specialist AND c.department_source IS NOT NULL ELSE category_slug=ANY(c.specialist_slugs) END)
       AND NOT EXISTS (
         SELECT 1 FROM regexp_split_to_table(trim(search_query), '\s+') term
