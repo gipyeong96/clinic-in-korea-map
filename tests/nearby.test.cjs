@@ -3,6 +3,16 @@ function load(file,imports={}){const m={exports:{}};new Function('module','expor
 const nearby=load('lib/nearby.ts',{'./department-labels.json':require('../lib/department-labels.json')});
 const search=load('lib/search.ts',{'./regions':{extractRegion:()=>null}});
 const input={latitude:37.4979,longitude:127.0276,radius:1000,department:'urology',specialist:true,registered:true,page:2};
+test('nearby empty actions change one option, reset pagination and never copy coordinates',()=>{
+ const initial={...input,query:'missing'};const actions=nearby.nearbyRecovery(initial);
+ assert.equal(actions.find(a=>a.label.startsWith('Expand radius')).changes.radius,2000);
+ assert.equal(actions.find(a=>a.label==='Remove keyword').changes.query,'');
+ assert.equal(actions.find(a=>a.label==='Remove registration filter').changes.registered,false);
+ assert.equal(actions.find(a=>a.label==='Remove specialist filter').changes.specialist,false);
+ for(const action of actions){assert.equal(action.changes.page,1);assert(Object.keys(action.changes).length<=2);assert(!('latitude' in action.changes));assert(!('longitude' in action.changes));const next={...initial,...action.changes};if(!('department' in action.changes))assert.equal(next.department,'urology');if(!('radius' in action.changes))assert.equal(next.radius,1000);}
+ assert.deepEqual(nearby.nearbyRecovery({department:'all',radius:5000,specialist:false,registered:false,query:'',page:1}),[]);
+ assert.equal(nearby.nearbyRecovery({...initial,radius:2000}).find(a=>a.label.startsWith('Expand radius')).changes.radius,5000);
+});
 test('nearby search accepts only bounded Korean coordinates and supported options',()=>{
  assert.deepEqual(nearby.nearbyInput(input),input);
  for(const change of [{latitude:NaN},{latitude:32},{longitude:133},{latitude:'37.4'},{radius:999},{department:'invalid'},{page:0},{page:1.5},{page:10001},{specialist:'1'},{registered:null}])assert.equal(nearby.nearbyInput({...input,...change}),null);

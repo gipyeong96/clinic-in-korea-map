@@ -18,7 +18,18 @@ const site = load('lib/site.ts');
 const evidence = load('lib/clinic-evidence.ts');
 const stations = load('lib/stations.ts', { './stations.json': JSON.parse(fs.readFileSync(path.join(__dirname, '../lib/stations.json'), 'utf8')) });
 const pagination=load('lib/pagination.ts');
-const recovery=load('lib/search-recovery.ts',{'./search':search});
+const recovery=load('lib/search-recovery.ts',{'./search':search,'./department-labels.json':require('../lib/department-labels.json'),'./area-navigation':load('lib/area-navigation.ts',{'./search':search,'./department-labels.json':require('../lib/department-labels.json')})});
+
+test('empty alternatives name the department/area and preserve context when choosing another area',()=>{
+ const input={department:'dermatology',location:'busan',query:'no-such-clinic',specialist:true,registered:true,page:1,departmentLabel:'Dermatology',locationLabel:'Busan'};
+ const alternatives=recovery.searchRecovery(input),browse=alternatives.find(a=>a.label==='Clear keyword');
+ assert.equal(browse.title,'Browse Dermatology in Busan');assert.match(browse.description,/no-such-clinic/);
+ const clean=new URL(browse.href,'https://example.com');assert.equal(clean.pathname,'/clinics/dermatology/busan');assert.equal(clean.searchParams.get('q'),null);assert.equal(clean.searchParams.get('registered'),'1');assert.equal(clean.searchParams.get('specialist'),'1');
+ const area=new URL(alternatives.find(a=>a.label==='Choose another area').href,'https://example.com');assert.equal(area.pathname,'/areas');for(const [key,value] of [['department','dermatology'],['q','no-such-clinic'],['registered','1'],['specialist','1']])assert.equal(area.searchParams.get(key),value);
+ const interpreted=recovery.searchRecovery({...input,department:'all',query:'skin doctor evening'}).find(a=>a.label==='Search the named department');
+ const url=new URL(interpreted.href,'https://example.com');assert.equal(url.pathname,'/clinics/dermatology/busan');assert.equal(url.searchParams.get('q'),'evening');assert.equal(url.searchParams.get('specialist'),'1');
+ assert(!recovery.searchRecovery({...input,department:'all',query:'rash'}).some(a=>a.label==='Search the named department'));
+});
 const active=load('lib/active-filters.ts',{'./search':search});
 
 test('plain English clinician phrases route to departments and retain locations and unrelated keywords',()=>{
