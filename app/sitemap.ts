@@ -1,3 +1,4 @@
+import {careGuides} from '@/lib/care-guides';
 import {additionalGoldmanClinics} from '@/lib/goldman';
 import { MetadataRoute } from 'next';
 import { mockClinics } from '@/lib/supabase';
@@ -12,7 +13,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const locations = ['all', 'gangnam', 'seoul-station', 'gangnam-station', 'jamsil-station', 'jamsil', 'incheon', 'dongtan', 'busan', 'daegu', 'daejeon', 'gwangju', 'ulsan', 'jeju'];
   return [
     {url:`${SITE_URL}/guides`,priority:0.6},
-    {url:`${SITE_URL}/guides/choose-urology-clinic-gangnam`,priority:0.6},
+    ...careGuides.map(guide=>({url:`${SITE_URL}/guides/${guide.slug}`,priority:0.6})),
     { url: SITE_URL, changeFrequency: 'weekly', priority: 1 },
     {url:`${SITE_URL}/areas`,changeFrequency:'monthly',priority:0.8},
     ...nationalProvinces.map(p=>({url:`${SITE_URL}/areas/${p.slug}`,changeFrequency:'monthly' as const,priority:0.7})),

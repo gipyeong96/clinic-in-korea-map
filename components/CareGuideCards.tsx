@@ -1,0 +1,3 @@
+import Link from 'next/link';
+import {careGuides} from '@/lib/care-guides';
+export default function CareGuideCards(){return <div className="grid md:grid-cols-3 gap-4">{careGuides.map(guide=><Link key={guide.slug} href={`/guides/${guide.slug}`} className="min-w-0 block rounded-xl border bg-white p-5 space-y-3 hover:border-amber-500 focus-visible:ring-2 focus-visible:ring-amber-500"><span className="text-xs font-semibold text-slate-500">{guide.tag}</span><h3 className="text-xl font-bold">{guide.title}</h3><p className="text-sm text-slate-600">{guide.description}</p><span className="inline-flex min-h-11 items-center underline">Read the guide →</span></Link>)}</div>;}

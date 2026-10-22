@@ -1,3 +1,4 @@
+import CareGuideCards from '@/components/CareGuideCards';
 import {metadata as rootMetadata} from './layout';
 import {nearbyStation} from '@/lib/card-location';
 import {stationPages} from '@/lib/stations';
@@ -135,8 +136,8 @@ export default function HomePage({ params }: HomePageProps) {
         </div>
       </section>
 
-      <aside aria-label="Saving clinics" className="max-w-5xl mx-auto px-4"><div className="rounded-xl border bg-white p-4 text-sm text-slate-600"><p className="font-semibold text-slate-800">Save clinics on this device — no sign-up needed.</p><p className="mt-1">Choose “Save clinic” on a clinic card or profile, then find it in <Link href="/my-clinics" className="underline inline-flex min-h-11 items-center">My clinics</Link>. Saved clinics stay in this browser.</p></div></aside>
-      <section aria-labelledby="care-guides-heading" className="max-w-5xl mx-auto px-4 space-y-4"><h2 id="care-guides-heading" className="text-2xl font-bold">Guides to finding care in Korea</h2><p className="text-slate-600">Practical questions to ask before choosing a clinic.</p><Link href="/guides/choose-urology-clinic-gangnam" className="block rounded-xl border bg-white p-5 space-y-2 hover:border-amber-500"><span className="text-xs font-semibold text-slate-500">CHOOSING A CLINIC</span><h3 className="text-xl font-bold">How to choose a urology clinic in Gangnam</h3><p className="text-sm text-slate-600">Compare reported specialists, services, location and what to confirm before visiting.</p><span className="inline-flex min-h-11 items-center underline">Read the guide →</span></Link><Link href="/guides" className="min-h-11 inline-flex items-center underline">Browse care guides</Link></section>
+      <aside aria-label="Saving clinics" className="max-w-5xl mx-auto px-4"><div className="rounded-xl border bg-white p-4 text-sm text-slate-600"><p className="font-semibold text-slate-800">Save clinics on this device — no sign-up needed.</p><p className="mt-1">Choose “Save clinic” on a clinic card or profile, then find it in <Link href="/my-clinics" className="underline inline-flex min-h-11 items-center">My clinics</Link>. Saved clinics stay in this browser. Select two or three in My clinics to compare their directory information.</p></div></aside>
+      <section aria-labelledby="care-guides-heading" className="max-w-5xl mx-auto px-4 space-y-4"><h2 id="care-guides-heading" className="text-2xl font-bold">Guides to finding care in Korea</h2><p className="text-slate-600">Checklists and explanations for finding care across Korea.</p><CareGuideCards/><Link href="/guides" className="min-h-11 inline-flex items-center underline">Browse care guides</Link></section>
     </div>
   );
 }
