@@ -3,6 +3,7 @@ import {useEffect,useState} from 'react';
 import Link from 'next/link';
 import {LibraryClinic,ClinicLibrary,LIBRARY_KEY,readLibrary,updateLibrary,normalizeLibraryClinic} from '@/lib/clinic-library';
 import ClinicComparison from '@/components/ClinicComparison';
+import {measure} from '@/lib/measurement';
 
 function useLibrary(){
   const [library,setLibrary]=useState<ClinicLibrary>({saved:[],recent:[]});
@@ -18,6 +19,7 @@ function useLibrary(){
       const current=readLibrary(localStorage.getItem(LIBRARY_KEY));
       if(action==='save'&&current.saved.length>=100&&!current.saved.some(c=>c.id===clinic.id)){setError('You can save up to 100 clinics. Remove a saved clinic first.');return;}
       localStorage.setItem(LIBRARY_KEY,JSON.stringify(updateLibrary(current,clinic,action)));
+      if(action==='save'&&!current.saved.some(c=>c.id===clinic.id))measure('clinic_save');
       setError('');window.dispatchEvent(new Event('clinic-library'));
     }catch{setError('Could not save changes. Browser storage may be unavailable or full.');}
   }

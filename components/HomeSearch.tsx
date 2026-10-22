@@ -34,6 +34,7 @@ export default function HomeSearch({ placeholder, btnText }: HomeSearchProps) {
   return (
     <div className="max-w-xl mx-auto text-left">
     <form 
+      aria-label="Search clinics"
       onSubmit={handleSearch}
       className="flex items-center bg-white rounded-xl shadow-lg border border-slate-200 p-1.5 text-slate-800"
     >

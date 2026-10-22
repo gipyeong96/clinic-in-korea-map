@@ -6,3 +6,9 @@
 - Link directly to relevant official condition/service pages and record the source and check date. Disclose the consulting relationship.
 - Do not infer English-speaking clinicians or interpretation availability from international-patient registration.
 - Research is read-only unless the user also asks to change hospital records or publish an article.
+
+## Growth measurement
+
+- Assess acquisition, search visibility, site usability and Meta experiments together. Verify the jowilder96@gmail.com account, Search Console map.clinicinkorea.com property and GA4 property 559263056 / G-0TP3EDEP3R before reporting.
+- Keep measurement at coarse page/action levels. Do not transmit search terms, GPS, hospital identifiers or condition-specific paths. Do not treat phone/directions clicks as confirmed appointments or visits.
+- Existing analytics history and IDs must be preserved. Exclude internal browsers through /measurement before future QA; do not activate irreversible GA data filters without a tested review.
