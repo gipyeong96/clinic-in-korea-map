@@ -1,8 +1,9 @@
 import {extractRegion} from './regions';
-export function searchLink(department:string,location:string,options:{query?:string;specialist?:boolean;radius?:number;page?:number}={}) {
+export function searchLink(department:string,location:string,options:{query?:string;specialist?:boolean;registered?:boolean;radius?:number;page?:number}={}) {
   const params=new URLSearchParams();
   if(options.query)params.set('q',options.query);
   if(options.specialist)params.set('specialist','1');
+  if(options.registered)params.set('registered','1');
   if(options.radius)params.set('radius',String(options.radius));
   if(options.page&&options.page>1)params.set('page',String(options.page));
   return `/clinics/${department}/${location}${params.size?'?'+params.toString():''}`;

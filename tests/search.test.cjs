@@ -147,6 +147,7 @@ function database({ error = null, locations = [], data = [] } = {}) {
     select(...args) { calls.push(['select', ...args]); return this; },
     eq(...args) { calls.push(['eq', ...args]); return this; },
     contains(...args) { calls.push(['contains', ...args]); return this; },
+    filter(...args) { calls.push(['filter', ...args]); return this; },
     in(...args) { calls.push(['in', ...args]); return this; },
     or(...args) { calls.push(['or', ...args]); return this; },
     order() { return this; }, limit() { return this; },
@@ -274,4 +275,22 @@ test('area context rejects unsupported department values and repeated query para
  assert.deepEqual(areaNavigation.areaContext({department:'../../bad',q:['a','b'],specialist:['1','0']}),{department:'all',query:'',specialist:false});
  assert.equal(areaNavigation.areaContext({q:'x'.repeat(300)}).query.length,200);
  assert.equal(areaNavigation.areaContext({department:'ent'}).department,'ent');
+});
+
+test('registry and specialist constraints intersect before pagination in city and station searches',async()=>{
+ const city=database();await city.api.getClinics({locationSlug:'seoul',categorySlug:'dentistry',specialist:true,registered:true,offset:25,limit:26});
+ assert(city.calls.some(c=>c[0]==='contains'&&c[1]==='specialist_slugs'));
+ assert(city.calls.some(c=>c[0]==='contains'&&c[1]==='foreign_patient_registration'&&c[2].status==='listed'));
+ assert(city.calls.findIndex(c=>c[0]==='filter')<city.calls.findIndex(c=>c[0]==='range'));
+ const station=database();await station.api.getClinics({locationSlug:'seoul-station',categorySlug:'ent',registered:true,specialist:true,offset:25,limit:26,radius:500});
+ const rpc=station.calls.find(c=>c[0]==='rpc');assert.equal(rpc[1],'nearby_registered_clinics_page');assert.equal(rpc[2].specialist_only,true);assert.equal(rpc[2].result_offset,25);assert.equal(rpc[2].radius_m,500);
+});
+
+test('registration filter survives navigation and can be removed independently',()=>{
+ const input={department:'ent',location:'seoul-station',query:'clinic',specialist:true,registered:true,radius:500,page:2,departmentLabel:'ENT',locationLabel:'Seoul Station'};
+ const filters=active.activeFilters(input).filters;
+ const removed=new URL(filters.find(f=>f.action==='Remove registration filter').href,'https://example.com');assert(!removed.searchParams.has('registered'));assert.equal(removed.searchParams.get('specialist'),'1');
+ const specialist=new URL(filters.find(f=>f.action==='Remove specialist filter').href,'https://example.com');assert.equal(specialist.searchParams.get('registered'),'1');
+ const context=areaNavigation.areaContext({department:'ent',registered:'1',specialist:'1',q:'clinic'});assert(areaNavigation.areaClinicLink('busan',context).includes('registered=1'));assert(areaNavigation.areaBrowseLink('busan',context).includes('registered=1'));
+ for(const link of recovery.searchRecovery(input).filter(l=>l.label!=='Remove registration filter'&&l.href.startsWith('/clinics/')))assert.equal(new URL(link.href,'https://example.com').searchParams.get('registered'),'1');
 });

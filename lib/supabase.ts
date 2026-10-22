@@ -121,7 +121,7 @@ export const mockClinics: any[] = [
   }
 ];
 
-export async function getClinics(params?: { categorySlug?: string, locationSlug?: string, limit?: number, query?: string, specialist?: boolean, radius?: number, offset?: number }) {
+export async function getClinics(params?: { categorySlug?: string, locationSlug?: string, limit?: number, query?: string, specialist?: boolean, registered?: boolean, radius?: number, offset?: number }) {
   if(!params?.locationSlug||params.locationSlug==='all'){
     const region=extractRegion(params?.query||'');
     if(region)params={...params,locationSlug:region.slug,query:region.query};
@@ -129,11 +129,11 @@ export async function getClinics(params?: { categorySlug?: string, locationSlug?
   if (params?.query?.trim() && searchTerms(params.query).length === 0) return [];
   const station = stationForSlug(params?.locationSlug || '');
   if (station) {
-    const { data, error } = await supabase.rpc(params?.offset!==undefined?'nearby_clinics_page':'nearby_clinics', {
+    const { data, error } = await supabase.rpc(params?.registered?'nearby_registered_clinics_page':params?.offset!==undefined?'nearby_clinics_page':'nearby_clinics', {
       station_ids: station.stations.map(s => s.id), radius_m: params?.radius || 1000,
       category_slug: params?.categorySlug || 'all', search_query: searchTerms(params?.query || '').join(' '),
       specialist_only: params?.specialist || false, result_limit: params?.limit || 100,
-      ...(params?.offset!==undefined?{result_offset:params.offset}:{}),
+      ...(params?.offset!==undefined||params?.registered?{result_offset:params?.offset||0}:{}),
     });
     if (error) throw new Error('Unable to load clinics near this station');
     return (data || []).map((clinic: any) => ({ ...clinic, station_name: station.name_en }));
@@ -177,6 +177,10 @@ export async function getClinics(params?: { categorySlug?: string, locationSlug?
     query = params.categorySlug && params.categorySlug !== 'all'
       ? query.contains('specialist_slugs', [params.categorySlug])
       : query.eq('has_specialist', true).not('department_source','is',null);
+  }
+
+  if(params?.registered){
+    query=query.contains('foreign_patient_registration',{status:'listed'}).filter('foreign_patient_registration->>source_date','match','^[0-9]{4}-[0-9]{2}-[0-9]{2}$');
   }
 
   // Always bring premium first, then other clinics
