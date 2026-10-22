@@ -10,7 +10,7 @@ export default function Areas({searchParams={}}:{searchParams?:Record<string,str
   <AreaDepartmentFilter context={context}/>
   <form action={`/clinics/${context.department}/all`} className="flex flex-wrap gap-3">
     <label className="flex-1 min-w-40 text-sm font-semibold">Area name<input name="q" placeholder="English or 한국어" required maxLength={200} className="mt-1 block w-full border rounded-lg p-3" /></label>
-    {context.specialist&&<input type="hidden" name="specialist" value="1"/>}
+    {context.registered&&<input type="hidden" name="registered" value="1"/>}{context.specialist&&<input type="hidden" name="specialist" value="1"/>}
     <button className="self-end min-h-11 px-5 py-3 rounded-lg bg-slate-900 text-white">Search</button>
   </form>
   <p className="text-xs text-slate-500">Names and address scopes checked 21 October 2026. <a className="underline" href="https://www.studyinkorea.go.kr/ko/life/regionsIntro.do" target="_blank" rel="noreferrer">Government regional directory</a>. Older province names in source addresses are supported.</p>
