@@ -1,3 +1,4 @@
+import ContextualCareGuides from '@/components/ContextualCareGuides';
 import GoldmanGoogleReviews from '@/components/GoldmanGoogleReviews';
 import GoldmanCareGuide from '@/components/GoldmanCareGuide';
 import {clinicCorrectionLink} from '@/lib/feedback';
@@ -174,6 +175,8 @@ export default async function ClinicDetail({ params, searchParams }: ClinicDetai
           <ClinicContact clinic={clinic} />
           <Link href={clinicCorrectionLink(clinic.hira_code||String(clinic.id))} className="inline-flex min-h-11 items-center underline text-sm">Report incorrect information for this clinic</Link>
         </section>
+
+        <ContextualCareGuides department={focusSlug} location={region?.slug} stage="profile"/>
 
         <GoldmanVisitGuide clinicId={String(clinic.id)} />
         <GoldmanGoogleReviews key={String(clinic.id)} clinicId={String(clinic.id)} />

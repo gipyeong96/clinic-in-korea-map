@@ -1,6 +1,8 @@
 import labels from './department-labels.json';
 export const nearbyRadii=[500,1000,2000,5000];
 export type NearbyOptions={department:string;radius:number;specialist:boolean;registered:boolean;query:string};
+export const nearbyDepartments=[{slug:'urology',label:'Urology near me'},{slug:'dentistry',label:'Dentist near me'},{slug:'dermatology',label:'Dermatologist near me'}];
+export function nearbySummary(options:NearbyOptions){return [options.department==='all'?'All departments':(labels as Record<string,string>)[options.department]||'All departments',`Within ${options.radius===500?'500 m':`${options.radius/1000} km`}`,options.specialist?'Specialists reported':null,options.registered?'International-patient registration listed':null,options.query?`Keyword: ${options.query}`:null].filter(Boolean).join(' · ');}
 export function nearbyOptions(params:Record<string,string|string[]|undefined>):NearbyOptions{
  const department=typeof params.department==='string'&&Object.prototype.hasOwnProperty.call(labels,params.department)?params.department:'all';
  const radius=typeof params.radius==='string'&&nearbyRadii.includes(Number(params.radius))?Number(params.radius):1000;

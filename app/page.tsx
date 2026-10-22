@@ -1,3 +1,5 @@
+import {nearbyDepartments} from '@/lib/nearby';
+import {nearbySearchLink} from '@/lib/search';
 import CareGuideCards from '@/components/CareGuideCards';
 import {metadata as rootMetadata} from './layout';
 import {nearbyStation} from '@/lib/card-location';
@@ -79,7 +81,7 @@ export default function HomePage({ params }: HomePageProps) {
             placeholder={dict.search_placeholder} 
             btnText={dict.search_btn} 
           />
-          <Link href="/nearby" className="inline-flex min-h-11 items-center rounded-lg border border-slate-500 px-5 py-3 text-sm font-semibold hover:bg-slate-800">Use my location · Find clinics near me</Link>
+          <Link href="/nearby" className="inline-flex min-h-11 items-center rounded-lg border border-slate-500 px-5 py-3 text-sm font-semibold hover:bg-slate-800">Use my location · Find clinics near me</Link><nav aria-label="Find a department near me" className="flex flex-wrap gap-2">{nearbyDepartments.map(option=><Link key={option.slug} href={nearbySearchLink(option.slug)} className="inline-flex min-h-11 items-center rounded-full border border-slate-500 px-3 py-2 text-sm hover:bg-slate-800">{option.label}</Link>)}</nav><p className="text-xs text-slate-300">Choose your options first. Location access starts only when you select “Use my location”.</p>
         </div>
       </section>
 
