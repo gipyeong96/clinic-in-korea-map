@@ -1,3 +1,4 @@
+import ContextualCareGuides from '@/components/ContextualCareGuides';
 import {uniqueClinicProfiles} from '@/lib/site';
 import ResultDepartmentPicker from '@/components/ResultDepartmentPicker';
 import StationFinder from '@/components/StationFinder';
@@ -121,6 +122,7 @@ export default async function SearchPage({ params, searchParams }: Props) {
       {!failed&&(page>1||!filteredClinics.length)&&pagination}
       {!failed&&filteredClinics.length>0 && <ClinicSearchClient returnTo={searchLink(params.department,params.location,{query,specialist,registered,radius:station?radius:undefined,page})} lang="en" filteredClinics={filteredClinics.map(clinic=>({...clinic,address_region:clinicRegion(clinic),card_station:nearbyStation(clinic,stationPages)}))} mapCenter={mapCenter} selectedDepartment={params.department} />}
       {!failed&&filteredClinics.length>0&&pagination}
+      <ContextualCareGuides department={params.department} location={params.location} specialist={specialist} registered={registered}/>
     </div>
   </>;
 }

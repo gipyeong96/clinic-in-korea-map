@@ -10,5 +10,5 @@ export default function NearbyPage({searchParams}:{searchParams:Record<string,st
   initial.query=parsed.searchParams.get('q')||'';
   if(initial.department==='all')initial.department=parsed.searchParams.get('department')||'all';
  }
- return <div className="max-w-5xl mx-auto px-4 py-8 space-y-5"><h1 className="text-3xl font-black">Find clinics near me</h1><p>Use your current location to find clinics by straight-line distance. Review your search options, then choose “Use my location” to start.</p><NearbySearch key={JSON.stringify(initial)} initial={initial}/></div>;
+ return <div className="max-w-5xl mx-auto px-4 py-8 space-y-5"><h1 className="text-3xl font-black">Find clinics near me</h1><p>Choose a department and radius, then review your options before sharing your location. Results use straight-line distance.</p><NearbySearch key={JSON.stringify(initial)} initial={initial}/></div>;
 }
