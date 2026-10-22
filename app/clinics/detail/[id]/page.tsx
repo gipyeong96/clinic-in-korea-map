@@ -1,4 +1,5 @@
 import ContextualCareGuides from '@/components/ContextualCareGuides';
+import ShareClinic from '@/components/ShareClinic';
 import GoldmanGoogleReviews from '@/components/GoldmanGoogleReviews';
 import GoldmanCareGuide from '@/components/GoldmanCareGuide';
 import {clinicCorrectionLink} from '@/lib/feedback';
@@ -177,6 +178,7 @@ export default async function ClinicDetail({ params, searchParams }: ClinicDetai
           <p className="text-sm font-medium select-all">{address||'Address not provided'}</p>
           {nearest&&<div className="rounded-lg bg-slate-50 p-3 space-y-1 text-sm"><Link href={`/clinics/${focusSlug}/${nearest.slug}`} className="inline-flex min-h-11 items-center underline font-semibold">Nearby station: {nearest.name}</Link><p>{Math.round(nearest.distance).toLocaleString()} m straight-line distance · official station coordinates</p><p className="text-xs text-slate-500">Distance is measured from the station coordinates, not an exit or walking route. <Link className="underline" href={`/clinics/${focusSlug}/${nearest.slug}`}>Find clinics near this station</Link>.</p></div>}
           <ClinicContact clinic={clinic} />
+          <ShareClinic name={name} url={`${SITE_URL}${clinicPath(clinic)}`}/>
           <Link href={clinicCorrectionLink(clinic.hira_code||String(clinic.id))} className="inline-flex min-h-11 items-center underline text-sm">Report incorrect information for this clinic</Link>
         </section>
 

@@ -46,10 +46,10 @@ export default function ClinicLibraryPage(){
     <p className="font-semibold">Save clinics on this device — no sign-up needed.</p>
     <p className="text-sm text-slate-600">Saved clinics and the last 20 clinic profiles you viewed are stored only in this browser on this device. They are not synced to an account. Clearing browser data removes this list.</p>
     {error&&<p role="status" className="text-sm text-rose-700">{error}</p>}
-    {ready&&!error&&<ClinicComparison key={chosen.map(c=>c.id).join('|')} selected={chosen}/>}
+    {ready&&!error&&library.saved.length>0&&<ClinicComparison key={chosen.map(c=>c.id).join('|')} selected={chosen}/>}
     {!ready?<p role="status">Loading your clinics…</p>:<>{(['saved','recent'] as const).map(kind=><section key={kind} className="space-y-3" aria-label={kind==='saved'?'Saved clinics':'Recently viewed clinics'}>
       <h2 className="text-xl font-bold">{kind==='saved'?'Saved clinics':'Recently viewed'} ({library[kind].length})</h2>
-      {!library[kind].length?<p className="rounded-xl border bg-white p-5 text-sm text-slate-600">{kind==='saved'?'Choose “Save clinic” on a clinic card or profile to keep it here.':'Clinic profiles you open will appear here.'}</p>:<ul className="space-y-3">{library[kind].map(clinic=><li key={clinic.id} className="rounded-xl border bg-white p-4 space-y-2">
+      {!library[kind].length?<div className="rounded-xl border bg-white p-5 text-sm text-slate-600 space-y-3"><p>{kind==='saved'?'Choose “Save clinic” on a clinic card or profile to keep it here.':'Clinic profiles you open will appear here.'}</p>{kind==='saved'&&<><Link href="/" className="min-h-11 inline-flex items-center rounded-lg bg-slate-900 px-4 py-2 font-semibold text-white">Find a clinic to save</Link><p className="text-xs">After saving clinics, you can choose two or three to compare.</p></>}</div>:<ul className="space-y-3">{library[kind].map(clinic=><li key={clinic.id} className="rounded-xl border bg-white p-4 space-y-2">
         <Link href={clinic.path} className="font-bold underline block">{clinic.name}</Link>
         {clinic.nameKo!==clinic.name&&<p className="text-sm text-slate-500">{clinic.nameKo}</p>}
         <p className="text-sm">{clinic.region}</p><p className="text-sm text-slate-600">{clinic.address}</p>
