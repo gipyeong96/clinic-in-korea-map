@@ -78,6 +78,7 @@ export default function HomePage({ params }: HomePageProps) {
             placeholder={dict.search_placeholder} 
             btnText={dict.search_btn} 
           />
+          <Link href="/nearby" className="inline-flex min-h-11 items-center rounded-lg border border-slate-500 px-5 py-3 text-sm font-semibold hover:bg-slate-800">Use my location · Find clinics near me</Link>
         </div>
       </section>
 
@@ -135,27 +136,7 @@ export default function HomePage({ params }: HomePageProps) {
       </section>
 
       <aside aria-label="Saving clinics" className="max-w-5xl mx-auto px-4"><div className="rounded-xl border bg-white p-4 text-sm text-slate-600"><p className="font-semibold text-slate-800">Save clinics on this device — no sign-up needed.</p><p className="mt-1">Choose “Save clinic” on a clinic card or profile, then find it in <Link href="/my-clinics" className="underline inline-flex min-h-11 items-center">My clinics</Link>. Saved clinics stay in this browser.</p></div></aside>
-      {/* Featured Partner (Goldman) */}
-      <section className="max-w-5xl mx-auto px-4 space-y-6">
-        <div className="text-center space-y-2">
-          <span className="text-xs uppercase font-extrabold tracking-widest text-amber-500">
-            RECOMMENDED CLINICS
-          </span>
-          <h2 className="text-2xl md:text-3xl font-extrabold text-slate-800">
-            Goldman Urology Specialty Clinics
-          </h2>
-          <p className="text-sm text-slate-500 max-w-md mx-auto">
-            Certified clinics equipped with multi-lingual support, board-certified specialists, and advanced facilities.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {featuredClinics.map((clinic) => (
-            <ClinicCard key={clinic.id} clinic={{...clinic,address_region:clinicRegion(clinic),card_station:nearbyStation(clinic,stationPages)}} />
-          ))}
-        </div>
-        <details className="rounded-xl border bg-white p-4"><summary className="cursor-pointer min-h-11 py-3 font-semibold">Visit Goldman: all 5 branches, hours & phone numbers</summary><GoldmanVisitGuide /></details>
-      </section>
+      <section aria-labelledby="care-guides-heading" className="max-w-5xl mx-auto px-4 space-y-4"><h2 id="care-guides-heading" className="text-2xl font-bold">Guides to finding care in Korea</h2><p className="text-slate-600">Practical questions to ask before choosing a clinic.</p><Link href="/guides/choose-urology-clinic-gangnam" className="block rounded-xl border bg-white p-5 space-y-2 hover:border-amber-500"><span className="text-xs font-semibold text-slate-500">CHOOSING A CLINIC</span><h3 className="text-xl font-bold">How to choose a urology clinic in Gangnam</h3><p className="text-sm text-slate-600">Compare reported specialists, services, location and what to confirm before visiting.</p><span className="inline-flex min-h-11 items-center underline">Read the guide →</span></Link><Link href="/guides" className="min-h-11 inline-flex items-center underline">Browse care guides</Link></section>
     </div>
   );
 }

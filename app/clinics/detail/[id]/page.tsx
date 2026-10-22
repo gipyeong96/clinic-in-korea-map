@@ -1,3 +1,4 @@
+import GoldmanCareGuide from '@/components/GoldmanCareGuide';
 import {clinicCorrectionLink} from '@/lib/feedback';
 import {additionalGoldmanClinic} from '@/lib/goldman';
 import GoldmanVisitGuide from '@/components/GoldmanVisitGuide';
@@ -170,6 +171,7 @@ export default async function ClinicDetail({ params, searchParams }: ClinicDetai
         </section>
 
         <GoldmanVisitGuide clinicId={String(clinic.id)} />
+        <GoldmanCareGuide clinicId={String(clinic.id)} />
 
         {/* Semantic Table for AEO (AI bots easily parse tables) */}
         <section className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
