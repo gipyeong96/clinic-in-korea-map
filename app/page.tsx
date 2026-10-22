@@ -34,16 +34,16 @@ export default function HomePage({ params }: HomePageProps) {
   const featuredClinics = [...mockClinics.filter((c) => c.is_premium),...additionalGoldmanClinics];
 
   const departments = [
-    { slug: 'urology', name: dict.urology },
-    { slug: 'dentistry', name: dict.dentistry },
-    { slug: 'internal-medicine', name: dict['internal-medicine'] },
-    { slug: 'dermatology', name: dict.dermatology },
-    { slug: 'plastic-surgery', name: dict['plastic-surgery'] },
-    { slug: 'ent', name: 'ENT (Ear, Nose & Throat)' },
-    { slug: 'pediatrics', name: 'Pediatrics (Children)' },
-    { slug: 'ob-gyn', name: 'Obstetrics & Gynecology' },
-    { slug: 'orthopedics', name: 'Orthopedics (Bones & Joints)' },
-    { slug: 'ophthalmology', name: 'Ophthalmology (Eyes)' },
+    { slug: 'urology', name: dict.urology, hint: 'Urinary tract & male reproductive health' },
+    { slug: 'dentistry', name: dict.dentistry, hint: 'Teeth & gums' },
+    { slug: 'internal-medicine', name: dict['internal-medicine'], hint: 'Adult medical care' },
+    { slug: 'dermatology', name: dict.dermatology, hint: 'Skin, hair & nails' },
+    { slug: 'plastic-surgery', name: dict['plastic-surgery'], hint: 'Reconstructive & cosmetic surgery' },
+    { slug: 'ent', name: 'ENT', hint: 'Ear, nose & throat' },
+    { slug: 'pediatrics', name: 'Pediatrics', hint: 'Babies, children & teens' },
+    { slug: 'ob-gyn', name: 'Obstetrics & Gynecology', hint: 'Pregnancy & reproductive health' },
+    { slug: 'orthopedics', name: 'Orthopedics', hint: 'Bones, joints & muscles' },
+    { slug: 'ophthalmology', name: 'Ophthalmology', hint: 'Eyes & vision' },
   ];
 
   const locations = [
@@ -125,9 +125,9 @@ export default function HomePage({ params }: HomePageProps) {
               <Link 
                 key={dept.slug}
                 href={areaBrowseLink(undefined,{department:dept.slug,query:'',specialist:false})}
-                className="text-xs font-semibold bg-slate-50 text-slate-700 py-2.5 px-4 rounded-lg border border-slate-200/60 hover:bg-amber-500 hover:text-white hover:border-amber-600 transition text-center"
+                className="min-h-11 min-w-0 break-words text-xs bg-slate-50 text-slate-700 py-3 px-3 rounded-lg border border-slate-200/60 hover:bg-amber-50 hover:border-amber-500 transition text-left"
               >
-                {dept.name}
+                <span className="block font-semibold">{dept.name}</span><span className="block mt-1 text-slate-500 leading-relaxed">{dept.hint}</span>
               </Link>
             ))}
           </div>
