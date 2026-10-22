@@ -1,3 +1,4 @@
+import {clinicCorrectionLink} from '@/lib/feedback';
 import {additionalGoldmanClinic} from '@/lib/goldman';
 import GoldmanVisitGuide from '@/components/GoldmanVisitGuide';
 import React from 'react';
@@ -165,6 +166,7 @@ export default async function ClinicDetail({ params, searchParams }: ClinicDetai
           <SaveClinic clinic={snapshot}/>
           <p className="text-sm font-medium select-all">{address||'Address not provided'}</p>
           <ClinicContact clinic={clinic} />
+          <Link href={clinicCorrectionLink(clinic.hira_code||String(clinic.id))} className="inline-flex min-h-11 items-center underline text-sm">Report incorrect information for this clinic</Link>
         </section>
 
         <GoldmanVisitGuide clinicId={String(clinic.id)} />
