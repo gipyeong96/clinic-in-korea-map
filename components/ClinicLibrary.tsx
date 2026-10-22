@@ -2,6 +2,7 @@
 import {useEffect,useState} from 'react';
 import Link from 'next/link';
 import {LibraryClinic,ClinicLibrary,LIBRARY_KEY,readLibrary,updateLibrary} from '@/lib/clinic-library';
+import ClinicComparison from '@/components/ClinicComparison';
 
 function useLibrary(){
   const [library,setLibrary]=useState<ClinicLibrary>({saved:[],recent:[]});
@@ -35,19 +36,24 @@ export function RecordClinicVisit({clinic}:{clinic:LibraryClinic}){
 
 export default function ClinicLibraryPage(){
   const {library,ready,error,change}=useLibrary();
+  const [selected,setSelected]=useState<string[]>([]);
+  const chosen=selected.map(id=>library.saved.find(c=>c.id===id)).filter((c):c is LibraryClinic=>!!c);
+  function choose(id:string){setSelected(current=>{const valid=current.filter(value=>library.saved.some(c=>c.id===value));return valid.includes(id)?valid.filter(value=>value!==id):valid.length<3?[...valid,id]:valid;});}
   return <div className="max-w-4xl mx-auto px-4 py-8 space-y-6 min-w-0 break-words">
     <h1 className="text-3xl font-bold">My clinics</h1>
     <p className="font-semibold">Save clinics on this device — no sign-up needed.</p>
     <p className="text-sm text-slate-600">Saved clinics and the last 20 clinic profiles you viewed are stored only in this browser on this device. They are not synced to an account. Clearing browser data removes this list.</p>
     {error&&<p role="status" className="text-sm text-rose-700">{error}</p>}
+    {ready&&!error&&<ClinicComparison key={chosen.map(c=>c.id).join('|')} selected={chosen}/>}
     {!ready?<p role="status">Loading your clinics…</p>:<>{(['saved','recent'] as const).map(kind=><section key={kind} className="space-y-3" aria-label={kind==='saved'?'Saved clinics':'Recently viewed clinics'}>
       <h2 className="text-xl font-bold">{kind==='saved'?'Saved clinics':'Recently viewed'} ({library[kind].length})</h2>
       {!library[kind].length?<p className="rounded-xl border bg-white p-5 text-sm text-slate-600">{kind==='saved'?'Choose “Save clinic” on a clinic card or profile to keep it here.':'Clinic profiles you open will appear here.'}</p>:<ul className="space-y-3">{library[kind].map(clinic=><li key={clinic.id} className="rounded-xl border bg-white p-4 space-y-2">
         <Link href={clinic.path} className="font-bold underline block">{clinic.name}</Link>
         {clinic.nameKo!==clinic.name&&<p className="text-sm text-slate-500">{clinic.nameKo}</p>}
         <p className="text-sm">{clinic.region}</p><p className="text-sm text-slate-600">{clinic.address}</p>
-        <div className="flex flex-wrap gap-2"><SaveClinic clinic={clinic}/>{kind==='recent'&&<button type="button" onClick={()=>change(clinic,'remove-recent')} className="min-h-11 px-3 py-2 text-sm underline" aria-label={`Remove ${clinic.name} from recently viewed`}>Remove from recent</button>}</div>
+        <div className="flex flex-wrap gap-2"><SaveClinic clinic={clinic}/>{kind==='saved'&&<label className="min-h-11 flex items-center gap-2 px-2 text-sm font-semibold"><input type="checkbox" checked={chosen.some(c=>c.id===clinic.id)} disabled={chosen.length>=3&&!chosen.some(c=>c.id===clinic.id)} onChange={()=>choose(clinic.id)} aria-label={`Compare ${clinic.name}`}/>Compare</label>}{kind==='recent'&&<button type="button" onClick={()=>change(clinic,'remove-recent')} className="min-h-11 px-3 py-2 text-sm underline" aria-label={`Remove ${clinic.name} from recently viewed`}>Remove from recent</button>}</div>
       </li>)}</ul>}
+      {kind==='saved'&&chosen.length>0&&<a href="#compare-heading" className="inline-flex min-h-11 items-center underline text-sm">Compare {chosen.length} selected clinics ↑</a>}
     </section>)}<p className="text-xs text-slate-500">List details reflect when a clinic was saved or viewed. Open its profile for current information.</p></>}
     <Link href="/" className="inline-flex min-h-11 items-center underline">Find more clinics</Link>
   </div>;
