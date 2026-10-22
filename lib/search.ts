@@ -26,16 +26,16 @@ export function homeSearchPath(input: string) {
   let department = 'all';
   let location = 'all';
   const departments: [RegExp, string][] = [
-    [/\b(?:urology|urologist)\b/, 'urology'],
-    [/\b(?:dentistry|dental|dentist)\b/, 'dentistry'],
+    [/\b(?:urology|urologists?)\b/, 'urology'],
+    [/\b(?:dentistry|dental|dentists?)\b/, 'dentistry'],
     [/\binternal(?:[ -]+medicine)?\b/, 'internal-medicine'],
-    [/\b(?:dermatology|dermatologist)\b/, 'dermatology'],
+    [/\b(?:dermatology|dermatologists?|skin[ -]+(?:doctors?|clinics?))\b/, 'dermatology'],
     [/\bplastic(?:[ -]+surgery)?\b/, 'plastic-surgery'],
-    [/\b(?:ent|ear nose throat|otolaryngology)\b/, 'ent'],
-    [/\b(?:pediatrics|pediatrician|paediatrics)\b/, 'pediatrics'],
-    [/\b(?:ob[ -]?gyn|gynecology|gynaecology|obstetrics)\b/, 'ob-gyn'],
+    [/\b(?:ent(?:[ -]+doctors?)?|ear[ ,–-]+nose[ ,–-]+(?:and[ -]+)?throat(?:[ -]+(?:doctors?|clinics?))?|otolaryngology)\b/, 'ent'],
+    [/\b(?:pediatrics|pediatricians?|paediatrics|paediatricians?|(?:kids?|children(?:['’]s)?)[ -]+(?:doctors?|clinics?))\b/, 'pediatrics'],
+    [/\b(?:ob[ -]?gyn|gynecology|gynaecology|gynecologists?|gynaecologists?|obstetrics)\b/, 'ob-gyn'],
     [/\b(?:orthopedics|orthopaedics|orthopedist)\b/, 'orthopedics'],
-    [/\b(?:ophthalmology|ophthalmologist|eye clinic)\b/, 'ophthalmology'],
+    [/\b(?:ophthalmology|ophthalmologists?|eye[ -]+(?:doctors?|clinics?))\b/, 'ophthalmology'],
   ];
   const locations: [RegExp, string][] = [
     [/\bgangnam[ -]+station\b/, 'gangnam-station'],
@@ -49,7 +49,13 @@ export function homeSearchPath(input: string) {
     [/\bulsan\b/, 'ulsan'], [/\bjeju\b/, 'jeju'],
   ];
   for (const [pattern, slug] of departments) {
-    if (pattern.test(remaining)) { department = slug; remaining = remaining.replace(pattern, ' '); break; }
+    if (pattern.test(remaining)) {
+      department = slug;
+      // Consume only a connector immediately after the department phrase.
+      // Keep "near me" intact and preserve other words such as "walk in".
+      remaining=remaining.replace(new RegExp(pattern.source+'(?:\\s+(?:in|at|near)\\b(?![\\s-]+me\\b))?'), ' ');
+      break;
+    }
   }
   if(hasNearMeIntent(remaining))return nearbySearchLink(department,{query:nearbyKeyword(remaining)});
   const region=extractRegion(remaining);

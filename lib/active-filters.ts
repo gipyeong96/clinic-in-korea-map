@@ -1,4 +1,7 @@
 import {searchLink} from './search';
+export function activeSearchSummary(input:Parameters<typeof activeFilters>[0]){
+ return [input.department==='all'?'All departments':input.departmentLabel,input.location==='all'?'Across Korea':input.locationLabel,input.radius?`Within ${input.radius===500?'500 m':`${input.radius/1000} km`}`:null,input.specialist?'Specialists reported':null,input.registered?'International-patient registration listed':null,input.query?`Keyword: ${input.query}`:null].filter(Boolean).join(' · ');
+}
 export function activeFilters(input:{department:string;location:string;query:string;specialist:boolean;registered?:boolean;radius?:number;departmentLabel:string;locationLabel:string}){
   const {department,location,query,specialist,registered,radius,departmentLabel,locationLabel}=input;
   const options={query,specialist,registered,radius};

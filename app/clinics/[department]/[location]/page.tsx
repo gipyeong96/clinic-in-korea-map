@@ -1,3 +1,4 @@
+import ResultSearchOptions from '@/components/ResultSearchOptions';
 import ContextualCareGuides from '@/components/ContextualCareGuides';
 import {uniqueClinicProfiles} from '@/lib/site';
 import ResultDepartmentPicker from '@/components/ResultDepartmentPicker';
@@ -12,7 +13,7 @@ import { PAGE_SIZE, MAX_PAGE, searchPage } from '@/lib/pagination';
 import { matchRegions,regionLabel } from '@/lib/national-regions';
 import { searchRecovery } from '@/lib/search-recovery';
 import {areaBrowseLink} from '@/lib/area-navigation';
-import {activeFilters} from '@/lib/active-filters';
+import {activeFilters,activeSearchSummary} from '@/lib/active-filters';
 import { getDictionary } from '@/lib/translation';
 import { getClinics } from '@/lib/supabase';
 import { SITE_URL, clinicPath, serializeJsonLd } from '@/lib/site';
@@ -98,8 +99,10 @@ export default async function SearchPage({ params, searchParams }: Props) {
         <p>Within {radius.toLocaleString()} m · Nearest first · Straight-line distance, not walking distance. For interchanges, the nearest listed line coordinate is used.</p>
         <details className="text-xs"><summary className="cursor-pointer underline">Official station sources and dates</summary><div className="space-y-1 py-2">{station.stations.map(s => <p key={s.id}>{s.line} · <a className="underline" href={s.source_url} target="_blank" rel="noreferrer">Official source</a> · Source record: {s.source_date}</p>)}<p>These are dated records, not a live timetable. Routes and train services may change. Source dates may be dataset or portal update dates.</p></div></details>
         </div></details>
-        <details id="change-station" className="scroll-mt-24 rounded-xl border bg-white p-3"><summary className="cursor-pointer min-h-11 py-3 font-semibold">Choose another station</summary><p className="pb-3">Your department, radius and filters stay selected. Choose a region or search by station name.</p><StationFinder compact department={params.department} searchOptions={{query,specialist,registered,radius}} /></details>
+
       </div>}
+      <ResultSearchOptions key={searchLink(params.department,params.location,{query,specialist,registered,radius:station?radius:undefined,page})} summary={activeSearchSummary({department:params.department,location:params.location,query,specialist,registered,radius:station?radius:undefined,departmentLabel:dept,locationLabel:loc})}>
+      {station&&<details id="change-station" className="scroll-mt-24 rounded-xl border bg-white p-3"><summary className="cursor-pointer min-h-11 py-3 font-semibold">Choose another station</summary><p className="pb-3">Your department, radius and filters stay selected. Choose a region or search by station name.</p><StationFinder compact department={params.department} searchOptions={{query,specialist,registered,radius}} /></details>}
       <form action={`/clinics/${params.department}/${params.location}`} method="get" className="flex flex-wrap items-end gap-3 bg-white p-4 rounded-xl border border-slate-200">
         <label className="flex-1 min-w-[180px] text-sm font-semibold">Clinic name or address
           <input name="q" defaultValue={query} maxLength={200} className="block border rounded-lg px-3 py-2 w-full mt-1" placeholder="Search names or addresses" />
@@ -113,6 +116,7 @@ export default async function SearchPage({ params, searchParams }: Props) {
       {currentFilters.filters.length>0&&<nav aria-label="Active search filters" className="flex flex-wrap items-center gap-2 text-sm"><span className="font-semibold">Your search:</span>{currentFilters.filters.map(filter=><a key={filter.action} href={filter.href} aria-label={`${filter.action}: ${filter.label}`} className="min-h-11 inline-flex max-w-full items-center gap-2 rounded-full border bg-white px-4 py-2 break-words"><span className="min-w-0">{filter.label}</span><span aria-hidden="true">{filter.action==='Change radius'?'↕':'×'}</span></a>)}<a href={currentFilters.clear} className="min-h-11 inline-flex items-center px-3 underline">Clear all filters</a></nav>}
       <ResultDepartmentPicker department={params.department} location={params.location} options={{query,specialist,registered,radius:station?radius:undefined}} />
       <a href={areaBrowseLink(undefined,{department:params.department,query,specialist,registered})} className="inline-flex min-h-11 items-center underline text-sm">Choose area</a>
+      </ResultSearchOptions>
       <p className="text-sm text-slate-500" role={failed ? 'alert' : 'status'}>
         {failed ? 'Clinic information is temporarily unavailable. Please try again later.' : `Page ${page} · ${filteredClinics.length} clinic profiles on this page.${!filteredClinics.length&&page>1?' No further results. Use Previous page or change your search.':''}`}
       </p>

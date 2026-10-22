@@ -21,6 +21,24 @@ const pagination=load('lib/pagination.ts');
 const recovery=load('lib/search-recovery.ts',{'./search':search});
 const active=load('lib/active-filters.ts',{'./search':search});
 
+test('plain English clinician phrases route to departments and retain locations and unrelated keywords',()=>{
+ for(const [phrase,department] of [['skin doctor','dermatology'],['skin-clinic','dermatology'],['eye doctors','ophthalmology'],["children’s doctor",'pediatrics'],['kids clinic','pediatrics'],['ear nose and throat doctor','ent'],['paediatrician','pediatrics'],['gynecologist','ob-gyn']]){
+  assert.equal(search.homeSearchPath(phrase+' in Busan'),`/clinics/${department}/busan`);
+ }
+ assert.equal(search.homeSearchPath('Goldman skin doctor in Busan evening'),'/clinics/dermatology/busan?q=goldman%20evening');
+ assert.equal(search.homeSearchPath('skin doctor walk in Busan'),'/clinics/dermatology/busan?q=walk%20in');
+ assert.equal(search.homeSearchPath('eye doctor near me'),'/nearby?department=ophthalmology');
+ assert.equal(search.homeSearchPath('kids doctor nearby weekend'),'/nearby?department=pediatrics&q=weekend');
+ for(const input of ['rash busan','eye pain busan','skinny doctor busan'])assert.equal(new URL(search.homeSearchPath(input),'https://example.com').pathname,'/clinics/all/busan');
+});
+
+test('compact active-search summary describes every applied condition without changing URLs',()=>{
+ const input={department:'dermatology',location:'gangnam-station',query:'evening',specialist:true,registered:true,radius:500,departmentLabel:'Dermatology',locationLabel:'Gangnam Station'};
+ const before=JSON.stringify(input),summary=active.activeSearchSummary(input);
+ for(const part of ['Dermatology','Gangnam Station','Within 500 m','Specialists reported','International-patient registration listed','Keyword: evening'])assert(summary.includes(part));
+ assert.equal(JSON.stringify(input),before);assert.equal(active.activeSearchSummary({...input,department:'all',location:'all',query:'',specialist:false,registered:false,radius:undefined}),'All departments · Across Korea');
+});
+
 test('active filter removals preserve unrelated conditions and reset pagination',()=>{
  const {filters,clear}=active.activeFilters({department:'dentistry',location:'seoul-station',query:'치과',specialist:true,radius:1000,departmentLabel:'Dentistry',locationLabel:'Seoul Station'});
  assert.equal(filters.length,5);assert.equal(clear,'/clinics/all/all');
@@ -257,6 +275,8 @@ test('specialist counts stay attached to the department that reported them', () 
 
 const suggestions=load('lib/home-suggestions.ts',{'./stations':stations,'./national-regions':national,'./search':search});
 test('home station suggestions distinguish nearby clinics and preserve department and extra terms',()=>{
+ assert(suggestions.homeSuggestions('skin doctor in busan').regions.some(r=>r.href==='/clinics/dermatology/busan'));
+ assert(suggestions.homeSuggestions('eye doctor near Gangnam Station').stations.some(r=>r.href==='/clinics/ophthalmology/gangnam-station'));
  assert.deepEqual(suggestions.homeSuggestions('Seoul urology near me'),{stations:[],regions:[]});
  assert.equal(suggestions.homeSuggestions('Hongdae dentist').stations[0].href,'/clinics/dentistry/station-86b835f49957a6');
  assert.equal(suggestions.homeSuggestions('홍대').stations[0].label,'Hongik Univ. Station');
