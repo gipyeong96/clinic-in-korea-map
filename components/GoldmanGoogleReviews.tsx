@@ -50,7 +50,7 @@ export default function GoldmanGoogleReviews({clinicId}:{clinicId:string}){
  const [opened,setOpened]=useState(false);
  const apiKey=process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
  if(!branch||!place)return null;
- return <section aria-labelledby="google-reviews-heading" className="rounded-2xl border bg-white p-4 sm:p-6 space-y-4 min-w-0">
+ return <section aria-labelledby="google-reviews-heading" className="rounded-2xl border bg-white p-2 min-[360px]:p-4 sm:p-6 space-y-4 min-w-0">
   <div><h2 id="google-reviews-heading" className="text-xl font-bold">Google ratings &amp; reviews</h2><p className="text-sm text-slate-600 mt-2">Goldman {branch.name} · {branch.address}</p></div>
   <p className="text-sm">See feedback shared by Google Maps users for this branch. Reviews reflect individual experiences and do not establish treatment suitability.</p>
   {!opened&&apiKey&&<button onClick={()=>setOpened(true)} className="min-h-11 w-full sm:w-auto rounded-lg bg-slate-900 text-white px-5 py-3 font-semibold">Show Google ratings &amp; reviews</button>}
