@@ -2,6 +2,8 @@ import { createClient } from '@supabase/supabase-js';
 import { searchTerms } from './search';
 import { regionAddresses, addressFilter, locationIdsForSlug, extractRegion } from './regions';
 import { stationForSlug } from './stations';
+import {unifiedClinicRecord} from './site';
+import {additionalGoldmanClinic,GOLDMAN_ENGLISH_URL} from './goldman';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://lgbiyvqwurtlqsfsdnyy.supabase.co';
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'sb_publishable_gw_11u4mkJiC-NvZPxUbOw_7AnTbO7s';
@@ -198,6 +200,18 @@ export async function getClinics(params?: { categorySlug?: string, locationSlug?
 }
 
 export async function getClinicById(id: string) {
+  const record=unifiedClinicRecord(id);
+  if(record){
+    const fallback=mockClinics.find(c=>c.id===record.id)||additionalGoldmanClinic(record.id);
+    const {data}=await supabase.from('clinics').select('*, categories(*), locations(*)').eq('hira_code',record.hira).single();
+    // Public evidence stays attached to its original source. Branch contact and
+    // visit details come from the verified English branch directory.
+    return {...fallback,...data,id:record.id,hira_code:record.hira,name_en:fallback.name_en,name_ko:fallback.name_ko,
+      telephone:fallback.telephone,address_ko:fallback.address_ko,address_en:fallback.address_en,
+      categories:data?.categories||fallback.category||fallback.categories,
+      locations:data?.locations||fallback.location,is_premium:true,
+      premium_data:{...fallback.premium_data,...data?.premium_data,website:GOLDMAN_ENGLISH_URL}};
+  }
   // Check mock clinics first for custom slugs
   const mockMatch = mockClinics.find(c => c.id === id);
   if (mockMatch) return { ...mockMatch, categories: mockMatch.category, locations: mockMatch.location };

@@ -11,7 +11,7 @@ test('nearby search accepts only bounded Korean coordinates and supported option
 });
 test('nearby API sends validated filters before pagination and never returns success for database failure',async()=>{
  const calls=[];let fail=false;
- const api=load('app/api/nearby/route.ts',{'@/lib/nearby':nearby,'@/lib/search':search,'@/lib/supabase':{supabase:{rpc:async(name,args)=>{calls.push({name,args});return {data:Array.from({length:26},(_,i)=>({id:i})),error:fail?{}:null};}}},'next/server':{NextResponse:{json:(body,options)=>({body,...options})}}});
+ const api=load('app/api/nearby/route.ts',{'@/lib/site':load('lib/site.ts'),'@/lib/nearby':nearby,'@/lib/search':search,'@/lib/supabase':{supabase:{rpc:async(name,args)=>{calls.push({name,args});return {data:Array.from({length:26},(_,i)=>({id:i})),error:fail?{}:null};}}},'next/server':{NextResponse:{json:(body,options)=>({body,...options})}}});
  const result=await api.POST(new Request('https://example.com/api/nearby',{method:'POST',body:JSON.stringify(input)}));assert.equal(result.body.clinics.length,25);assert.equal(result.body.hasNext,true);assert.equal(result.headers['Cache-Control'],'no-store, private');assert.equal(calls[0].args.result_offset,25);assert.equal(calls[0].args.registered_only,true);assert.equal(calls[0].args.specialist_only,true);assert.equal(calls[0].name,'nearby_location_clinics_page');
  const bad=await api.POST(new Request('https://example.com/api/nearby',{method:'POST',body:JSON.stringify({...input,longitude:0})}));assert.equal(bad.status,400);assert.equal(calls.length,1);
  fail=true;const failed=await api.POST(new Request('https://example.com/api/nearby',{method:'POST',body:JSON.stringify(input)}));assert.equal(failed.status,503);
@@ -27,7 +27,7 @@ test('nearby URL context keeps only valid filters and never restores page or coo
 
 test('nearby keyword filtering reaches the existing RPC before pagination without wildcard broadening',async()=>{
  const calls=[];
- const api=load('app/api/nearby/route.ts',{'@/lib/nearby':nearby,'@/lib/search':search,'@/lib/supabase':{supabase:{rpc:async(name,args)=>{calls.push(args);return {data:[],error:null};}}},'next/server':{NextResponse:{json:(body,options)=>({body,...options})}}});
+ const api=load('app/api/nearby/route.ts',{'@/lib/site':load('lib/site.ts'),'@/lib/nearby':nearby,'@/lib/search':search,'@/lib/supabase':{supabase:{rpc:async(name,args)=>{calls.push(args);return {data:[],error:null};}}},'next/server':{NextResponse:{json:(body,options)=>({body,...options})}}});
  const post=query=>api.POST(new Request('https://example.com/api/nearby',{method:'POST',body:JSON.stringify({...input,query})}));
  await post('Goldman,% 치과');assert.equal(calls[0].search_query,'Goldman 치과');assert.equal(calls[0].specialist_only,true);assert.equal(calls[0].registered_only,true);assert.equal(calls[0].result_offset,25);
  const empty=await post('%%%_*');assert.deepEqual(empty.body,{clinics:[],hasNext:false});assert.equal(calls.length,1);

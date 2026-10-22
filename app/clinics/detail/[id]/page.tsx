@@ -1,12 +1,11 @@
 import GoldmanGoogleReviews from '@/components/GoldmanGoogleReviews';
 import GoldmanCareGuide from '@/components/GoldmanCareGuide';
 import {clinicCorrectionLink} from '@/lib/feedback';
-import {additionalGoldmanClinic} from '@/lib/goldman';
 import GoldmanVisitGuide from '@/components/GoldmanVisitGuide';
 import React from 'react';
-import { SITE_URL, clinicPath, serializeJsonLd } from '@/lib/site';
+import { SITE_URL, clinicPath, serializeJsonLd, canonicalClinicId } from '@/lib/site';
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { notFound, permanentRedirect } from 'next/navigation';
 import { getClinicById } from '@/lib/supabase';
 import { getDictionary } from '@/lib/translation';
 import { MapPin, Phone, Clock, Star, ShieldCheck, Info } from 'lucide-react';
@@ -28,7 +27,7 @@ interface ClinicDetailProps {
 }
 
 export async function generateMetadata({ params }: ClinicDetailProps) {
-  const clinic = additionalGoldmanClinic(params.id) || await getClinicById(params.id);
+  const clinic = await getClinicById(params.id);
   if (!clinic) return { title: 'Clinic Not Found' };
 
   return {
@@ -41,7 +40,12 @@ export async function generateMetadata({ params }: ClinicDetailProps) {
 }
 
 export default async function ClinicDetail({ params, searchParams }: ClinicDetailProps) {
-  const clinic = additionalGoldmanClinic(params.id) || await getClinicById(params.id);
+  const canonicalId=canonicalClinicId(params.id);
+  if(canonicalId!==params.id){
+    const back=searchReturnPath(searchParams.returnTo);
+    permanentRedirect(`/clinics/detail/${canonicalId}${back?'?'+new URLSearchParams({returnTo:back}):''}`);
+  }
+  const clinic = await getClinicById(params.id);
   if (!clinic) return notFound();
 
   const region=clinicRegion(clinic);

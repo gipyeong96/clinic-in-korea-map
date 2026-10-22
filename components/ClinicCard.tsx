@@ -38,7 +38,7 @@ export default function ClinicCard({ clinic, selectedDepartment='all', onShowMap
   const address = cardAddress(clinic);
   const branch=goldmanBranch(String(clinic.id));
   const nearby=clinic.card_station;
-  const phone=clinicPhone(clinic.telephone);
+  const phone=clinicPhone(branch?.phone||clinic.telephone);
   const slogan = clinic.premium_data?.slogan_en;
   
   const categoryName = clinicFocus(clinic);
@@ -131,7 +131,7 @@ export default function ClinicCard({ clinic, selectedDepartment='all', onShowMap
 
       <div className="mt-5 pt-3 border-t border-slate-100 space-y-2">
         <SaveClinic clinic={clinicSnapshot(clinic)} />
-        <ClinicContact clinic={clinic} compact />
+        <ClinicContact clinic={branch?{...clinic,telephone:branch.phone}:clinic} compact />
         <div className="flex gap-2">
         <Link 
           href={detailHref}
@@ -144,9 +144,9 @@ export default function ClinicCard({ clinic, selectedDepartment='all', onShowMap
           View Details
         </Link>
         {onShowMap&&hasClinicCoordinates(clinic)&&<button type="button" onClick={onShowMap} className="min-h-11 border rounded-lg px-3 py-2 text-sm font-semibold">Show on map</button>}
-        {clinic.is_premium && clinic.premium_data?.website && (
+        {(branch || (clinic.is_premium && clinic.premium_data?.website)) && (
           <a
-            href={goldmanBranch(String(clinic.id))?GOLDMAN_ENGLISH_URL:clinic.premium_data.website}
+            href={branch?GOLDMAN_ENGLISH_URL:clinic.premium_data.website}
             target="_blank"
             rel="noopener noreferrer"
             className="min-h-11 inline-flex items-center justify-center gap-1 px-2 py-2 bg-white border border-amber-300 text-amber-700 rounded-lg hover:bg-amber-100 transition text-xs font-semibold"
