@@ -14,3 +14,12 @@ test('nearby review accurately describes chosen radius, department, keyword and 
  assert.equal(nearby.nearbySummary({department:'all',radius:2000,specialist:false,registered:false,query:''}),'All departments · Within 2 km');
  assert.deepEqual(nearby.nearbyDepartments.map(d=>d.slug),['urology','dentistry','dermatology']);
 });
+
+test('dental guidance follows dental results, profiles and nearby without displacing evidence explanations',()=>{
+ for(const stage of ['results','profile','nearby']){
+  assert.deepEqual(slugs({department:'dentistry',stage}),['find-a-dentist-in-korea','before-visiting-a-clinic-in-korea']);
+  for(const filter of ['specialist','registered'])assert.deepEqual(slugs({department:'dentistry',stage,[filter]:true}),['find-a-dentist-in-korea','understand-clinic-information']);
+ }
+ for(const department of ['all','urology','dermatology',undefined])assert(!slugs({department}).includes('find-a-dentist-in-korea'));
+ assert.equal(new Set(guides.careGuides.map(g=>g.slug)).size,guides.careGuides.length);
+});
