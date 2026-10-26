@@ -13,7 +13,7 @@ function regionFor(city: string) {
   return city;
 }
 
-export default function StationFinder({department='all',searchOptions={},compact=false}:{department?:string;searchOptions?:{query?:string;specialist?:boolean;registered?:boolean;weekend?:string;radius?:number};compact?:boolean}) {
+export default function StationFinder({department='all',searchOptions={},compact=false,previewLimit}:{previewLimit?:number;department?:string;searchOptions?:{query?:string;specialist?:boolean;registered?:boolean;weekend?:string;radius?:number};compact?:boolean}) {
   const [city, setCity] = useState('');
   const [line, setLine] = useState('');
   const [query, setQuery] = useState('');
@@ -23,8 +23,8 @@ export default function StationFinder({department='all',searchOptions={},compact
   const featured=featuredStationSlugs.map(slug=>stationPages.find(s=>s.slug===slug)!);
   const hasFilter=Boolean(city||line||query.trim());
   return <div className="space-y-4">
-    {!compact&&<><p className="text-xs text-slate-500">Major stations · Quick links to transport hubs and city centres.</p>
-    <div className="grid grid-cols-2 gap-2" aria-label="Major station shortcuts">{featured.map(s=><Link key={s.slug} href={searchLink(department,s.slug,searchOptions)} className="min-h-11 border rounded-lg p-3 hover:border-amber-500 focus-visible:ring-2 focus-visible:ring-amber-500"><span className="block font-semibold text-sm">{s.name_en}</span><span className="block text-xs text-slate-500">{s.name_ko} · {regionFor(s.city)}</span></Link>)}</div></>}
+    {!compact&&<><p className="text-xs font-semibold text-slate-600">Major station shortcuts</p>
+    <div className="grid grid-cols-2 gap-2" aria-label="Major station shortcuts">{featured.slice(0,previewLimit).map(s=><Link key={s.slug} href={searchLink(department,s.slug,searchOptions)} className="min-h-11 border rounded-lg p-3 hover:border-amber-500 focus-visible:ring-2 focus-visible:ring-amber-500"><span className="block font-semibold text-sm">{s.name_en}</span><span className="block text-xs text-slate-500">{s.name_ko} · {regionFor(s.city)}</span></Link>)}</div>{previewLimit&&featured.length>previewLimit&&<details className="rounded-lg border p-3"><summary className="min-h-11 cursor-pointer py-3 text-sm font-semibold">More station shortcuts</summary><div className="grid grid-cols-2 gap-2">{featured.slice(previewLimit).map(s=><Link key={s.slug} href={searchLink(department,s.slug,searchOptions)} className="min-h-11 rounded-lg border p-3 text-sm font-semibold">{s.name_en}<span className="block text-xs font-normal text-slate-600">{regionFor(s.city)}</span></Link>)}</div></details>}</>}
     <details open={compact||undefined} className="rounded-lg border p-3">
     <summary className="cursor-pointer min-h-11 py-3 font-semibold text-sm list-item list-inside">Search all {stationPages.length.toLocaleString()} stations</summary>
     <div className="space-y-4 pt-3">

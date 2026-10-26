@@ -61,7 +61,7 @@ export default function HomeSearch({ placeholder, btnText }: HomeSearchProps) {
       </div>
       <button 
         type="submit" 
-        className="bg-amber-500 hover:bg-amber-600 text-white font-bold text-sm px-6 py-2.5 rounded-lg shadow transition"
+        className="bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold min-h-11 text-sm px-4 sm:px-6 py-2.5 rounded-lg shadow transition"
       >
         {btnText}
       </button>

@@ -1,3 +1,10 @@
+## Homepage usability preference — 2026-10-26
+
+- Improve usability alongside organic discovery and speed. The user finds the homepage text-heavy and visually undifferentiated.
+- Use clinics.seoul.kr and koreaclinicgo.com as design references for clear search hierarchy, visual care categories and progressive disclosure, not as sources of copied content or provider eligibility claims.
+- Prefer short labels, restrained icons/emoji paired with text, and accessible click/tap/keyboard disclosures for supplementary explanations. Do not rely on hover-only tooltips. Keep essential scope, consent and data limitations visible where needed.
+- Keep the homepage free of added disease menus. Preserve crawlable navigation and content, and avoid heavy UI dependencies for simple disclosures.
+
 # Care guide and blog editorial preferences
 
 - For articles about consulting clients, consult the hospital's official English website before drafting. Use relevant condition, examination, treatment, equipment and branch pages to make the article specific and useful.
