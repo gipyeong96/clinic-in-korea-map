@@ -194,7 +194,12 @@ function database({ error = null, locations = [], data = [] } = {}) {
     range(...args) { calls.push(['range',...args]); return this; },
     then(resolve) { return Promise.resolve({ data, error }).then(resolve); },
   };
-  const client = { rpc: async (...args) => { calls.push(['rpc', ...args]); return {data,error}; }, from(table) { return table === 'locations' ? { select: async () => ({ data: locations }) } : builder; } };
+  const client = { rpc: async (...args) => { calls.push(['rpc', ...args]); return {data,error}; }, from(table) { return table === 'locations' ? {
+    rows:locations,select(){return this;},eq(key,value){calls.push(['location-eq',key,value]);this.rows=this.rows.filter(r=>r[key]===value);return this;},
+    in(key,values){calls.push(['location-in',key,values]);this.rows=this.rows.filter(r=>values.includes(r[key]));return this;},order(){return this;},
+    range(start,end){calls.push(['location-range',start,end]);this.rows=this.rows.slice(start,end+1);return this;},
+    async maybeSingle(){return {data:this.rows[0]||null,error};},then(resolve){return Promise.resolve({data:this.rows,error}).then(resolve);}
+  } : builder; } };
   const api = load('lib/supabase.ts', { './search': search, './regions': regions, './stations': stations, './site':site, './goldman':load('lib/goldman.ts',{'./site':site}), '@supabase/supabase-js': { createClient: () => client } });
   return { calls, api };
 }
@@ -211,8 +216,19 @@ test('exact scoped location search includes descendants but not prefix neighbour
   await api.getClinics({ locationSlug: 'seoul--gangnam-gu' });
   assert.deepEqual(calls.find(call => call[0] === 'in'), ['in', 'location_id', [1, 2]]);
   const unknown = database();
-  await unknown.api.getClinics({ locationSlug: 'unknown' });
-  assert(unknown.calls.some(call => call[1] === 'locations.slug' && call[2] === 'unknown'));
+  assert.deepEqual(await unknown.api.getClinics({ locationSlug: 'unknown' }),[]);
+  assert(unknown.calls.some(call => call[0]==='location-eq' && call[1] === 'slug' && call[2] === 'unknown'));
+  assert(!unknown.calls.some(call=>call[0]==='select'));
+});
+
+test('location lookup handles roots beyond the API cap, paginates children and fails closed',async()=>{
+ const locations=[...Array.from({length:1100},(_,i)=>({id:i+1,slug:`unrelated-${i}`})),{id:2000,slug:'target'},...Array.from({length:1100},(_,i)=>({id:2001+i,slug:`child-${i}`,parent_id:2000}))];
+ const {calls,api}=database({locations});await api.getClinics({locationSlug:'target',categorySlug:'dentistry',specialist:true,registered:true,limit:26,offset:25});
+ const scope=calls.find(c=>c[0]==='in'&&c[1]==='location_id')[2];assert.equal(scope.length,1101);assert.equal(scope[0],2000);assert(!scope.includes(1));
+ assert(calls.some(c=>c[0]==='location-range'&&c[1]===1000));assert.deepEqual(calls.find(c=>c[0]==='range'),['range',25,50]);
+ assert(!calls.some(c=>c[1]==='locations.slug'));
+ const failure=database({locations,error:{message:'offline'}});await assert.rejects(failure.api.getClinics({locationSlug:'target'}),/Unable to load clinic locations/);
+ assert(!failure.calls.some(c=>c[0]==='select'));
 });
 
 test('Gangnam uses full province/district address constraints instead of merged dong IDs', async () => {
