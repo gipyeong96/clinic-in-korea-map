@@ -23,7 +23,7 @@ export default function HomeSearch({ placeholder, btnText }: HomeSearchProps) {
   const nearby=hasNearMeIntent(query);
   const interpreted=new URL(homeSearchPath(query),'https://example.com');
   const department=interpreted.pathname.split('/')[2];
-  const areaIntent=!nearby&&department!=='all'?suggestions.regions[0]:undefined;
+  const areaIntent=!nearby&&department!=='all'&&suggestions.regions.length===1?suggestions.regions[0]:undefined;
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
