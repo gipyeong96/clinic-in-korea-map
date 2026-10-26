@@ -1,3 +1,4 @@
+import InlineHelp from '@/components/InlineHelp';
 import ContextualCareGuides from '@/components/ContextualCareGuides';
 import ShareClinic from '@/components/ShareClinic';
 import GoldmanGoogleReviews from '@/components/GoldmanGoogleReviews';
@@ -160,7 +161,7 @@ export default async function ClinicDetail({ params, searchParams }: ClinicDetai
                 )}
                 {departments.some(d=>d.specialists>0) && (
                   <span className="flex items-center gap-1 text-xs font-bold px-2 py-1 bg-blue-50 text-blue-600 rounded border border-blue-100">
-                    <ShieldCheck className="w-3 h-3 shrink-0" /><span className="min-w-0">Specialists reported — see departments below</span>
+                    <ShieldCheck className="w-3 h-3 shrink-0" /><span className="min-w-0">Specialists reported</span>
                   </span>
                 )}
               </div>
@@ -178,15 +179,16 @@ export default async function ClinicDetail({ params, searchParams }: ClinicDetai
           )}
         </section>
 
-        <section className="bg-white rounded-xl border p-4 space-y-3" aria-label="Plan your visit">
-          <SaveClinic clinic={snapshot}/>
+        <section id="visit-details" className="scroll-mt-24 bg-white rounded-2xl border border-blue-200 p-4 sm:p-6 space-y-3" aria-label="Plan your visit">
+          <h2 className="flex items-center gap-2 text-xl font-bold text-slate-900"><MapPin aria-hidden="true" className="h-5 w-5 text-blue-700"/>Plan your visit</h2>
           <p className="text-sm font-medium select-all">{address||'Address not provided'}</p>
-          {nearest&&<div className="rounded-lg bg-slate-50 p-3 space-y-1 text-sm"><Link href={`/clinics/${focusSlug}/${nearest.slug}`} className="inline-flex min-h-11 items-center underline font-semibold">Nearby station: {nearest.name}</Link><p>{Math.round(nearest.distance).toLocaleString()} m straight-line distance · official station coordinates</p><p className="text-xs text-slate-500">Distance is measured from the station coordinates, not an exit or walking route. <Link className="underline" href={`/clinics/${focusSlug}/${nearest.slug}`}>Find clinics near this station</Link>.</p></div>}
+          {nearest&&<div className="rounded-lg bg-slate-50 p-3 space-y-1 text-sm"><Link href={`/clinics/${focusSlug}/${nearest.slug}`} className="inline-flex min-h-11 items-center underline font-semibold">Nearby station: {nearest.name}</Link><p>{Math.round(nearest.distance).toLocaleString()} m straight-line distance · official station coordinates</p><InlineHelp label="About this distance">Distance is measured from official station coordinates, not an exit or walking route.</InlineHelp></div>}
           <ClinicContact clinic={clinic} />
-          <ShareClinic name={name} url={`${SITE_URL}${clinicPath(clinic)}`}/>
+          <div className="flex flex-wrap items-start gap-3 border-t pt-3"><SaveClinic clinic={snapshot}/><ShareClinic name={name} url={`${SITE_URL}${clinicPath(clinic)}`}/></div>
           <Link href={clinicCorrectionLink(clinic.hira_code||String(clinic.id))} className="inline-flex min-h-11 items-center underline text-sm">Report incorrect information for this clinic</Link>
         </section>
 
+        <nav aria-label="Clinic page sections" className="flex flex-wrap gap-2 text-sm"><a href="#visit-details" className="min-h-11 inline-flex items-center rounded-full border border-blue-200 bg-blue-50 px-4 font-semibold text-blue-900">Contact & directions</a><a href="#clinic-information" className="min-h-11 inline-flex items-center rounded-full border border-violet-200 bg-violet-50 px-4 font-semibold text-violet-900">Departments & clinic information</a></nav>
         <ClinicWeekendHours id={clinic.hira_code||params.id} name={clinic.name_ko||''} address={clinic.address_ko||''} telephone={clinic.telephone||''}/>
         <ClinicConditions ykiho={clinic.hira_code||params.id} record={(conditionPilot as Record<string,unknown>)[clinic.hira_code||params.id]}/>
         <ContextualCareGuides department={focusSlug} location={region?.slug} stage="profile"/>
@@ -197,15 +199,15 @@ export default async function ClinicDetail({ params, searchParams }: ClinicDetai
             {nearest&&<Link className="min-h-11 inline-flex items-center rounded-lg border px-3 py-3 underline" href={searchLink(focusSlug,nearest.slug,{radius:1000})}>Compare near {nearest.name} · 1 km</Link>}
             {isJamsilDong(clinic.address_ko)&&departments.some(d=>d.slug==='urology')&&<Link className="min-h-11 inline-flex items-center rounded-lg border px-3 py-3 underline" href="/clinics/urology/jamsil">Compare urology clinics in Jamsil-dong</Link>}
           </nav>
-          <p>Area results follow address boundaries. Station results use a straight-line radius and can cross neighbourhood boundaries. Save clinics from results to compare them in <Link className="underline" href="/my-clinics">My clinics</Link>.</p>
+          <InlineHelp label="Area or station — what’s the difference?">Area results follow address boundaries. Station results use a straight-line radius and can cross neighbourhood boundaries. Save clinics from results to compare them in <Link className="underline" href="/my-clinics">My clinics</Link>.</InlineHelp>
         </section>}
 
         <GoldmanVisitGuide clinicId={String(clinic.id)} />
         <GoldmanGoogleReviews key={String(clinic.id)} clinicId={String(clinic.id)} />
         <GoldmanCareGuide clinicId={String(clinic.id)} />
 
-        {/* Semantic Table for AEO (AI bots easily parse tables) */}
-        <section className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        {/* Always-visible anchors keep the full evidence table accessible. */}
+        <section id="clinic-information" className="scroll-mt-24 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
           <div className="p-6 border-b border-slate-100">
             <h2 className="text-xl font-bold flex items-center gap-2">
               <Info className="w-5 h-5 text-slate-400" /> 
