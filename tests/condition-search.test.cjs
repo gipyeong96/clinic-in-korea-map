@@ -6,6 +6,11 @@ test('aliases preserve disease scope and require explicit choices without discar
  assert.equal(search.matchConditionSearch('kidney stones Jamsil').condition.slug,'urinary-stones');
  assert.equal(search.matchConditionSearch('cystitis').areas.length,2);
  assert.equal(search.matchConditionSearch('BPH near me').nearby,true);
+ for(const query of ['BPH nearby','kidney stones around me','cystitis near-me','STI clinics near me']){
+  assert.equal(search.matchConditionSearch(query).nearby,true,query);
+ }
+ assert.equal(search.matchConditionSearch('kidney stone treatment in Jamsil').areas[0].slug,'jamsil');
+ for(const query of ['BPH Busan nearby','Goldman BPH nearby','BPH near medical centre','kidney stones treatment Dr Kim'])assert.equal(search.matchConditionSearch(query),null,query);
  for(const query of ['UTI Gangnam','burning pee','Goldman BPH Gangnam','cystitisplus','cystitis BPH'])assert.equal(search.matchConditionSearch(query),null);
 });
 test('expanded comparisons use only eligible verified identities and retain exact source geographies',()=>{
