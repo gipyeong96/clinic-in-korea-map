@@ -30,7 +30,7 @@ export default function Guide(){return <CareGuideArticle slug={slug} title={titl
  </section>
  <section className="space-y-3" aria-labelledby="station-dentist"><h2 id="station-dentist" className="text-2xl font-bold">Can I find a dental clinic near a subway or railway station?</h2>
   <p>Search a station’s English or Korean name. Selecting a station opens dental results for that station, with a radius you can adjust. Distances use dated official station coordinates, not an individual exit or a live walking route.</p>
-  <StationFinder department="dentistry"/>
+  <StationFinder department="dentistry" compact/>
  </section>
  <section className="space-y-3" aria-labelledby="english-dentist"><h2 id="english-dentist" className="text-2xl font-bold">How can I check whether a dentist can communicate in English?</h2>
   <p>Contact the exact branch and ask about your appointment. An English website, an English listing name or “Registered for international patients” does not by itself confirm an English-speaking dentist or an interpreter.</p>
