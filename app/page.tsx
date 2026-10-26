@@ -138,7 +138,7 @@ export default function HomePage({ params }: HomePageProps) {
       </section>
 
       <aside aria-label="Saving clinics" className="max-w-5xl mx-auto px-4"><div className="rounded-xl border bg-white p-4 text-sm text-slate-600"><p className="font-semibold text-slate-800">Save clinics on this device — no sign-up needed.</p><p className="mt-1">Choose “Save clinic” on a clinic card or profile, then find it in <Link href="/my-clinics" className="underline inline-flex min-h-11 items-center">My clinics</Link>. Saved clinics stay in this browser. Select two or three in My clinics to compare their directory information.</p></div></aside>
-      <section aria-labelledby="care-guides-heading" className="max-w-5xl mx-auto px-4 space-y-4"><h2 id="care-guides-heading" className="text-2xl font-bold">Guides to finding care in Korea</h2><p className="text-slate-600">Checklists and explanations for finding care across Korea.</p><CareGuideCards/><Link href="/guides" className="min-h-11 inline-flex items-center underline">Browse care guides</Link></section>
+      <section aria-labelledby="care-guides-heading" className="max-w-5xl mx-auto px-4 space-y-4"><h2 id="care-guides-heading" className="text-2xl font-bold">Guides to finding care in Korea</h2><p className="text-slate-600">Checklists and explanations for finding care across Korea.</p><Link href="/conditions" className="inline-flex min-h-11 items-center underline">Compare clinics by reported condition →</Link><CareGuideCards/><Link href="/guides" className="min-h-11 inline-flex items-center underline">Browse care guides</Link></section>
     </div>
   );
 }

@@ -1,3 +1,4 @@
+import {indexableConditionPages} from '@/lib/condition-pages';
 import {careGuides} from '@/lib/care-guides';
 import {additionalGoldmanClinics} from '@/lib/goldman';
 import { MetadataRoute } from 'next';
@@ -12,6 +13,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const departments = ['all', 'urology', 'dentistry', 'internal-medicine', 'dermatology', 'plastic-surgery'];
   const locations = ['all', 'gangnam', 'seoul-station', 'gangnam-station', 'jamsil-station', 'jamsil', 'incheon', 'dongtan', 'busan', 'daegu', 'daejeon', 'gwangju', 'ulsan', 'jeju'];
   return [
+    {url:`${SITE_URL}/conditions`,priority:0.6},
+    ...indexableConditionPages.map(p=>({url:`${SITE_URL}${p.path}`,priority:0.6})),
     {url:`${SITE_URL}/guides`,priority:0.6},
     ...careGuides.map(guide=>({url:`${SITE_URL}/guides/${guide.slug}`,priority:0.6})),
     { url: SITE_URL, changeFrequency: 'weekly', priority: 1 },
