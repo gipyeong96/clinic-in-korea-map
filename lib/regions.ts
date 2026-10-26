@@ -50,3 +50,27 @@ export function locationIdsForSlug(rows: {id: number; slug: string; parent_id?: 
   }
   return Array.from(ids);
 }
+
+// Fetch only this identity and its descendants. An unfiltered location catalog
+// is API-capped and may omit the requested slug, causing a costly clinic join.
+export async function scopedLocationIds(db:{from:(table:string)=>any},slug:string):Promise<number[]> {
+  const {data:root,error}=await db.from('locations').select('id').eq('slug',slug).maybeSingle();
+  if(error)throw new Error('Unable to load clinic locations');
+  if(!root)return [];
+  const ids=new Set<number>([root.id]);let parents:number[]=[root.id];
+  for(let depth=0;parents.length&&depth<8;depth++){
+    const next:number[]=[];
+    for(let batch=0;batch<parents.length;batch+=100){
+      for(let offset=0;;offset+=1000){
+        const {data,error}=await db.from('locations').select('id').in('parent_id',parents.slice(batch,batch+100)).order('id').range(offset,offset+999);
+        if(error||!data)throw new Error('Unable to load clinic locations');
+        for(const row of data)if(!ids.has(row.id)){ids.add(row.id);next.push(row.id);}
+        if(ids.size>10000)throw new Error('Clinic location scope is too large');
+        if(data.length<1000)break;
+      }
+    }
+    parents=next;
+  }
+  if(parents.length)throw new Error('Clinic location hierarchy is too deep');
+  return Array.from(ids);
+}

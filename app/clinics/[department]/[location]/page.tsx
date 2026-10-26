@@ -1,4 +1,6 @@
 import ResultSearchOptions from '@/components/ResultSearchOptions';
+import {registeredLocationLabel} from '@/lib/registered-location';
+import {nearbyAction} from '@/lib/nearby-copy';
 import ContextualCareGuides from '@/components/ContextualCareGuides';
 import {uniqueClinicProfiles} from '@/lib/site';
 import ResultDepartmentPicker from '@/components/ResultDepartmentPicker';
@@ -30,20 +32,23 @@ interface Props {
   searchParams: { [key: string]: string | string[] | undefined };
 }
 function text(value: string | string[] | undefined) { return typeof value === 'string' ? value.trim().slice(0, 200) : ''; }
-function names(department: string, location: string) {
+async function names(department: string, location: string) {
   const dict = getDictionary('en');
+  const loc=regionLabel(location) || (stationForSlug(location) ? `${stationForSlug(location)!.name_en}, ${stationForSlug(location)!.city}` : (location === 'gangnam' ? 'Gangnam area (Gangnam-gu & Seocho-gu)' : location === 'all' ? 'Korea' : (dict as Record<string, string>)[location])) || await registeredLocationLabel(location);
   return {
     dept: department === 'all' ? 'Medical' : (departmentLabels as Record<string,string>)[department] || (dict as Record<string, string>)[department] || department,
-    loc: regionLabel(location) || (stationForSlug(location) ? `${stationForSlug(location)!.name_en}, ${stationForSlug(location)!.city}` : (location === 'gangnam' ? 'Gangnam area (Gangnam-gu & Seocho-gu)' : location === 'all' ? 'Korea' : (dict as Record<string, string>)[location] || location.replace(/-/g, ' ').replace(/\b\w/g,c=>c.toUpperCase()))),
+    loc:loc||'the selected area',
+    resolved:!!loc,
   };
 }
-export function generateMetadata({ params, searchParams }: Props) {
-  const { dept, loc } = names(params.department, params.location);
+export async function generateMetadata({ params, searchParams }: Props) {
+  const { dept, loc, resolved } = await names(params.department, params.location);
+  const place=`${stationForSlug(params.location)?'near':'in'} ${loc}`;
   return {
-    title: `${dept} Clinics in ${loc} | Korea Clinic Map`,
-    description: `Browse ${dept.toLowerCase()} clinics in ${loc}. View addresses and contact details. Contact clinics to confirm language support and services.`,
+    title: `${params.department==='dentistry'?'Dentists':`${dept} Clinics`} ${place} | Korea Clinic Map`,
+    description: params.department==='dentistry'?`Find dental clinics ${place}. Compare nearby stations, contact details and reported specialists, or use your location to find dentists nearby.`:`Browse ${dept.toLowerCase()} clinics ${place}. View addresses and contact details. Contact clinics to confirm language support and services.`,
     alternates: { canonical: `${SITE_URL}/clinics/${params.department}/${params.location}` },
-    robots: Object.keys(searchParams).length ? { index: false, follow: true } : undefined,
+    robots: Object.keys(searchParams).length || !resolved ? { index: false, follow: true } : undefined,
   };
 }
 export default async function SearchPage({ params, searchParams }: Props) {
@@ -77,7 +82,7 @@ export default async function SearchPage({ params, searchParams }: Props) {
     seen.add(key);
     return true;
   }));
-  const { dept, loc } = names(params.department, params.location);
+  const { dept, loc } = await names(params.department, params.location);
   const mapCenter = station ? { lat: station.stations[0].latitude, lng: station.stations[0].longitude } : filteredClinics.length ? { lat: filteredClinics[0].latitude, lng: filteredClinics[0].longitude } : { lat: 37.5665, lng: 126.9780 };
   const currentFilters=activeFilters({department:params.department,location:params.location,query,specialist,registered,radius:station?radius:undefined,departmentLabel:dept,locationLabel:loc});
   const schema = {
@@ -93,7 +98,8 @@ export default async function SearchPage({ params, searchParams }: Props) {
   return <>
     <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(schema) }} />
     <div className="max-w-6xl mx-auto px-4 py-5 space-y-3 sm:py-8 sm:space-y-6">
-      <h1 className="text-2xl md:text-3xl font-black">{station ? `${params.department === 'all' ? 'Clinics' : `${dept} Clinics`} near ${station.name_en}` : `${dept} Clinics in ${loc}`}</h1>
+      <h1 className="text-2xl md:text-3xl font-black break-words">{params.department==='dentistry'?`Dentists ${station?'near':'in'} ${station?station.name_en:loc}`:station ? `${params.department === 'all' ? 'Clinics' : `${dept} Clinics`} near ${station.name_en}` : `${dept} Clinics in ${loc}`}</h1>
+      <a href={nearbySearchLink(params.department,{query,specialist,registered,radius:station?radius:undefined})} className="min-h-11 inline-flex items-center rounded-lg bg-slate-900 px-4 py-3 text-sm font-semibold text-white">{nearbyAction(params.department)}</a>
       {station && <div className="space-y-2 text-sm text-slate-600">
         <p>{station.name_ko} · Within {radius.toLocaleString()} m · Nearest first</p>
         <details><summary className="cursor-pointer underline">Station and distance details</summary><div className="space-y-2 py-2"><p>{station.city} · {station.stations.map(s => s.line).join(' / ')}</p>

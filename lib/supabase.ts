@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import { searchTerms } from './search';
-import { regionAddresses, addressFilter, locationIdsForSlug, extractRegion } from './regions';
+import { regionAddresses, addressFilter, scopedLocationIds, extractRegion } from './regions';
 import { stationForSlug } from './stations';
 import {unifiedClinicRecord} from './site';
 import {additionalGoldmanClinic,GOLDMAN_ENGLISH_URL} from './goldman';
@@ -144,14 +144,8 @@ export async function getClinics(params?: { categorySlug?: string, locationSlug?
   
   const addressPrefixes = regionAddresses[params?.locationSlug || ''];
   if (params?.locationSlug && params.locationSlug !== 'all' && !addressPrefixes) {
-    const { data: matchedLocs } = await supabase
-      .from('locations')
-      .select('id, parent_id, slug');
-    if (!matchedLocs) throw new Error('Unable to load clinic locations');
-      
-    if (matchedLocs && matchedLocs.length > 0) {
-      locationIds = locationIdsForSlug(matchedLocs, params.locationSlug);
-    }
+    locationIds = await scopedLocationIds(supabase,params.locationSlug);
+    if(!locationIds.length)return [];
   }
 
   let query = supabase.from('clinics').select('*, categories!inner(*), locations!inner(*)');
@@ -164,8 +158,6 @@ export async function getClinics(params?: { categorySlug?: string, locationSlug?
     query = query.or(addressFilter(addressPrefixes));
   } else if (locationIds.length > 0) {
     query = query.in('location_id', locationIds);
-  } else if (params?.locationSlug && params.locationSlug !== 'all') {
-    query = query.eq('locations.slug', params.locationSlug);
   }
   
   // Restrict the text to literal search terms; never pass PostgREST operators from input.

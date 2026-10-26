@@ -9,6 +9,8 @@
 
 ## Growth measurement
 
+- As of 2026-10-26, prioritize organic SEO, answer usefulness and AI search discoverability (AEO/GEO). Paid Meta experiments and additional reel production are lower priority unless the user requests them. Do not equate ordinary organic traffic with verified AI citations or referrals.
+
 - Assess acquisition, search visibility, site usability and Meta experiments together. Verify the jowilder96@gmail.com account, Search Console map.clinicinkorea.com property and GA4 property 559263056 / G-0TP3EDEP3R before reporting.
 - Keep measurement at coarse page/action levels. Do not transmit search terms, GPS, hospital identifiers or condition-specific paths. Do not treat phone/directions clicks as confirmed appointments or visits.
 - Existing analytics history and IDs must be preserved. Exclude internal browsers through /measurement before future QA; do not activate irreversible GA data filters without a tested review.
