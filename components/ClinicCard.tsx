@@ -6,7 +6,7 @@ import {goldmanBranch,goldmanLocationUrl,GOLDMAN_ENGLISH_URL} from '@/lib/goldma
 import React from 'react';
 import {cardAddress} from '@/lib/card-location';
 import Link from 'next/link';
-import { Phone, MapPin, Globe } from 'lucide-react';
+import { Phone, MapPin, Globe, TrainFront, CalendarDays, Stethoscope, ChevronDown } from 'lucide-react';
 import { clinicFocus, groupedDepartments } from '@/lib/clinic-evidence';
 import RegistrationBadge from './RegistrationBadge';
 import ClinicContact from './ClinicContact';
@@ -49,7 +49,7 @@ export default function ClinicCard({ clinic, selectedDepartment='all', onShowMap
 
   return (
     <div 
-      className={`min-w-0 break-words p-5 rounded-xl border transition shadow-sm hover:shadow-md flex flex-col justify-between ${
+      className={`min-w-0 break-words p-5 rounded-2xl border transition shadow-sm hover:shadow-md flex flex-col justify-between ${
         clinic.is_premium 
           ? 'bg-amber-50/50 border-amber-300 ring-1 ring-amber-300/30' 
           : 'bg-white border-slate-200'
@@ -67,7 +67,7 @@ export default function ClinicCard({ clinic, selectedDepartment='all', onShowMap
         </div>
 
         <Link href={detailHref}>
-          <h3 className="text-lg font-bold text-slate-800 hover:text-emerald-600 transition mb-0.5 leading-snug">
+          <h3 className="text-xl font-bold text-slate-900 hover:text-emerald-600 transition mb-0.5 leading-snug">
             {name}
           </h3>
         </Link>
@@ -77,16 +77,16 @@ export default function ClinicCard({ clinic, selectedDepartment='all', onShowMap
           </p>
         )}
         <RegistrationBadge clinic={clinic} />
-        {clinic.weekend_label&&<p className="text-sm font-semibold text-slate-700 my-2">{clinic.weekend_label}</p>}
-        {typeof clinic.distance_m === 'number' && <p className="text-sm font-semibold text-slate-700 mb-2">{clinic.station_name} · {Math.round(clinic.distance_m)} m <span className="text-xs font-normal">straight-line distance</span></p>}
+        {clinic.weekend_label&&<p className="flex items-start gap-2 rounded-lg bg-amber-50 border border-amber-200 p-2 text-sm font-semibold text-amber-900 my-2"><CalendarDays aria-hidden="true" className="h-4 w-4 shrink-0 mt-0.5"/>{clinic.weekend_label}</p>}
+        {typeof clinic.distance_m === 'number' && <p className="flex flex-wrap items-center gap-1.5 rounded-lg bg-blue-50 p-2 text-sm font-semibold text-blue-900 mb-2"><TrainFront aria-hidden="true" className="h-4 w-4 shrink-0"/>{clinic.station_name} · {Math.round(clinic.distance_m)} m <span className="text-xs font-normal">straight-line distance</span></p>}
         {branch?<p className="text-sm text-slate-700 mb-2"><a href={goldmanLocationUrl(branch.tab)} target="_blank" rel="noopener noreferrer" className="underline">Station access: {branch.transit}</a><span className="block text-xs text-slate-500">Clinic’s published directions</span></p>:!(typeof clinic.distance_m==='number')&&nearby&&<p className="text-sm text-slate-700 mb-2"><Link href={`/clinics/${selectedDepartment}/${nearby.slug}`} className="underline">Nearby station: {nearby.name}</Link> · {Math.round(nearby.distance)} m<span className="block text-xs text-slate-500">Straight-line distance · official station coordinates</span></p>}
         {(categoryName || locationName) && (
-          <span className="text-xs text-slate-400 font-medium uppercase tracking-wider block mb-3">
+          <span className="text-xs text-slate-600 font-medium block mb-3">
             {categoryName} {categoryName && locationName ? '•' : ''} {locationName}
           </span>
         )}
-        {selected && <p className="text-xs text-slate-600 mb-2">{selected.name} reported · {selected.specialists>0 ? `${selected.specialists} specialist${selected.specialists===1?'':'s'} reported` : 'No specialist recorded in this department'}</p>}
-        {departments.length>0 && <p className="text-xs text-slate-500 mb-3">Reported departments: {departments.slice(0,3).map(d=>d.name).join(', ')}{departments.length>3 ? ` +${departments.length-3} more` : ''}</p>}
+        {selected && <p className="flex items-start gap-2 text-sm text-slate-700 mb-2"><Stethoscope aria-hidden="true" className="h-4 w-4 shrink-0 mt-0.5"/>{selected.name} reported · {selected.specialists>0 ? `${selected.specialists} specialist${selected.specialists===1?'':'s'} reported` : 'No specialist recorded in this department'}</p>}
+
 
         {clinic.is_premium && slogan && slogan!==branch?.transit && (
           <p className="text-xs italic text-slate-600 mb-4 line-clamp-2">
@@ -108,26 +108,19 @@ export default function ClinicCard({ clinic, selectedDepartment='all', onShowMap
           )}
         </div>
         
-        {/* Public Facilities & Equipment Badges */}
-        {((clinic.public_equipment?.length ?? 0) > 0 || (clinic.public_facilities?.inpatient_beds ?? 0) > 0) && (
-          <div role="group" aria-label="Equipment and facilities" className="mt-4 border-t border-slate-100 pt-3 flex flex-wrap gap-1.5">
-            {clinic.public_equipment?.map((eq: string) => (
-              <span key={eq} className="px-1.5 py-0.5 bg-slate-100 text-slate-500 text-[10px] rounded border border-slate-200">
-                {eq}
-              </span>
-            ))}
-            {(clinic.public_facilities?.inpatient_beds ?? 0) > 0 && (
-              <span className="px-1.5 py-0.5 bg-blue-50 text-blue-500 text-[10px] rounded border border-blue-100">
-                Inpatient Beds
-              </span>
-            )}
-            {(clinic.public_facilities?.surgery_rooms ?? 0) > 0 && (
-              <span className="px-1.5 py-0.5 bg-rose-50 text-rose-500 text-[10px] rounded border border-rose-100">
-                Surgery Room
-              </span>
-            )}
+        {(departments.length>0 || (clinic.public_equipment?.length ?? 0)>0 || (clinic.public_facilities?.inpatient_beds ?? 0)>0 || (clinic.public_facilities?.surgery_rooms ?? 0)>0) && <details className="group mt-4 rounded-xl border border-slate-200 bg-slate-50">
+          <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-slate-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-700"><span>Departments & facilities</span><ChevronDown aria-hidden="true" className="ml-auto h-4 w-4 shrink-0 group-open:rotate-180"/></summary>
+          <div className="px-3 pb-3 space-y-3 text-xs text-slate-600">
+            {departments.length>0&&<p><span className="font-semibold">Reported departments: </span>{departments.map(d=>d.name).join(', ')}</p>}
+            {((clinic.public_equipment?.length ?? 0)>0 || (clinic.public_facilities?.inpatient_beds ?? 0)>0 || (clinic.public_facilities?.surgery_rooms ?? 0)>0)&&<div role="group" aria-label="Equipment and facilities" className="flex flex-wrap gap-1.5">
+              {clinic.public_equipment?.map((eq:string)=><span key={eq} className="rounded border bg-white px-2 py-1">{eq}</span>)}
+              {(clinic.public_facilities?.inpatient_beds ?? 0)>0&&<span className="rounded border bg-white px-2 py-1">Inpatient Beds</span>}
+              {(clinic.public_facilities?.surgery_rooms ?? 0)>0&&<span className="rounded border bg-white px-2 py-1">Surgery Room</span>}
+            </div>}
+            <p>Public directory records; confirm current services with the clinic.</p>
           </div>
-        )}
+        </details>}
+
       </div>
 
       <div className="mt-5 pt-3 border-t border-slate-100 space-y-2">
@@ -138,7 +131,7 @@ export default function ClinicCard({ clinic, selectedDepartment='all', onShowMap
           href={detailHref}
           className={`min-h-11 flex-1 inline-flex items-center justify-center text-center py-2 rounded-lg text-sm font-semibold transition ${
             clinic.is_premium
-              ? 'bg-amber-500 hover:bg-amber-600 text-white'
+              ? 'bg-amber-400 hover:bg-amber-300 text-slate-950'
             : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
           }`}
         >
