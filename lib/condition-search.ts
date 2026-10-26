@@ -15,8 +15,9 @@ export function matchConditionSearch(query:string){
  }}
  if(!found)return null;
  const areas=conditionAreas.filter(a=>new RegExp(a.slug==='gangnam'?'(^|\\s)(gangnam|강남)(?=$|\\s)':'(^|\\s)(jamsil|잠실)(?=$|\\s)').test(remaining));
- const nearby=/\bnear\s+me\b/.test(remaining);
- remaining=remaining.replace(/\b(gangnam|jamsil|in|for|clinic|clinics|hospital|hospitals|near\s+me)\b|강남|잠실/g,' ').trim();
+ const nearbyPattern=/\b(?:near[\s-]+me|around\s+me|nearby)\b/gi;
+ const nearby=new RegExp(nearbyPattern.source,'i').test(remaining);
+ remaining=remaining.replace(nearbyPattern,' ').replace(/\b(gangnam|jamsil|in|for|clinics?|hospitals?|treatment)\b|강남|잠실/g,' ').trim();
  if(remaining)return null;
  return {condition:found,areas:areas.length?areas:conditionAreas,nearby};
 }
