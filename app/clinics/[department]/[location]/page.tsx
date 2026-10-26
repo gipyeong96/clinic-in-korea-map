@@ -37,17 +37,19 @@ async function names(department: string, location: string) {
   const loc=regionLabel(location) || (stationForSlug(location) ? `${stationForSlug(location)!.name_en}, ${stationForSlug(location)!.city}` : (location === 'gangnam' ? 'Gangnam area (Gangnam-gu & Seocho-gu)' : location === 'all' ? 'Korea' : (dict as Record<string, string>)[location])) || await registeredLocationLabel(location);
   return {
     dept: department === 'all' ? 'Medical' : (departmentLabels as Record<string,string>)[department] || (dict as Record<string, string>)[department] || department,
-    loc:loc||'the selected area',
+    loc:location==='jamsil'?'Jamsil-dong, Songpa-gu, Seoul':loc||'the selected area',
     resolved:!!loc,
   };
 }
 export async function generateMetadata({ params, searchParams }: Props) {
   const { dept, loc, resolved } = await names(params.department, params.location);
   const place=`${stationForSlug(params.location)?'near':'in'} ${loc}`;
+  const jamsilDescription=params.department==='urology'&&(params.location==='jamsil'||params.location==='jamsil-station')?(params.location==='jamsil'?'Compare urology clinic information in Jamsil-dong, Songpa-gu, Seoul. Check reported specialists and registration, or switch to Jamsil Station for radius-based results including nearby Sincheon-dong.':'Compare urology clinics near Jamsil Station, Songpa-gu, Seoul by straight-line distance. Choose a 500 m, 1 km or 2 km radius; results can include parts of Jamsil-dong and Sincheon-dong.'):undefined;
   return {
     title: `${params.department==='dentistry'?'Dentists':`${dept} Clinics`} ${place} | Korea Clinic Map`,
     description: params.department==='urology'&&params.location==='gangnam'?'Compare urology clinic directory information in Gangnam-gu and Seocho-gu, Seoul. Filter reported specialists and international-patient registration, or find clinics near Gangnam Station.':params.department==='dentistry'?`Find dental clinics ${place}. Compare nearby stations, contact details and reported specialists, or use your location to find dentists nearby.`:`Browse ${dept.toLowerCase()} clinics ${place}. View addresses and contact details. Contact clinics to confirm language support and services.`,
     alternates: { canonical: `${SITE_URL}/clinics/${params.department}/${params.location}` },
+    ...(jamsilDescription?{title:`Compare Urology Clinics ${params.location==='jamsil'?'in Jamsil-dong':'near Jamsil Station'}, Seoul | Korea Clinic Map`,description:jamsilDescription}:{}),
     robots: Object.keys(searchParams).length || !resolved ? { index: false, follow: true } : undefined,
   };
 }
@@ -100,6 +102,14 @@ export default async function SearchPage({ params, searchParams }: Props) {
     <div className="max-w-6xl mx-auto px-4 py-5 space-y-3 sm:py-8 sm:space-y-6">
       <h1 className="text-2xl md:text-3xl font-black break-words">{params.department==='dentistry'?`Dentists ${station?'near':'in'} ${station?station.name_en:loc}`:station ? `${params.department === 'all' ? 'Clinics' : `${dept} Clinics`} near ${station.name_en}` : `${dept} Clinics in ${loc}`}</h1>
       <a href={nearbySearchLink(params.department,{query,specialist,registered,radius:station?radius:undefined})} className="min-h-11 inline-flex items-center rounded-lg bg-slate-900 px-4 py-3 text-sm font-semibold text-white">{nearbyAction(params.department)}</a>
+      {params.department==='urology'&&['jamsil','jamsil-station'].includes(params.location)&&<section aria-label="Jamsil comparison search scope" className="rounded-xl border bg-white p-4 space-y-3 text-sm">
+        <p>{station?<>Results use a <strong>{radius.toLocaleString()} m radius around Jamsil Station</strong>, ordered by straight-line distance. Depending on the radius, this can include parts of Jamsil-dong and Sincheon-dong.</>:<>This area lists clinics with a source address in <strong>Jamsil-dong (잠실동), Songpa-gu, Seoul</strong>. For clinics around Jamsil Station, including nearby Sincheon-dong (신천동), use the station search.</>}</p>
+        <nav aria-label="Jamsil urology comparison choices" className="flex flex-wrap gap-2">
+          <a aria-current={!station?'page':undefined} className="min-h-11 rounded-lg border px-3 py-3 font-semibold" href={searchLink('urology','jamsil',{query,specialist,registered})}>In Jamsil-dong</a>
+          <a aria-current={station?'page':undefined} className="min-h-11 rounded-lg border px-3 py-3 font-semibold" href={searchLink('urology','jamsil-station',{query,specialist,registered,radius:station?radius:1000})}>Near Jamsil Station · {station?`${radius.toLocaleString()} m`:'1 km'}</a>
+        </nav>
+        <details><summary className="min-h-11 py-3 cursor-pointer underline">Compare clinic information</summary><p>Use search options to filter reported urology specialists and international-patient registration. Save two or three clinics, then <a className="underline" href="/my-clinics">compare saved clinics</a>. Registration does not confirm English support. Station distance is measured from official coordinates, not an exit or walking route; a radius does not cover an entire neighbourhood.</p></details>
+      </section>}
       {params.department==='urology'&&params.location==='gangnam'&&<section aria-label="Compare urology clinics in Gangnam" className="rounded-xl border bg-white p-4 space-y-3 text-sm">
         <p>Compare clinics reporting urology across <strong>Gangnam-gu and Seocho-gu, Seoul</strong>.</p>
         <nav aria-label="Gangnam urology search choices" className="flex flex-wrap gap-2">

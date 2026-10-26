@@ -21,6 +21,8 @@ import {SaveClinic,RecordClinicVisit} from '@/components/ClinicLibrary';
 import {clinicSnapshot} from '@/lib/clinic-library';
 import {nearbyStation} from '@/lib/card-location';
 import {stationPages} from '@/lib/stations';
+import {isJamsilDong} from '@/lib/jamsil-scope';
+import {searchLink} from '@/lib/search';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -183,6 +185,15 @@ export default async function ClinicDetail({ params, searchParams }: ClinicDetai
         </section>
 
         <ContextualCareGuides department={focusSlug} location={region?.slug} stage="profile"/>
+        {(region||nearest)&&<section aria-label="Compare clinics in this area" className="rounded-xl border bg-white p-4 space-y-3 text-sm">
+          <h2 className="font-bold">Compare clinics in this area</h2>
+          <nav className="flex flex-wrap gap-2" aria-label="Nearby clinic comparison">
+            {region&&<Link className="min-h-11 inline-flex items-center rounded-lg border px-3 py-3 underline" href={searchLink(focusSlug,region.slug)}>Browse {focusSlug==='all'?'clinics':focus.toLowerCase()+' clinics'} in {region.label}</Link>}
+            {nearest&&<Link className="min-h-11 inline-flex items-center rounded-lg border px-3 py-3 underline" href={searchLink(focusSlug,nearest.slug,{radius:1000})}>Compare near {nearest.name} · 1 km</Link>}
+            {isJamsilDong(clinic.address_ko)&&departments.some(d=>d.slug==='urology')&&<Link className="min-h-11 inline-flex items-center rounded-lg border px-3 py-3 underline" href="/clinics/urology/jamsil">Compare urology clinics in Jamsil-dong</Link>}
+          </nav>
+          <p>Area results follow address boundaries. Station results use a straight-line radius and can cross neighbourhood boundaries. Save clinics from results to compare them in <Link className="underline" href="/my-clinics">My clinics</Link>.</p>
+        </section>}
 
         <GoldmanVisitGuide clinicId={String(clinic.id)} />
         <GoldmanGoogleReviews key={String(clinic.id)} clinicId={String(clinic.id)} />
