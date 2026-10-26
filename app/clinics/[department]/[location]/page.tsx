@@ -158,7 +158,7 @@ export default async function SearchPage({ params, searchParams }: Props) {
       {!failed&&filteredClinics.length>0 && <ClinicSearchClient initialMapView={searchParams.view==='map'} mapPage={{page,previous:page>1?mapPageLink(page-1):undefined,next:hasNext&&page<MAX_PAGE?mapPageLink(page+1):undefined}} returnTo={searchLink(params.department,params.location,{query,specialist,registered,weekend,radius:station?radius:undefined,page})} lang="en" filteredClinics={filteredClinics.map(clinic=>({...clinic,address_region:clinicRegion(clinic),card_station:nearbyStation(clinic,stationPages)}))} mapCenter={mapCenter} selectedDepartment={params.department} />}
       {!failed&&filteredClinics.length>0&&pagination}
       <ConditionSearchSuggestions query={query}/>
-      <ContextualCareGuides department={params.department} location={params.location} specialist={specialist} registered={registered}/>
+      <ContextualCareGuides weekend={weekend} department={params.department} location={params.location} specialist={specialist} registered={registered}/>
     </div>
   </>;
 }
