@@ -1,0 +1,27 @@
+{
+  "checked_at": "2026-10-26",
+  "source_url": "https://www.data.go.kr/data/3039508/openapi.do",
+  "endpoint": "https://apis.data.go.kr/B551182/hospDiagInfoService1/getClinicTop5List1",
+  "identity_source": "HIRA official national provider snapshot 2026-06",
+  "selection": "20 Gangnam-gu/Seocho-gu and 20 Jamsil-dong/Sincheon-dong clinics, institution type 31. Each group prioritizes 10 records reporting urology, then deterministic SHA256 order among supported departments. This is a technical coverage pilot, not a representative clinical prevalence sample.",
+  "sample_size": 40,
+  "existing_directory_identity_name_address_matches": 40,
+  "api_identity_and_name_verified_with_conditions": 27,
+  "successful_response_without_record": 13,
+  "unresolved_request_errors": 0,
+  "transient_errors_retried": 1,
+  "group_results": {
+    "gangnam_area": {"selected": 20, "verified_with_conditions": 9, "no_record": 11},
+    "jamsil_area": {"selected": 20, "verified_with_conditions": 18, "no_record": 2}
+  },
+  "observed_reference_month": "202604",
+  "coverage": "HIRA describes the preceding year relative to the reference month. The response does not provide exact start/end dates; do not fabricate day boundaries or treat retrieval date as treatment period.",
+  "response_schema": "Actual response names use mfrnIntrsIlnsCdNm1..5 and shwSbjtCdNm, differing from the documentation's mfrnIntrsIlnsNm1..5 and shwSbjtNm. Import accepts both disease-name variants.",
+  "display_rules": [
+    "Only 27 positively verified records are included in the pilot snapshot; no-record responses do not become negative claims about services.",
+    "Retain original Korean names and source order. English labels are editorial translations, not new diagnosis groupings.",
+    "No ordinal ranking, treatment counts, outcomes, qualification or language claims are inferred.",
+    "Source reference month and retrieval date are separate. No disease-specific analytics payload is added.",
+    "No production database writes, credential publication, bulk condition landing pages or disease structured-data claims are included."
+  ]
+}
