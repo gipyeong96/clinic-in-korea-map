@@ -1,0 +1,34 @@
+{
+  "checkedAt": "2026-10-26",
+  "directorySnapshot": "2026-06",
+  "selection": "All type-31 clinics reporting department 15 in Gangnam-gu/Seocho-gu or Jamsil-dong/Sincheon-dong in the official June 2026 snapshot. This is a fixed directory cohort, not all current providers or a disease prevalence survey.",
+  "selected": 256,
+  "summary": {
+    "verified": 229,
+    "no_record": 26,
+    "needs_review": 1
+  },
+  "referenceMonths": [
+    "202604"
+  ],
+  "areas": {
+    "gangnam": {
+      "selected": 230,
+      "verified": 204,
+      "no_record": 25,
+      "needs_review": 1
+    },
+    "jamsil": {
+      "selected": 26,
+      "verified": 25,
+      "no_record": 1
+    }
+  },
+  "preservedPilotRecordsOutsideCohort": 11,
+  "notes": [
+    "Reporting urology is not a specialist qualification.",
+    "No-record is not evidence that a condition is not treated.",
+    "Name mismatches and unverified records are excluded from condition comparisons.",
+    "Existing pilot profile records outside the expanded cohort are retained but do not enter the new comparisons."
+  ]
+}

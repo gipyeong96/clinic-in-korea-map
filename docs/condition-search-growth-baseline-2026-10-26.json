@@ -1,0 +1,11 @@
+{
+  "checkedAt":"2026-10-26",
+  "account":"jowilder96@gmail.com",
+  "property":"https://map.clinicinkorea.com/",
+  "source":"Search Console UI, Web search, 28-day selector; observed chart dates 2026-10-15 through 2026-10-24, last update approximately 6 hours earlier",
+  "overall":{"clicks":35,"impressionsDisplay":"2.42K (rounded UI value)","ctr":"1.4%","averagePosition":12.9},
+  "conditionFilter":{"regex":"(?i)(cystitis|bph|prostat|kidney.?stone|urinary.?stone|urolithiasis|neurogenic|방광염|전립선|요로결석)","clicks":0,"impressions":0,"table":"No data","interpretation":"No visible matching rows in this report. This does not prove absence of market demand; query data can be omitted or delayed. Newly deployed condition pages postdate the visible data window."},
+  "regionFilter":{"regex":"(?i)(gangnam|jamsil|강남|잠실)","clicks":0,"impressions":8,"ctr":"0%","averagePosition":13,"visibleQueries":[{"query":"gangnam clinic near me","impressions":4},{"query":"gangnam plastic surgery street","impressions":1},{"query":"where can i get a skin analysis near jamsil?","impressions":1},{"query":"아윤의원 강남","impressions":1},{"query":"gangnam plastic surgery clinic","impressions":1}],"visiblePageExamples":[{"path":"/clinics/all/gangnam-station","impressions":2},{"path":"/clinics/all/station-5434607b7846de","impressions":2},{"path":"/clinics/dermatology/jamsil-station","impressions":1},{"path":"/clinics/plastic-surgery/jamsil","impressions":1}],"interpretation":"Page rows are aggregate matches, not a one-to-one query-to-page mapping. Query and page totals can differ; do not sum them as additional traffic."},
+  "nextReview":["After enough post-deployment data is available, compare equal completed date windows and inspect selected condition URLs for actual indexing and Google-selected canonicals.","Check whether condition queries reach the intended regional comparison or an individual clinic; inspect exact query filters before attributing a specific page.","Keep titles based on visible condition/scope evidence; do not infer ranking gains from deploying content.","GA4 remains coarse page/action measurement. This check did not refresh GA4 or attribute condition-specific calls, appointments, visits, or AI referrals."],
+  "changes":"Read-only report filters only; no index request, property configuration, analytics ID, advertising or budget changes."
+}

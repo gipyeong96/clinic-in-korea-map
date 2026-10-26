@@ -1,0 +1,15 @@
+{
+  "checkedAt": "2026-10-26",
+  "userDirection": "Record these as reference platforms and continue gradual development. Consider Saturday, Sunday, currently scheduled care and emergency department discovery.",
+  "references": [
+    {"url":"https://hospitalfact.kr/","observed":"Source/date visibility, reviewed topic shortcuts, geographic hubs, and a distinction between regular schedule information and actual opening status.","application":"Retain our source and coverage labels; evaluate schedule-based weekend discovery with matching methods and data dates.","limits":"Homepage observations only; the platform's coverage and verification claims were not independently audited. Do not copy its content or use its records as our official data source."},
+    {"url":"https://koreaclinicgo.com/","observed":"Location-first care-category discovery, a separate clinic-name search, published-price navigation and an inquiry flow distinguished from confirmed booking.","application":"Keep location/care selection easy for English readers and distinguish directory exploration from confirmed service arrangements.","limits":"Homepage observations only. No inquiry submitted, account changes, or contact details sent."}
+  ],
+  "futurePhases": [
+    {"priority":1,"feature":"Saturday / Sunday regular clinic schedules","dependency":"Verify official schedule API fields, institution identity matching, source timestamps, lunch/last-registration times, holiday exceptions and refresh requirements.","label":"Scheduled Saturday / Sunday hours; call before visiting.","status":"Discovery backlog; not implemented in this PR."},
+    {"priority":2,"feature":"Scheduled care at the current Korean local time","dependency":"Reliable schedule data, Asia/Seoul time, cross-midnight logic, closure/holiday exceptions and an explicit stale-data state.","label":"Scheduled to be open; actual reception not confirmed.","status":"Do not infer live opening from the June directory or historical disease records."},
+    {"priority":3,"feature":"Emergency department discovery","dependency":"Separately verify National Emergency Medical Center / E-Gen official facility and resource interfaces, license, update intervals and access. Bed/resource availability does not guarantee acceptance.","status":"Keep separate from routine clinic comparisons. Official E-Gen homepage retrieval returned 502 during this check; no live availability claim or API integration was made."}
+  ],
+  "officialReference": "https://www.e-gen.or.kr/egen/main.do",
+  "preserve": ["Existing partner information and public evidence", "Measurement privacy: no condition, precise GPS or clinic identifiers in external analytics", "No production deployment without approval"]
+}

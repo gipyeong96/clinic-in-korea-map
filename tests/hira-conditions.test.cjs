@@ -7,7 +7,7 @@ test('condition evidence requires exact institution identity, valid period, posi
  assert.equal(m.exports.conditionRecord(record,'different-id'),null);
  assert.equal(m.exports.referenceLabel('202402'),'February 2024');
 });
-test('pilot records retain identity, original names, source order and actual reference month',()=>{
- const records=JSON.parse(fs.readFileSync('lib/hira-condition-pilot.json','utf8').replace(/^\uFEFF/,''));assert.equal(Object.keys(records).length,27);
+test('expanded records retain identity, original names, source order and actual reference month',()=>{
+ const records=JSON.parse(fs.readFileSync('lib/hira-condition-pilot.json','utf8').replace(/^\uFEFF/,''));assert.equal(Object.keys(records).length,240);
  for(const [key,record] of Object.entries(records)){const result=m.exports.conditionRecord(record,key);assert(result);assert.equal(result.referenceMonth,'202604');assert.deepEqual(result.conditions,record.conditions);assert(result.clinicName);}
 });
