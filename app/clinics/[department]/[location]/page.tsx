@@ -101,13 +101,13 @@ export default async function SearchPage({ params, searchParams }: Props) {
       <h1 className="text-2xl md:text-3xl font-black break-words">{params.department==='dentistry'?`Dentists ${station?'near':'in'} ${station?station.name_en:loc}`:station ? `${params.department === 'all' ? 'Clinics' : `${dept} Clinics`} near ${station.name_en}` : `${dept} Clinics in ${loc}`}</h1>
       <a href={nearbySearchLink(params.department,{query,specialist,registered,radius:station?radius:undefined})} className="min-h-11 inline-flex items-center rounded-lg bg-slate-900 px-4 py-3 text-sm font-semibold text-white">{nearbyAction(params.department)}</a>
       {params.department==='urology'&&params.location==='gangnam'&&<section aria-label="Compare urology clinics in Gangnam" className="rounded-xl border bg-white p-4 space-y-3 text-sm">
-        <p>This area covers <strong>Gangnam-gu and Seocho-gu, Seoul</strong>. These are clinics reporting urology in this area, not a search for clinics named “Gangnam”. Near Gangnam Station? Choose the station search for distance-sorted results.</p>
+        <p>Compare clinics reporting urology across <strong>Gangnam-gu and Seocho-gu, Seoul</strong>.</p>
         <nav aria-label="Gangnam urology search choices" className="flex flex-wrap gap-2">
           <a className="min-h-11 rounded-lg border px-3 py-3 font-semibold" href={searchLink('urology','gangnam-station',{query,specialist,registered})}>Near Gangnam Station · 1 km</a>
           <a className="min-h-11 rounded-lg border px-3 py-3 font-semibold" href={searchLink('urology','gangnam',{query,specialist:!specialist,registered})}>{specialist?'Show all reported urology departments':'Filter: urology specialists reported'}</a>
           <a className="min-h-11 rounded-lg border px-3 py-3 font-semibold" href={searchLink('urology','gangnam',{query,specialist,registered:!registered})}>{registered?'Include clinics without registry match':'Filter: registered for international patients'}</a>
         </nav>
-        <p>Save two or three clinics, then <a className="underline" href="/my-clinics">compare saved clinics</a> by reported specialists, registration, address and contact details. Registration does not confirm English support. <a className="underline" href="/guides/choose-urology-clinic-gangnam">Read the clinic selection checklist</a>.</p>
+        <details><summary className="min-h-11 py-3 cursor-pointer underline">How to compare clinics</summary><p>Save two or three clinics, then <a className="underline" href="/my-clinics">compare saved clinics</a> by reported specialists, registration, address and contact details. Registration does not confirm English support. Station searches sort by straight-line distance. <a className="underline" href="/guides/choose-urology-clinic-gangnam">Read the clinic selection checklist</a>.</p></details>
       </section>}
       {station && <div className="space-y-2 text-sm text-slate-600">
         <p>{station.name_ko} · Within {radius.toLocaleString()} m · Nearest first</p>
