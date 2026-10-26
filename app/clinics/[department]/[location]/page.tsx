@@ -46,7 +46,7 @@ export async function generateMetadata({ params, searchParams }: Props) {
   const place=`${stationForSlug(params.location)?'near':'in'} ${loc}`;
   return {
     title: `${params.department==='dentistry'?'Dentists':`${dept} Clinics`} ${place} | Korea Clinic Map`,
-    description: params.department==='dentistry'?`Find dental clinics ${place}. Compare nearby stations, contact details and reported specialists, or use your location to find dentists nearby.`:`Browse ${dept.toLowerCase()} clinics ${place}. View addresses and contact details. Contact clinics to confirm language support and services.`,
+    description: params.department==='urology'&&params.location==='gangnam'?'Compare urology clinic directory information in Gangnam-gu and Seocho-gu, Seoul. Filter reported specialists and international-patient registration, or find clinics near Gangnam Station.':params.department==='dentistry'?`Find dental clinics ${place}. Compare nearby stations, contact details and reported specialists, or use your location to find dentists nearby.`:`Browse ${dept.toLowerCase()} clinics ${place}. View addresses and contact details. Contact clinics to confirm language support and services.`,
     alternates: { canonical: `${SITE_URL}/clinics/${params.department}/${params.location}` },
     robots: Object.keys(searchParams).length || !resolved ? { index: false, follow: true } : undefined,
   };
@@ -100,6 +100,15 @@ export default async function SearchPage({ params, searchParams }: Props) {
     <div className="max-w-6xl mx-auto px-4 py-5 space-y-3 sm:py-8 sm:space-y-6">
       <h1 className="text-2xl md:text-3xl font-black break-words">{params.department==='dentistry'?`Dentists ${station?'near':'in'} ${station?station.name_en:loc}`:station ? `${params.department === 'all' ? 'Clinics' : `${dept} Clinics`} near ${station.name_en}` : `${dept} Clinics in ${loc}`}</h1>
       <a href={nearbySearchLink(params.department,{query,specialist,registered,radius:station?radius:undefined})} className="min-h-11 inline-flex items-center rounded-lg bg-slate-900 px-4 py-3 text-sm font-semibold text-white">{nearbyAction(params.department)}</a>
+      {params.department==='urology'&&params.location==='gangnam'&&<section aria-label="Compare urology clinics in Gangnam" className="rounded-xl border bg-white p-4 space-y-3 text-sm">
+        <p>This area covers <strong>Gangnam-gu and Seocho-gu, Seoul</strong>. These are clinics reporting urology in this area, not a search for clinics named “Gangnam”. Near Gangnam Station? Choose the station search for distance-sorted results.</p>
+        <nav aria-label="Gangnam urology search choices" className="flex flex-wrap gap-2">
+          <a className="min-h-11 rounded-lg border px-3 py-3 font-semibold" href={searchLink('urology','gangnam-station',{query,specialist,registered})}>Near Gangnam Station · 1 km</a>
+          <a className="min-h-11 rounded-lg border px-3 py-3 font-semibold" href={searchLink('urology','gangnam',{query,specialist:!specialist,registered})}>{specialist?'Show all reported urology departments':'Filter: urology specialists reported'}</a>
+          <a className="min-h-11 rounded-lg border px-3 py-3 font-semibold" href={searchLink('urology','gangnam',{query,specialist,registered:!registered})}>{registered?'Include clinics without registry match':'Filter: registered for international patients'}</a>
+        </nav>
+        <p>Save two or three clinics, then <a className="underline" href="/my-clinics">compare saved clinics</a> by reported specialists, registration, address and contact details. Registration does not confirm English support. <a className="underline" href="/guides/choose-urology-clinic-gangnam">Read the clinic selection checklist</a>.</p>
+      </section>}
       {station && <div className="space-y-2 text-sm text-slate-600">
         <p>{station.name_ko} · Within {radius.toLocaleString()} m · Nearest first</p>
         <details><summary className="cursor-pointer underline">Station and distance details</summary><div className="space-y-2 py-2"><p>{station.city} · {station.stations.map(s => s.line).join(' / ')}</p>

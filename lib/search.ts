@@ -64,6 +64,9 @@ export function homeSearchPath(input: string) {
     if(location!=='all')break;
     if (pattern.test(remaining)) { location = slug; remaining = remaining.replace(pattern, ' '); break; }
   }
+  // Generic directory words are not clinic-name constraints after a department
+  // has been recognized. Preserve names and other qualifiers in mixed phrases.
+  if(department!=='all'&&/^(?:\s*(?:clinics?|hospitals?|in|at|near)\b\s*)+$/i.test(remaining))remaining='';
   const query = remaining.trim().replace(/\s+/g, ' ');
   return `/clinics/${department}/${location}${query ? `?q=${encodeURIComponent(query)}` : ''}`;
 }

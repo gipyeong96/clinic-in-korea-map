@@ -301,6 +301,17 @@ test('specialist counts stay attached to the department that reported them', () 
 });
 
 const suggestions=load('lib/home-suggestions.ts',{'./stations':stations,'./national-regions':national,'./search':search});
+
+test('regional department phrases offer area results without generic name constraints',()=>{
+ for(const input of ['gangnam urology clinic','urology clinics in Gangnam','Gangnam hospital urologist'])assert.equal(search.homeSearchPath(input),'/clinics/urology/gangnam');
+ assert.equal(search.homeSearchPath('Busan dental clinic'),'/clinics/dentistry/busan');
+ assert.equal(search.homeSearchPath('Gangnam Station urology clinic'),'/clinics/urology/gangnam-station');
+ assert.equal(search.homeSearchPath('Goldman urology clinic Gangnam'),'/clinics/urology/gangnam?q=goldman%20clinic');
+ assert.equal(search.homeSearchPath('clinic'),'/clinics/all/all?q=clinic');
+ assert(suggestions.homeSuggestions('gangnam urology clinic').regions.some(r=>r.href==='/clinics/urology/gangnam'));
+ assert(suggestions.homeSuggestions('gangnam urology clinic').stations.some(r=>r.href==='/clinics/urology/gangnam-station'));
+ assert(!suggestions.homeSuggestions('Gangnam Station urology clinic').regions.some(r=>r.href==='/clinics/urology/gangnam'));
+});
 test('home station suggestions distinguish nearby clinics and preserve department and extra terms',()=>{
  assert(suggestions.homeSuggestions('skin doctor in busan').regions.some(r=>r.href==='/clinics/dermatology/busan'));
  assert(suggestions.homeSuggestions('eye doctor near Gangnam Station').stations.some(r=>r.href==='/clinics/ophthalmology/gangnam-station'));
