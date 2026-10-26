@@ -77,6 +77,7 @@ export default function ClinicCard({ clinic, selectedDepartment='all', onShowMap
           </p>
         )}
         <RegistrationBadge clinic={clinic} />
+        {clinic.weekend_label&&<p className="text-sm font-semibold text-slate-700 my-2">{clinic.weekend_label}</p>}
         {typeof clinic.distance_m === 'number' && <p className="text-sm font-semibold text-slate-700 mb-2">{clinic.station_name} · {Math.round(clinic.distance_m)} m <span className="text-xs font-normal">straight-line distance</span></p>}
         {branch?<p className="text-sm text-slate-700 mb-2"><a href={goldmanLocationUrl(branch.tab)} target="_blank" rel="noopener noreferrer" className="underline">Station access: {branch.transit}</a><span className="block text-xs text-slate-500">Clinic’s published directions</span></p>:!(typeof clinic.distance_m==='number')&&nearby&&<p className="text-sm text-slate-700 mb-2"><Link href={`/clinics/${selectedDepartment}/${nearby.slug}`} className="underline">Nearby station: {nearby.name}</Link> · {Math.round(nearby.distance)} m<span className="block text-xs text-slate-500">Straight-line distance · official station coordinates</span></p>}
         {(categoryName || locationName) && (

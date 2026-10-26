@@ -2,20 +2,22 @@ import {extractRegion} from './regions';
 const nearMePattern=/\b(?:near[\s-]+me|around\s+me|nearby)\b/gi;
 export function hasNearMeIntent(input:string){return new RegExp(nearMePattern.source,'i').test(input);}
 export function nearbyKeyword(input:string){return input.slice(0,200).replace(nearMePattern,' ').replace(/\b(?:clinics?|hospitals?)\b/gi,' ').trim().replace(/\s+/g,' ');}
-export function nearbySearchLink(department:string,options:{query?:string;specialist?:boolean;registered?:boolean;radius?:number}={}){
+export function nearbySearchLink(department:string,options:{query?:string;specialist?:boolean;registered?:boolean;weekend?:string;radius?:number}={}){
  const params=new URLSearchParams();
  if(department!=='all')params.set('department',department);
  if(options.query)params.set('q',options.query);
  if(options.specialist)params.set('specialist','1');
  if(options.registered)params.set('registered','1');
+ if(options.weekend==='saturday'||options.weekend==='sunday')params.set('weekend',options.weekend);
  if(options.radius)params.set('radius',String(options.radius));
  return `/nearby${params.size?'?'+params.toString():''}`;
 }
-export function searchLink(department:string,location:string,options:{query?:string;specialist?:boolean;registered?:boolean;radius?:number;page?:number}={}) {
+export function searchLink(department:string,location:string,options:{query?:string;specialist?:boolean;registered?:boolean;weekend?:string;radius?:number;page?:number}={}) {
   const params=new URLSearchParams();
   if(options.query)params.set('q',options.query);
   if(options.specialist)params.set('specialist','1');
   if(options.registered)params.set('registered','1');
+ if(options.weekend==='saturday'||options.weekend==='sunday')params.set('weekend',options.weekend);
   if(options.radius)params.set('radius',String(options.radius));
   if(options.page&&options.page>1)params.set('page',String(options.page));
   return `/clinics/${department}/${location}${params.size?'?'+params.toString():''}`;
