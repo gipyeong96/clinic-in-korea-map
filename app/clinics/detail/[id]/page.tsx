@@ -23,6 +23,8 @@ import {nearbyStation} from '@/lib/card-location';
 import {stationPages} from '@/lib/stations';
 import {isJamsilDong} from '@/lib/jamsil-scope';
 import {searchLink} from '@/lib/search';
+import ClinicConditions from '@/components/ClinicConditions';
+import conditionPilot from '@/lib/hira-condition-pilot.json';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -184,6 +186,7 @@ export default async function ClinicDetail({ params, searchParams }: ClinicDetai
           <Link href={clinicCorrectionLink(clinic.hira_code||String(clinic.id))} className="inline-flex min-h-11 items-center underline text-sm">Report incorrect information for this clinic</Link>
         </section>
 
+        <ClinicConditions ykiho={clinic.hira_code||params.id} record={(conditionPilot as Record<string,unknown>)[clinic.hira_code||params.id]}/>
         <ContextualCareGuides department={focusSlug} location={region?.slug} stage="profile"/>
         {(region||nearest)&&<section aria-label="Compare clinics in this area" className="rounded-xl border bg-white p-4 space-y-3 text-sm">
           <h2 className="font-bold">Compare clinics in this area</h2>
