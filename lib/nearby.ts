@@ -1,23 +1,24 @@
 import labels from './department-labels.json';
 export const nearbyRadii=[500,1000,2000,5000];
-export type NearbyOptions={department:string;radius:number;specialist:boolean;registered:boolean;query:string};
+export type NearbyOptions={department:string;radius:number;specialist:boolean;registered:boolean;weekend?:string;query:string};
 export function nearbyRecovery(input:NearbyOptions&{page:number}){
  const actions:{label:string;description:string;changes:Partial<NearbyOptions>&{page:number}}[]=[];
  if(input.page>1)actions.push({label:'Back to the first page',description:'Keep your current location and search options.',changes:{page:1}});
  if(input.query)actions.push({label:'Remove keyword',description:`Remove “${input.query}”; keep the department, radius and clinic filters.`,changes:{query:'',page:1}});
  const wider=nearbyRadii.find(r=>r>input.radius);
  if(wider)actions.push({label:`Expand radius to ${wider/1000} km`,description:'Keep the current location, department and other options.',changes:{radius:wider,page:1}});
+ if(input.weekend)actions.push({label:'Remove weekend filter',description:'Include clinics without verified weekend hours.',changes:{weekend:'',page:1}});
  if(input.registered)actions.push({label:'Remove registration filter',description:'Include profiles without a confirmed registry match.',changes:{registered:false,page:1}});
  if(input.specialist)actions.push({label:'Remove specialist filter',description:'Include profiles without a positive reported specialist count.',changes:{specialist:false,page:1}});
  if(input.department!=='all')actions.push({label:'Search all departments nearby',description:'Keep your current location, radius, keyword and clinic filters.',changes:{department:'all',page:1}});
  return actions;
 }
 export const nearbyDepartments=[{slug:'urology',label:'Urology near me'},{slug:'dentistry',label:'Dentist near me'},{slug:'dermatology',label:'Dermatologist near me'}];
-export function nearbySummary(options:NearbyOptions){return [options.department==='all'?'All departments':(labels as Record<string,string>)[options.department]||'All departments',`Within ${options.radius===500?'500 m':`${options.radius/1000} km`}`,options.specialist?'Specialists reported':null,options.registered?'International-patient registration listed':null,options.query?`Keyword: ${options.query}`:null].filter(Boolean).join(' · ');}
+export function nearbySummary(options:NearbyOptions){return [options.department==='all'?'All departments':(labels as Record<string,string>)[options.department]||'All departments',`Within ${options.radius===500?'500 m':`${options.radius/1000} km`}`,options.specialist?'Specialists reported':null,options.registered?'International-patient registration listed':null,options.weekend?`${options.weekend==='saturday'?'Saturday':'Sunday'} hours available`:null,options.query?`Keyword: ${options.query}`:null].filter(Boolean).join(' · ');}
 export function nearbyOptions(params:Record<string,string|string[]|undefined>):NearbyOptions{
  const department=typeof params.department==='string'&&Object.prototype.hasOwnProperty.call(labels,params.department)?params.department:'all';
  const radius=typeof params.radius==='string'&&nearbyRadii.includes(Number(params.radius))?Number(params.radius):1000;
- return {department,radius,specialist:params.specialist==='1',registered:params.registered==='1',query:typeof params.q==='string'?params.q.trim().slice(0,200):''};
+ return {department,radius,...(params.weekend==='saturday'||params.weekend==='sunday'?{weekend:params.weekend}:{}),specialist:params.specialist==='1',registered:params.registered==='1',query:typeof params.q==='string'?params.q.trim().slice(0,200):''};
 }
 export function nearbyInput(value:unknown){
  if(!value||typeof value!=='object'||Array.isArray(value))return null;
@@ -27,6 +28,7 @@ export function nearbyInput(value:unknown){
  if(typeof v.department!=='string'||(v.department!=='all'&&!Object.prototype.hasOwnProperty.call(labels,v.department)))return null;
  if(typeof v.specialist!=='boolean'||typeof v.registered!=='boolean'||typeof v.page!=='number'||!Number.isInteger(v.page)||v.page<1||v.page>10000)return null;
  if(v.query!==undefined&&(typeof v.query!=='string'||v.query.length>200))return null;
- return {latitude:v.latitude,longitude:v.longitude,radius:v.radius,department:v.department,specialist:v.specialist,registered:v.registered,page:v.page,...(typeof v.query==='string'?{query:v.query.trim()}:{})};
+ if(v.weekend!==undefined&&v.weekend!==''&&v.weekend!=='saturday'&&v.weekend!=='sunday')return null;
+ return {...(v.weekend?{weekend:v.weekend as string}:{}),latitude:v.latitude,longitude:v.longitude,radius:v.radius,department:v.department,specialist:v.specialist,registered:v.registered,page:v.page,...(typeof v.query==='string'?{query:v.query.trim()}:{})};
 }
 export function locationError(code:number){return code===1?'Location access was not allowed. You can enable it in your browser settings or search by station or area.':code===3?'Finding your location took too long. Try again outdoors, or search by station or area.':'Your location could not be determined. Try again, or search by station or area.';}
