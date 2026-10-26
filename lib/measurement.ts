@@ -4,6 +4,7 @@ export function measurementCampaign(search:string){const p=new URLSearchParams(s
 export function measurementPage(path:string){
  if(path==='/')return 'home';
  if(path.startsWith('/clinics/detail/'))return 'profile';
+ if(path.startsWith('/conditions'))return 'results';
  if(path.startsWith('/clinics/'))return 'results';
  if(path==='/nearby')return 'nearby';
  if(path.startsWith('/areas'))return 'areas';
