@@ -364,3 +364,13 @@ test('registration filter survives navigation and can be removed independently',
  const context=areaNavigation.areaContext({department:'ent',registered:'1',specialist:'1',q:'clinic'});assert(areaNavigation.areaClinicLink('busan',context).includes('registered=1'));assert(areaNavigation.areaBrowseLink('busan',context).includes('registered=1'));
  for(const link of recovery.searchRecovery(input).filter(l=>l.label!=='Remove registration filter'&&l.href.startsWith('/clinics/')))assert.equal(new URL(link.href,'https://example.com').searchParams.get('registered'),'1');
 });
+
+test('English urology regions share explicit area/station intent and retain keyword qualifiers',()=>{
+ const cases=[['seoul urology clinic','seoul'],['gangnam urology clinic','gangnam'],['incheon urology clinic','incheon'],['jamsil urology clinic','jamsil-station'],['jamsil-dong urology clinic','jamsil'],['seocho urology clinic','area-seoul-seocho-gu'],['dongtan urology clinic','dongtan'],['seoul station urology clinic','seoul-station']];
+ for(const [q,slug] of cases){assert.equal(search.homeSearchPath(q),'/clinics/urology/'+slug);assert.equal(search.urologySearchChoice(q).href,search.homeSearchPath(q));}
+ assert.equal(search.homeSearchPath('guwol-dong urology clinic'),'/clinics/urology/area-incheon-namdong-gu?q='+encodeURIComponent('구월동'));
+ assert.equal(search.homeSearchPath('Goldman urology Jamsil'),'/clinics/urology/jamsil-station?q=goldman');
+ assert.equal(search.homeSearchPath('Jamsil-dong dentistry'),'/clinics/dentistry/jamsil');
+ assert.equal(search.urologySearchChoice('urology near me'),undefined);
+ assert.equal(search.homeSearchPath('urology near me'),'/nearby?department=urology');
+});
