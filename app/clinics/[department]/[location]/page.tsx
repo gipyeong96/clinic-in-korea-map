@@ -39,11 +39,11 @@ interface Props {
 function text(value: string | string[] | undefined) { return typeof value === 'string' ? value.trim().slice(0, 200) : ''; }
 async function names(department: string, location: string) {
   const dict = getDictionary('en');
-  const loc=regionLabel(location) || (stationForSlug(location) ? `${stationForSlug(location)!.name_en}, ${stationForSlug(location)!.city}` : (location === 'gangnam' ? 'Gangnam area (Gangnam-gu & Seocho-gu)' : location === 'all' ? 'Korea' : (dict as Record<string, string>)[location])) || await registeredLocationLabel(location);
+  const loc=(location==='guwol-dong'?'Guwol-dong, Namdong-gu, Incheon':null) || regionLabel(location) || (stationForSlug(location) ? `${stationForSlug(location)!.name_en}, ${stationForSlug(location)!.city}` : (location === 'gangnam' ? 'Gangnam area (Gangnam-gu & Seocho-gu)' : location === 'all' ? 'Korea' : (dict as Record<string, string>)[location])) || await registeredLocationLabel(location);
   return {
     dept: department === 'all' ? 'Medical' : (departmentLabels as Record<string,string>)[department] || (dict as Record<string, string>)[department] || department,
-    loc:location==='jamsil'?'Jamsil-dong, Songpa-gu, Seoul':loc||'the selected area',
-    resolved:!!loc,
+    loc:location==='guwol-dong'?'Guwol-dong, Namdong-gu, Incheon':location==='jamsil'?'Jamsil-dong, Songpa-gu, Seoul':loc||'the selected area',
+    resolved:location==='guwol-dong'||!!loc,
   };
 }
 export async function generateMetadata({ params, searchParams }: Props) {

@@ -63,7 +63,7 @@ export function homeSearchPath(input: string) {
   const explicitJamsilDong=/\bjamsil[ -]+dong\b/.test(remaining);
   const guwol=department==='urology'&&/\bguwol(?:[ -]+dong)?\b/.test(remaining);
   if(explicitJamsilDong){location='jamsil';remaining=remaining.replace(/\bjamsil[ -]+dong\b/,' ');}
-  if(guwol){location='area-incheon-namdong-gu';remaining=remaining.replace(/\bguwol(?:[ -]+dong)?\b/,' ').replace(/\bincheon\b/,' ');}
+  if(guwol){location='guwol-dong';remaining=remaining.replace(/\bguwol(?:[ -]+dong)?\b/,' ').replace(/\bincheon\b/,' ');}
   const region=location==='all'?extractRegion(remaining):null;
   if(region&&!/\bstation\b|역/.test(remaining)){location=region.slug;remaining=region.query;}
   for (const [pattern, slug] of locations) {
@@ -74,7 +74,7 @@ export function homeSearchPath(input: string) {
   // has been recognized. Preserve names and other qualifiers in mixed phrases.
   if(department!=='all'&&/^(?:\s*(?:clinics?|hospitals?|in|at|near)\b\s*)+$/i.test(remaining))remaining='';
   if(department==='urology'&&location==='jamsil'&&!explicitJamsilDong)location='jamsil-station';
-  const query = [guwol?'구월동':'',remaining.trim().replace(/\s+/g, ' ')].filter(Boolean).join(' ');
+  const query = remaining.trim().replace(/\s+/g, ' ');
   return `/clinics/${department}/${location}${query ? `?q=${encodeURIComponent(query)}` : ''}`;
 }
 
@@ -88,6 +88,7 @@ export function urologySearchChoice(input:string){
  if(!url.pathname.startsWith('/clinics/urology/'))return undefined;
  const slug=url.pathname.split('/')[3];
  const labels:Record<string,string>={seoul:'Urology clinics in Seoul',gangnam:'Urology clinics in Gangnam area','jamsil-station':'Urology clinics near Jamsil Station',jamsil:'Urology clinics in Jamsil-dong','seoul-station':'Urology clinics near Seoul Station',incheon:'Urology clinics in Incheon',dongtan:'Urology clinics in Dongtan','area-seoul-seocho-gu':'Urology clinics in Seocho-gu','area-incheon-namdong-gu':'Urology clinics in Namdong-gu, Incheon'};
+ if(slug==='guwol-dong')return {href,label:'Urology clinics in Guwol-dong, Incheon'};
  if(!labels[slug])return undefined;
  return {href,label:slug==='area-incheon-namdong-gu'&&url.searchParams.get('q')?.includes('구월동')?'Search Guwol-dong in Namdong-gu, Incheon':labels[slug]};
 }
