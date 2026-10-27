@@ -78,7 +78,7 @@ export default function RootLayout({
                 <Link href="/stations" className="hover:text-slate-300">Stations across Korea</Link>
                 <Link href="/clinics/urology/gangnam" className="hover:text-slate-300">Urology Gangnam</Link>
                 <Link href="/clinics/urology/seoul-station" className="hover:text-slate-300">Urology Seoul Station</Link>
-                <Link href="/clinics/urology/jamsil" className="hover:text-slate-300">Urology Jamsil</Link>
+                <Link href="/clinics/urology/jamsil-station" className="hover:text-slate-300">Urology Jamsil</Link>
               </div>
             </div>
             <p className="text-[10px] text-slate-600 max-w-2xl mx-auto">

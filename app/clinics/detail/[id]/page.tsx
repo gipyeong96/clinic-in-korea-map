@@ -1,3 +1,5 @@
+import {goldmanSearchMetadata,goldmanComparison,urologyComparisonForAddress,urologyAreas} from '@/lib/urology-discovery';
+import {goldmanBranch} from '@/lib/goldman';
 import InlineHelp from '@/components/InlineHelp';
 import ContextualCareGuides from '@/components/ContextualCareGuides';
 import ShareClinic from '@/components/ShareClinic';
@@ -43,6 +45,7 @@ export async function generateMetadata({ params }: ClinicDetailProps) {
   return {
     title: `${clinicName(clinic)} | Korea Clinic Map`,
     description: `Contact information and medical equipment details for ${clinicName(clinic)} in ${clinicRegion(clinic)?.label || 'Korea'}.`,
+    ...goldmanSearchMetadata(params.id),
     alternates: {
       canonical: `${SITE_URL}${clinicPath(clinic)}`,
     }
@@ -69,6 +72,8 @@ export default async function ClinicDetail({ params, searchParams }: ClinicDetai
   const focus = clinicFocus(clinic);
   const focusSlug = clinic.department_source || isPremium ? clinic.categories?.slug || 'all' : 'all';
   const nearest=nearbyStation(clinic,stationPages);
+  const branch=goldmanBranch(params.id);
+  const comparison=branch?goldmanComparison[branch.id]:departments.some(d=>d.slug==='urology')?urologyComparisonForAddress(clinic.address_ko):undefined;
   
   // MedicalClinic Schema (SEO/AEO/GEO)
   const medicalClinicSchema = {
@@ -179,6 +184,11 @@ export default async function ClinicDetail({ params, searchParams }: ClinicDetai
           )}
         </section>
 
+        {comparison&&<aside aria-label="Local urology comparison" className="rounded-xl border border-blue-200 bg-blue-50 p-4 space-y-2 text-sm">
+          {branch&&<><p className="font-semibold">Goldman {branch.name} visit overview</p><p>{branch.address} · {branch.transit}</p><p className="text-xs text-slate-600">Partner clinic · Clinic in Korea has a consulting relationship with Goldman.</p></>}
+          <a href={'/clinics/urology/'+comparison} className="min-h-11 inline-flex items-center font-semibold underline">{urologyAreas[comparison].title} →</a>
+          <p>Explore other clinic records, reported specialists and contact details before choosing where to visit.</p>
+        </aside>}
         <section id="visit-details" className="scroll-mt-24 bg-white rounded-2xl border border-blue-200 p-4 sm:p-6 space-y-3" aria-label="Plan your visit">
           <h2 className="flex items-center gap-2 text-xl font-bold text-slate-900"><MapPin aria-hidden="true" className="h-5 w-5 text-blue-700"/>Plan your visit</h2>
           <p className="text-sm font-medium select-all">{address||'Address not provided'}</p>

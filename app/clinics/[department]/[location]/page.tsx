@@ -1,3 +1,5 @@
+import UrologyDiscovery from '@/components/UrologyDiscovery';
+import {urologyAreas} from '@/lib/urology-discovery';
 import {weekendCoverage,weekendCoverageCopy} from '@/lib/weekend-coverage';
 import {weekendQuery} from '@/lib/weekend-query';
 import ConditionSearchSuggestions from '@/components/ConditionSearchSuggestions';
@@ -53,6 +55,7 @@ export async function generateMetadata({ params, searchParams }: Props) {
     description: params.department==='urology'&&params.location==='gangnam'?'Compare urology clinic directory information in Gangnam-gu and Seocho-gu, Seoul. Filter reported specialists and international-patient registration, or find clinics near Gangnam Station.':params.department==='dentistry'?`Find dental clinics ${place}. Compare nearby stations, contact details and reported specialists, or use your location to find dentists nearby.`:`Browse ${dept.toLowerCase()} clinics ${place}. View addresses and contact details. Contact clinics to confirm language support and services.`,
     alternates: { canonical: `${SITE_URL}/clinics/${params.department}/${params.location}` },
     ...(jamsilDescription?{title:`Compare Urology Clinics ${params.location==='jamsil'?'in Jamsil-dong':'near Jamsil Station'}, Seoul | Korea Clinic Map`,description:jamsilDescription}:{}),
+    ...(params.department==='urology'&&urologyAreas[params.location]?{title:urologyAreas[params.location].title+' | Korea Clinic Map',description:urologyAreas[params.location].description}:{}),
     robots: Object.keys(searchParams).length || !resolved ? { index: false, follow: true } : undefined,
   };
 }
@@ -133,6 +136,7 @@ export default async function SearchPage({ params, searchParams }: Props) {
         </div></details>
 
       </div>}
+      {params.department==='urology'&&page===1&&<UrologyDiscovery location={params.location} showPartners={!query&&!specialist&&!registered&&!weekend&&!searchParams.radius}/>}
       <ResultSearchOptions key={searchLink(params.department,params.location,{query,specialist,registered,weekend,radius:station?radius:undefined,page})} summary={activeSearchSummary({department:params.department,location:params.location,query,specialist,registered,weekend,radius:station?radius:undefined,departmentLabel:dept,locationLabel:loc})}>
       {station&&<details id="change-station" className="scroll-mt-24 rounded-xl border bg-white p-3"><summary className="cursor-pointer min-h-11 py-3 font-semibold">Choose another station</summary><p className="pb-3">Your department, radius and filters stay selected. Choose a region or search by station name.</p><StationFinder compact department={params.department} searchOptions={{query,specialist,registered,weekend,radius}} /></details>}
       <form action={`/clinics/${params.department}/${params.location}`} method="get" className="flex flex-wrap items-end gap-3 bg-white p-4 rounded-xl border border-slate-200">
