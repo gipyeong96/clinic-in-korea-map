@@ -67,6 +67,7 @@ export default async function SearchPage({ params, searchParams }: Props) {
   const weekend=searchParams.weekend==='saturday'||searchParams.weekend==='sunday'?searchParams.weekend:undefined;
   const station = stationForSlug(params.location);
   const radius = searchRadius(searchParams.radius);
+  const stationHeading=station?.name_en.replace(/\([^)]*\)/g,'').replace(/\s+/g,' ').trim();
   if(hasNearMeIntent(query)){
     const parsed=new URL(homeSearchPath(query),SITE_URL);
     redirect(nearbySearchLink(params.department==='all'?(parsed.searchParams.get('department')||'all'):params.department,{query:parsed.searchParams.get('q')||'',specialist,registered,weekend,radius:station?radius:undefined}));
@@ -109,16 +110,18 @@ export default async function SearchPage({ params, searchParams }: Props) {
   return <>
     <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(schema) }} />
     <div className="max-w-6xl mx-auto px-4 py-5 space-y-3 sm:py-8 sm:space-y-6">
-      <h1 className="text-2xl md:text-3xl font-black break-words">{params.department==='dentistry'?`Dentists ${station?'near':'in'} ${station?station.name_en:loc}`:station ? `${params.department === 'all' ? 'Clinics' : `${dept} Clinics`} near ${station.name_en}` : `${dept} Clinics in ${loc}`}</h1>
+      <h1 className="text-2xl md:text-3xl font-black break-words">{params.department==='dentistry'?`Dentists ${station?'near':'in'} ${station?stationHeading:loc}`:station ? `${params.department === 'all' ? 'Clinics' : `${dept} Clinics`} near ${stationHeading}` : `${dept} Clinics in ${loc}`}</h1>
       <a href={nearbySearchLink(params.department,{query,specialist,registered,weekend,radius:station?radius:undefined})} className="min-h-11 inline-flex items-center rounded-lg bg-slate-900 px-4 py-3 text-sm font-semibold text-white">{nearbyAction(params.department)}</a>
+      {params.department==='urology'&&!failed&&filteredClinics.length>0&&<a href="#clinic-results" className="min-h-11 inline-flex items-center rounded-lg border border-blue-300 bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-900">View {filteredClinics.length} clinics{hasNext?' on this page':''} ↓</a>}
       {params.department==='urology'&&page===1&&<UrologyDiscovery location={params.location} showPartners={!query&&!specialist&&!registered&&!weekend&&!searchParams.radius}/>}
       {params.department==='urology'&&['jamsil','jamsil-station'].includes(params.location)&&<section aria-label="Jamsil comparison search scope" className="rounded-xl border bg-white p-4 space-y-3 text-sm">
-        <p>{station?<>Results use a <strong>{radius.toLocaleString()} m radius around Jamsil Station</strong>, ordered by straight-line distance. Depending on the radius, this can include parts of Jamsil-dong and Sincheon-dong.</>:<>This area lists clinics with a source address in <strong>Jamsil-dong (잠실동), Songpa-gu, Seoul</strong>. For clinics around Jamsil Station, including nearby Sincheon-dong (신천동), use the station search.</>}</p>
+        <p>{station?<>Within <strong>{radius.toLocaleString()} m of Jamsil Station</strong> · Straight-line distance · May include Sincheon-dong and parts of Jamsil-dong.</>:<>Addresses in <strong>Jamsil-dong only</strong>. Use the station search for nearby Sincheon-dong.</>}</p>
+        <details><summary className="min-h-11 py-3 cursor-pointer underline">Change area scope</summary>
         <nav aria-label="Jamsil urology comparison choices" className="flex flex-wrap gap-2">
           <a aria-current={!station?'page':undefined} className="min-h-11 rounded-lg border px-3 py-3 font-semibold" href={searchLink('urology','jamsil',{query,specialist,registered,weekend})}>In Jamsil-dong</a>
           <a aria-current={station?'page':undefined} className="min-h-11 rounded-lg border px-3 py-3 font-semibold" href={searchLink('urology','jamsil-station',{query,specialist,registered,weekend,radius:station?radius:1000})}>Near Jamsil Station · {station?`${radius.toLocaleString()} m`:'1 km'}</a>
         </nav>
-        <details><summary className="min-h-11 py-3 cursor-pointer underline">Compare clinic information</summary><p>Use search options to filter reported urology specialists and international-patient registration. Save two or three clinics, then <a className="underline" href="/my-clinics">compare saved clinics</a>. Registration does not confirm English support. Station distance is measured from official coordinates, not an exit or walking route; a radius does not cover an entire neighbourhood.</p></details>
+        </details>
       </section>}
       {params.department==='urology'&&params.location==='gangnam'&&<section aria-label="Compare urology clinics in Gangnam" className="rounded-xl border bg-white p-4 space-y-3 text-sm">
         <p>Compare clinics reporting urology across <strong>Gangnam-gu and Seocho-gu, Seoul</strong>.</p>
@@ -154,7 +157,7 @@ export default async function SearchPage({ params, searchParams }: Props) {
       <ResultDepartmentPicker department={params.department} location={params.location} options={{query,specialist,registered,weekend,radius:station?radius:undefined}} />
       <a href={areaBrowseLink(undefined,{department:params.department,query,specialist,registered,weekend})} className="inline-flex min-h-11 items-center underline text-sm">Choose area</a>
       </ResultSearchOptions>
-      <p className="text-sm text-slate-500" role={failed ? 'alert' : 'status'}>
+      <p id="clinic-results" tabIndex={-1} className="scroll-mt-24 text-sm text-slate-500" role={failed ? 'alert' : 'status'}>
         {failed ? 'Clinic information is temporarily unavailable. Please try again later.' : `Page ${page} · ${filteredClinics.length} clinic profiles on this page.${!filteredClinics.length&&page>1?' No further results. Use Previous page or change your search.':''}`}
       </p>
       {weekend&&<section aria-label="Weekend data coverage" className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm space-y-2">

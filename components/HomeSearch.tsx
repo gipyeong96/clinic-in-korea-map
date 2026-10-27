@@ -3,7 +3,7 @@
 import React, { useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Search } from 'lucide-react';
-import { homeSearchPath,searchLink,hasNearMeIntent } from '@/lib/search';
+import { homeSearchPath,searchLink,hasNearMeIntent,urologySearchChoice } from '@/lib/search';
 import {homeSuggestions} from '@/lib/home-suggestions';
 import Link from 'next/link';
 import ConditionSearchSuggestions from './ConditionSearchSuggestions';
@@ -26,6 +26,7 @@ export default function HomeSearch({ placeholder, btnText }: HomeSearchProps) {
   const nearby=hasNearMeIntent(query);
   const interpreted=new URL(homeSearchPath(query),'https://example.com');
   const department=interpreted.pathname.split('/')[2];
+  const urologyIntent=urologySearchChoice(query);
   const areaIntent=!nearby&&department!=='all'&&suggestions.regions.length===1?suggestions.regions[0]:undefined;
 
   const handleSearch = (e: React.FormEvent) => {
@@ -74,7 +75,8 @@ export default function HomeSearch({ placeholder, btnText }: HomeSearchProps) {
     {query.trim().length>=2&&!dismissed&&<section ref={choices} tabIndex={-1} id="home-search-suggestions" aria-label="Search suggestions" className="mt-2 rounded-xl border bg-white p-3 text-slate-800 shadow-lg space-y-2">
       <div className="flex items-center justify-between gap-2"><p role={submitted?'status':undefined} className="text-xs font-semibold">{submitted?(conditionIntent?'Choose a condition comparison or clinic search to continue.':'Choose a station, area, or keyword search to continue.'):'Choose what you mean'}</p><button type="button" onClick={()=>setDismissed(true)} className="min-h-11 px-3 text-xs underline">Dismiss</button></div>
       {conditionIntent&&<ConditionSearchSuggestions query={query}/>}
-      {!conditionIntent&&areaIntent&&<Link href={areaIntent.href} className="block min-h-11 rounded-lg bg-slate-900 p-3 text-sm font-semibold text-white">Browse {(departmentLabels as Record<string,string>)[department]||department} clinics in {areaIntent.label} →</Link>}
+      {!conditionIntent&&urologyIntent&&<Link href={urologyIntent.href} className="block min-h-11 rounded-lg bg-slate-900 p-3 text-sm font-semibold text-white">{urologyIntent.label} →</Link>}
+      {!conditionIntent&&!urologyIntent&&areaIntent&&<Link href={areaIntent.href} className="block min-h-11 rounded-lg bg-slate-900 p-3 text-sm font-semibold text-white">Browse {(departmentLabels as Record<string,string>)[department]||department} clinics in {areaIntent.label} →</Link>}
       {!conditionIntent&&suggestions.stations.length>0&&<nav aria-label="Suggested stations"><p className="text-xs font-bold text-slate-500">NEAR A STATION</p>{suggestions.stations.map(s=><Link key={s.href} href={s.href} className="block min-h-11 rounded-lg p-2 hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-amber-500"><span className="block text-sm font-semibold">{s.label}</span><span className="block text-xs text-slate-500">{s.detail}</span></Link>)}</nav>}
       {!conditionIntent&&suggestions.regions.length>0&&<nav aria-label="Suggested areas"><p className="text-xs font-bold text-slate-500">IN AN AREA</p>{suggestions.regions.map(s=><Link key={s.href} href={s.href} className="block min-h-11 rounded-lg p-2 hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-amber-500"><span className="block text-sm font-semibold">{s.label}</span></Link>)}</nav>}
       {nearby&&!conditionIntent?<div className="space-y-2"><Link href={homeSearchPath(query)} className="block min-h-11 rounded-lg bg-slate-900 p-3 text-sm font-semibold text-white">Find clinics near me →</Link><p className="text-xs text-slate-600">Your department stays selected. On the next screen, choose “Use my location” to allow location access.</p></div>:<Link href={searchLink('all','all',{query:query.trim()})} className="block min-h-11 border-t pt-3 text-sm underline break-words">Search clinic names / addresses for “{query.trim()}”</Link>}

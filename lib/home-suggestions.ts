@@ -34,7 +34,7 @@ export function homeSuggestions(input:string){
  }
  const interpreted=new URL(homeSearchPath(query),'https://example.com');
  const slug=interpreted.pathname.split('/')[3];
- if(['gangnam','jamsil','dongtan'].includes(slug)){regions=[{label:slug==='gangnam'?'Gangnam area (Gangnam-gu & Seocho-gu)':slug==='jamsil'?'Jamsil, Seoul':'Dongtan, Hwaseong',detail:'Clinics in this area',href:interpreted.pathname+interpreted.search}];}
- if(['강남','잠실','동탄'].includes(query)){const slug=query==='강남'?'gangnam':query==='잠실'?'jamsil':'dongtan';regions=[{label:slug==='gangnam'?'Gangnam area (Gangnam-gu & Seocho-gu)':slug==='jamsil'?'Jamsil, Seoul':'Dongtan, Hwaseong',detail:'Clinics in this area',href:searchLink('all',slug)}];}
+ if(['gangnam','jamsil','dongtan'].includes(slug)){regions=[{label:slug==='gangnam'?'Gangnam area (Gangnam-gu & Seocho-gu)':slug==='jamsil'?'Jamsil-dong, Songpa-gu, Seoul':'Dongtan, Hwaseong',detail:'Clinics in this area',href:interpreted.pathname+interpreted.search}];}
+ if(['강남','잠실','동탄'].includes(query)){const slug=query==='강남'?'gangnam':query==='잠실'?'jamsil':'dongtan';regions=[{label:slug==='gangnam'?'Gangnam area (Gangnam-gu & Seocho-gu)':slug==='jamsil'?'Jamsil-dong, Songpa-gu, Seoul':'Dongtan, Hwaseong',detail:'Clinics in this area',href:searchLink('all',slug)}];}
  return {stations,regions};
 }
