@@ -1,3 +1,5 @@
+import UrologyDiscovery from '@/components/UrologyDiscovery';
+import {urologyAreas} from '@/lib/urology-discovery';
 import {weekendCoverage,weekendCoverageCopy} from '@/lib/weekend-coverage';
 import {weekendQuery} from '@/lib/weekend-query';
 import ConditionSearchSuggestions from '@/components/ConditionSearchSuggestions';
@@ -53,6 +55,7 @@ export async function generateMetadata({ params, searchParams }: Props) {
     description: params.department==='urology'&&params.location==='gangnam'?'Compare urology clinic directory information in Gangnam-gu and Seocho-gu, Seoul. Filter reported specialists and international-patient registration, or find clinics near Gangnam Station.':params.department==='dentistry'?`Find dental clinics ${place}. Compare nearby stations, contact details and reported specialists, or use your location to find dentists nearby.`:`Browse ${dept.toLowerCase()} clinics ${place}. View addresses and contact details. Contact clinics to confirm language support and services.`,
     alternates: { canonical: `${SITE_URL}/clinics/${params.department}/${params.location}` },
     ...(jamsilDescription?{title:`Compare Urology Clinics ${params.location==='jamsil'?'in Jamsil-dong':'near Jamsil Station'}, Seoul | Korea Clinic Map`,description:jamsilDescription}:{}),
+    ...(params.department==='urology'&&urologyAreas[params.location]?{title:urologyAreas[params.location].title+' | Korea Clinic Map',description:urologyAreas[params.location].description}:{}),
     robots: Object.keys(searchParams).length || !resolved ? { index: false, follow: true } : undefined,
   };
 }
@@ -108,6 +111,7 @@ export default async function SearchPage({ params, searchParams }: Props) {
     <div className="max-w-6xl mx-auto px-4 py-5 space-y-3 sm:py-8 sm:space-y-6">
       <h1 className="text-2xl md:text-3xl font-black break-words">{params.department==='dentistry'?`Dentists ${station?'near':'in'} ${station?station.name_en:loc}`:station ? `${params.department === 'all' ? 'Clinics' : `${dept} Clinics`} near ${station.name_en}` : `${dept} Clinics in ${loc}`}</h1>
       <a href={nearbySearchLink(params.department,{query,specialist,registered,weekend,radius:station?radius:undefined})} className="min-h-11 inline-flex items-center rounded-lg bg-slate-900 px-4 py-3 text-sm font-semibold text-white">{nearbyAction(params.department)}</a>
+      {params.department==='urology'&&page===1&&<UrologyDiscovery location={params.location} showPartners={!query&&!specialist&&!registered&&!weekend&&!searchParams.radius}/>}
       {params.department==='urology'&&['jamsil','jamsil-station'].includes(params.location)&&<section aria-label="Jamsil comparison search scope" className="rounded-xl border bg-white p-4 space-y-3 text-sm">
         <p>{station?<>Results use a <strong>{radius.toLocaleString()} m radius around Jamsil Station</strong>, ordered by straight-line distance. Depending on the radius, this can include parts of Jamsil-dong and Sincheon-dong.</>:<>This area lists clinics with a source address in <strong>Jamsil-dong (잠실동), Songpa-gu, Seoul</strong>. For clinics around Jamsil Station, including nearby Sincheon-dong (신천동), use the station search.</>}</p>
         <nav aria-label="Jamsil urology comparison choices" className="flex flex-wrap gap-2">
