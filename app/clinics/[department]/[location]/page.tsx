@@ -1,3 +1,4 @@
+import {weekendCoverage,weekendCoverageCopy} from '@/lib/weekend-coverage';
 import {weekendQuery} from '@/lib/weekend-query';
 import ConditionSearchSuggestions from '@/components/ConditionSearchSuggestions';
 import ResultSearchOptions from '@/components/ResultSearchOptions';
@@ -88,6 +89,8 @@ export default async function SearchPage({ params, searchParams }: Props) {
     return true;
   }));
   const { dept, loc } = await names(params.department, params.location);
+  const weekendNotice=weekendCoverageCopy(weekendCoverage(params.location,loc,!!station));
+  const withoutWeekend=searchLink(params.department,params.location,{query,specialist,registered,radius:station?radius:undefined});
   const mapCenter = station ? { lat: station.stations[0].latitude, lng: station.stations[0].longitude } : filteredClinics.length ? { lat: filteredClinics[0].latitude, lng: filteredClinics[0].longitude } : { lat: 37.5665, lng: 126.9780 };
   const currentFilters=activeFilters({department:params.department,location:params.location,query,specialist,registered,weekend,radius:station?radius:undefined,departmentLabel:dept,locationLabel:loc});
   const schema = {
@@ -137,7 +140,7 @@ export default async function SearchPage({ params, searchParams }: Props) {
           <input name="q" defaultValue={query} maxLength={200} className="block border rounded-lg px-3 py-2 w-full mt-1" placeholder="Search names or addresses" />
         </label>
         {station && <label className="text-sm font-semibold">Radius<select id="search-radius" name="radius" defaultValue={String(radius)} className="scroll-mt-28 block border rounded-lg px-3 py-2 mt-1"><option value="500">500 m</option><option value="1000">1 km</option><option value="2000">2 km</option></select></label>}
-        <label className="basis-full text-sm font-semibold">Weekend hours<select name="weekend" defaultValue={weekend||''} className="ml-2 max-w-full rounded-lg border p-3"><option value="">Any schedule</option><option value="saturday">Saturday hours available</option><option value="sunday">Sunday hours available</option></select><span className="block font-normal text-xs text-slate-500 mt-2">Verified records currently cover Gangnam-gu, Seocho-gu, Jamsil-dong and Sincheon-dong. Clinics with missing hours are excluded. Reported schedule, not live availability.</span></label>
+        <label className="basis-full text-sm font-semibold">Weekend hours<select name="weekend" defaultValue={weekend||''} className="ml-2 max-w-full rounded-lg border p-3"><option value="">Any schedule</option><option value="saturday">Saturday hours available</option><option value="sunday">Sunday hours available</option></select><span className="block font-normal text-xs text-slate-500 mt-2">{weekendNotice.description} Reported schedule, not live availability.</span></label>
         <fieldset className="basis-full flex flex-wrap gap-x-5 gap-y-2"><legend className="text-sm font-semibold mb-1">Filter clinics</legend><label className="text-sm flex gap-2 min-h-11 items-center"><input type="checkbox" name="specialist" value="1" defaultChecked={specialist} /> {params.department==='all' ? 'Specialists reported' : `${dept} specialist reported`}</label><label className="text-sm flex gap-2 min-h-11 items-center"><input type="checkbox" name="registered" value="1" defaultChecked={registered} /> Registered for international patients</label><p className="basis-full text-xs text-slate-500">Select either or both. Registration is from the official KHIDI registry and does not confirm English or interpretation support.</p></fieldset>
         <button className="bg-slate-800 text-white rounded-lg px-4 py-2">Search</button>
         <button type="submit" formAction="/nearby" name="department" value={params.department} className="min-h-11 rounded-lg border border-slate-800 px-4 py-2 text-sm font-semibold">Find clinics near me</button>
@@ -150,7 +153,13 @@ export default async function SearchPage({ params, searchParams }: Props) {
       <p className="text-sm text-slate-500" role={failed ? 'alert' : 'status'}>
         {failed ? 'Clinic information is temporarily unavailable. Please try again later.' : `Page ${page} · ${filteredClinics.length} clinic profiles on this page.${!filteredClinics.length&&page>1?' No further results. Use Previous page or change your search.':''}`}
       </p>
-      {weekend&&<p className="text-xs text-slate-600">Weekend records currently cover Gangnam-gu, Seocho-gu, Jamsil-dong and Sincheon-dong only. Missing hours are excluded. Call before visiting.</p>}
+      {weekend&&<section aria-label="Weekend data coverage" className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm space-y-2">
+        <h2 className="font-bold"><span aria-hidden="true">📅 </span>{weekendNotice.title}</h2>
+        <p>{weekendNotice.description}</p>
+        <p className="text-xs text-slate-600">Reported schedule, not live availability. Call before visiting.</p>
+        <a href={withoutWeekend} className="min-h-11 inline-flex items-center rounded-lg border border-amber-300 bg-white px-3 py-2 font-semibold">Show clinics without weekend filter</a>
+        <details className="text-xs"><summary className="min-h-11 py-3 cursor-pointer underline">Coverage and retained search options</summary><p>Current pilot: Gangnam-gu, Seocho-gu, Jamsil-dong and Sincheon-dong in Seoul. Removing the weekend filter keeps your area, department, name/address, specialist and registration options, and station radius. Results restart on page 1.</p></details>
+      </section>}
       <details className="text-xs text-slate-500"><summary className="cursor-pointer underline">About these results</summary><p className="pt-2">Results use HIRA-reported departments. A reported department does not necessarily have a specialist. Clinic focus and full department details are shown separately.</p></details>
       {failed&&<a className="inline-flex min-h-11 items-center px-4 rounded-lg border bg-white font-semibold" href={searchLink(params.department,params.location,{query,specialist,registered,weekend,radius:station?radius:undefined,page})}>Try again</a>}
       {!failed&&!filteredClinics.length&&<section aria-label="Search suggestions" className="rounded-xl border bg-white p-5 space-y-4"><h2 className="text-lg font-bold">{page>1?'Continue your search':'Try a broader search'}</h2><p className="text-sm text-slate-600">{page>1?'There are no clinic profiles on this page. Return to the first page or adjust your search.':'No clinic profiles matched these options. Try one change below; the other options stay selected.'}</p><nav aria-label="Broaden your search" className="grid sm:grid-cols-2 gap-3">{searchRecovery({department:params.department,location:params.location,query,specialist,registered,weekend,radius:station?radius:undefined,page,departmentLabel:dept,locationLabel:loc}).map(link=><a key={link.label} href={link.href} className="min-h-11 min-w-0 break-words block rounded-lg border px-4 py-3 text-sm hover:border-slate-500"><span className="block font-semibold underline">{link.title||link.label}</span><span className="block text-xs text-slate-600 mt-1">{link.description}</span></a>)}</nav></section>}
