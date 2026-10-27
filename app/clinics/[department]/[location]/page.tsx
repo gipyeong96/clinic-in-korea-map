@@ -1,3 +1,5 @@
+import {confirmedEmptyResult} from '@/lib/search-indexing';
+import {isFocusCategory} from '@/lib/clinic-classification';
 import {weekendCoverage,weekendCoverageCopy} from '@/lib/weekend-coverage';
 import {weekendQuery} from '@/lib/weekend-query';
 import ConditionSearchSuggestions from '@/components/ConditionSearchSuggestions';
@@ -10,7 +12,7 @@ import ResultDepartmentPicker from '@/components/ResultDepartmentPicker';
 import StationFinder from '@/components/StationFinder';
 import {nearbyStation} from '@/lib/card-location';
 import {stationPages} from '@/lib/stations';
-import React from 'react';
+import React, {cache} from 'react';
 import { notFound, redirect } from 'next/navigation';
 import { extractRegion } from '@/lib/regions';
 import { searchLink,hasNearMeIntent,homeSearchPath,nearbySearchLink } from '@/lib/search';
@@ -35,6 +37,14 @@ interface Props {
   searchParams: { [key: string]: string | string[] | undefined };
 }
 function text(value: string | string[] | undefined) { return typeof value === 'string' ? value.trim().slice(0, 200) : ''; }
+const readSearch=cache(async (key:string):Promise<{clinics:any[];failed:boolean}>=>{
+ const options=JSON.parse(key);
+ try {return {clinics:options.weekend?await weekendQuery(supabase,options):await getClinics(options),failed:false};}
+ catch {return {clinics:[] as any[],failed:true};}
+});
+function searchKey(params:Props['params'],searchParams:Props['searchParams']){
+ return JSON.stringify({categorySlug:params.department,locationSlug:params.location,query:text(searchParams.q),specialist:searchParams.specialist==='1',registered:searchParams.registered==='1',weekend:searchParams.weekend==='saturday'||searchParams.weekend==='sunday'?searchParams.weekend:undefined,limit:PAGE_SIZE+1,radius:searchRadius(searchParams.radius),offset:(searchPage(searchParams.page)-1)*PAGE_SIZE});
+}
 async function names(department: string, location: string) {
   const dict = getDictionary('en');
   const loc=regionLabel(location) || (stationForSlug(location) ? `${stationForSlug(location)!.name_en}, ${stationForSlug(location)!.city}` : (location === 'gangnam' ? 'Gangnam area (Gangnam-gu & Seocho-gu)' : location === 'all' ? 'Korea' : (dict as Record<string, string>)[location])) || await registeredLocationLabel(location);
@@ -46,6 +56,8 @@ async function names(department: string, location: string) {
 }
 export async function generateMetadata({ params, searchParams }: Props) {
   const { dept, loc, resolved } = await names(params.department, params.location);
+  const result=Object.keys(searchParams).length===0&&resolved&&supportedDepartments.has(params.department)?await readSearch(searchKey(params,searchParams)):null;
+  const confirmedEmpty=confirmedEmptyResult(result);
   const place=`${stationForSlug(params.location)?'near':'in'} ${loc}`;
   const jamsilDescription=params.department==='urology'&&(params.location==='jamsil'||params.location==='jamsil-station')?(params.location==='jamsil'?'Compare urology clinic information in Jamsil-dong, Songpa-gu, Seoul. Check reported specialists and registration, or switch to Jamsil Station for radius-based results including nearby Sincheon-dong.':'Compare urology clinics near Jamsil Station, Songpa-gu, Seoul by straight-line distance. Choose a 500 m, 1 km or 2 km radius; results can include parts of Jamsil-dong and Sincheon-dong.'):undefined;
   return {
@@ -53,7 +65,7 @@ export async function generateMetadata({ params, searchParams }: Props) {
     description: params.department==='urology'&&params.location==='gangnam'?'Compare urology clinic directory information in Gangnam-gu and Seocho-gu, Seoul. Filter reported specialists and international-patient registration, or find clinics near Gangnam Station.':params.department==='dentistry'?`Find dental clinics ${place}. Compare nearby stations, contact details and reported specialists, or use your location to find dentists nearby.`:`Browse ${dept.toLowerCase()} clinics ${place}. View addresses and contact details. Contact clinics to confirm language support and services.`,
     alternates: { canonical: `${SITE_URL}/clinics/${params.department}/${params.location}` },
     ...(jamsilDescription?{title:`Compare Urology Clinics ${params.location==='jamsil'?'in Jamsil-dong':'near Jamsil Station'}, Seoul | Korea Clinic Map`,description:jamsilDescription}:{}),
-    robots: Object.keys(searchParams).length || !resolved ? { index: false, follow: true } : undefined,
+    robots: Object.keys(searchParams).length || !resolved || confirmedEmpty ? { index: false, follow: true } : undefined,
   };
 }
 export default async function SearchPage({ params, searchParams }: Props) {
@@ -74,11 +86,7 @@ export default async function SearchPage({ params, searchParams }: Props) {
   if(regionMatches&&regionMatches.options.length>1)return <div className="max-w-3xl mx-auto p-4 py-8 space-y-5"><h1 className="text-2xl font-bold">Choose a region</h1><p>More than one region matches “{query}”. Select the province and city you mean.</p><nav aria-label="Matching regions" className="grid sm:grid-cols-2 gap-3">{regionMatches.options.map(option=><a key={option.slug} className="min-h-11 p-4 rounded-lg border bg-white break-words font-semibold" href={searchLink(params.department,option.slug,{query:regionMatches.query,specialist,registered,weekend})}>{option.label}</a>)}</nav><a className="inline-block min-h-11 py-3 underline" href="/areas">Browse all regions</a></div>;
   const region=params.location==='all'?extractRegion(query):null;
   if(region)redirect(searchLink(params.department,region.slug,{query:region.query,specialist,registered,weekend,page}));
-  let clinics: any[] = [];
-  let failed = false;
-  try {
-    clinics = weekend ? await weekendQuery(supabase,{categorySlug:params.department,locationSlug:params.location,query,specialist,registered,weekend,limit:PAGE_SIZE+1,radius,offset}) : await getClinics({ categorySlug: params.department, locationSlug: params.location, query, specialist, registered, limit: PAGE_SIZE+1, radius, offset });
-  } catch { failed = true; }
+  const {clinics,failed}=await readSearch(searchKey(params,searchParams));
   // Collapse repeated imported profiles in the displayed batch without modifying source data.
   const seen = new Set<string>();
   const hasNext=clinics.length>PAGE_SIZE;
@@ -141,7 +149,7 @@ export default async function SearchPage({ params, searchParams }: Props) {
         </label>
         {station && <label className="text-sm font-semibold">Radius<select id="search-radius" name="radius" defaultValue={String(radius)} className="scroll-mt-28 block border rounded-lg px-3 py-2 mt-1"><option value="500">500 m</option><option value="1000">1 km</option><option value="2000">2 km</option></select></label>}
         <label className="basis-full text-sm font-semibold">Weekend hours<select name="weekend" defaultValue={weekend||''} className="ml-2 max-w-full rounded-lg border p-3"><option value="">Any schedule</option><option value="saturday">Saturday hours available</option><option value="sunday">Sunday hours available</option></select><span className="block font-normal text-xs text-slate-500 mt-2">{weekendNotice.description} Reported schedule, not live availability.</span></label>
-        <fieldset className="basis-full flex flex-wrap gap-x-5 gap-y-2"><legend className="text-sm font-semibold mb-1">Filter clinics</legend><label className="text-sm flex gap-2 min-h-11 items-center"><input type="checkbox" name="specialist" value="1" defaultChecked={specialist} /> {params.department==='all' ? 'Specialists reported' : `${dept} specialist reported`}</label><label className="text-sm flex gap-2 min-h-11 items-center"><input type="checkbox" name="registered" value="1" defaultChecked={registered} /> Registered for international patients</label><p className="basis-full text-xs text-slate-500">Select either or both. Registration is from the official KHIDI registry and does not confirm English or interpretation support.</p></fieldset>
+        <fieldset className="basis-full flex flex-wrap gap-x-5 gap-y-2"><legend className="text-sm font-semibold mb-1">Filter clinics</legend><label className="text-sm flex gap-2 min-h-11 items-center"><input type="checkbox" name="specialist" value="1" defaultChecked={specialist} /> {params.department==='all'||isFocusCategory(params.department) ? 'Specialists reported' : `${dept} specialist reported`}</label><label className="text-sm flex gap-2 min-h-11 items-center"><input type="checkbox" name="registered" value="1" defaultChecked={registered} /> Registered for international patients</label><p className="basis-full text-xs text-slate-500">Select either or both. Registration is from the official KHIDI registry and does not confirm English or interpretation support.</p></fieldset>
         <button className="bg-slate-800 text-white rounded-lg px-4 py-2">Search</button>
         <button type="submit" formAction="/nearby" name="department" value={params.department} className="min-h-11 rounded-lg border border-slate-800 px-4 py-2 text-sm font-semibold">Find clinics near me</button>
         <p className="basis-full text-xs text-slate-500">Use your current location with these search options. Location access starts only when you choose “Use my location” on the next screen.</p>

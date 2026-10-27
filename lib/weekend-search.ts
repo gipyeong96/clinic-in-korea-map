@@ -1,3 +1,4 @@
+import {matchesClassification,matchesSpecialist} from './clinic-classification';
 import {weekendHours,hoursLabel} from './weekend-hours';
 import {registeredEvidence} from './clinic-evidence';
 import {searchTerms} from './search';
@@ -13,8 +14,8 @@ export function filterWeekendClinics(rows:any[],options:{weekend:string;category
  const result=rows.filter(c=>{
   const evidence=weekendHours(c.hira_code||'',c.name_ko||'',c.address_ko||'',c.telephone||'');
   if(!evidence||hoursLabel(evidence[day])==='Hours not provided')return false;
-  if(options.categorySlug&&options.categorySlug!=='all'&&!c.departments?.some((d:any)=>d.slug===options.categorySlug))return false;
-  if(options.specialist&&(options.categorySlug&&options.categorySlug!=='all'?!c.specialist_slugs?.includes(options.categorySlug):!c.has_specialist||!c.department_source))return false;
+  if(!matchesClassification(c,options.categorySlug))return false;
+  if(options.specialist&&!matchesSpecialist(c,options.categorySlug))return false;
   if(options.registered&&!registeredEvidence(c))return false;
   return terms.every(t=>[c.name_en,c.name_ko,c.address_en,c.address_ko].some(v=>typeof v==='string'&&v.toLowerCase().includes(t.toLowerCase())));
  }).map(c=>{
