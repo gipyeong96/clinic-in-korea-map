@@ -66,7 +66,7 @@ export default function ClinicCard({ clinic, selectedDepartment='all', onShowMap
           </span>
         </div>
 
-        <Link href={detailHref}>
+        <Link href={detailHref} prefetch={false}>
           <h3 className="text-xl font-bold text-slate-900 hover:text-emerald-600 transition mb-0.5 leading-snug">
             {name}
           </h3>
@@ -129,6 +129,7 @@ export default function ClinicCard({ clinic, selectedDepartment='all', onShowMap
         <div className="flex gap-2">
         <Link 
           href={detailHref}
+          prefetch={false}
           className={`min-h-11 flex-1 inline-flex items-center justify-center text-center py-2 rounded-lg text-sm font-semibold transition ${
             clinic.is_premium
               ? 'bg-amber-400 hover:bg-amber-300 text-slate-950'

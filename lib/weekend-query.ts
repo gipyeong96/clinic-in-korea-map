@@ -1,3 +1,4 @@
+import {CLINIC_LIST_SELECT} from './clinic-list-select';
 import {unstable_cache} from 'next/cache';
 import records from './weekend-hours-pilot.json';
 import {filterWeekendClinics,weekendDay} from './weekend-search';
@@ -15,10 +16,10 @@ export async function weekendQuery(db:any,options:Parameters<typeof filterWeeken
   for(let start=0;start<ids.length;start+=400){
    const batches=[];for(let i=start;i<Math.min(ids.length,start+400);i+=50)batches.push(ids.slice(i,i+50));
    const result=await Promise.all(batches.map(batch=>unstable_cache(async()=>{
-    const r=await db.from('clinics').select('*, categories!inner(*), locations!inner(*)').in('hira_code',batch).limit(100);
+    const r=await db.from('clinics').select(CLINIC_LIST_SELECT).in('hira_code',batch).limit(100);
     if(r.error||!r.data)throw new Error('Weekend clinic data unavailable');
     return r;
-   },['weekend-directory-v2',...batch],{revalidate:300})()));
+   },['weekend-directory-v3',...batch],{revalidate:300})()));
    for(const r of result){if(r.error||!r.data)throw new Error('Weekend clinic data unavailable');rows.push(...r.data);}
   }
   return rows;

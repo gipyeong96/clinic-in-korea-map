@@ -22,7 +22,8 @@ import { searchRecovery } from '@/lib/search-recovery';
 import {areaBrowseLink} from '@/lib/area-navigation';
 import {activeFilters,activeSearchSummary} from '@/lib/active-filters';
 import { getDictionary } from '@/lib/translation';
-import { getClinics, supabase } from '@/lib/supabase';
+import {getClinicListForPage} from '@/lib/public-clinic-reads';
+import { supabase } from '@/lib/supabase';
 import { SITE_URL, clinicPath, serializeJsonLd } from '@/lib/site';
 import ClinicSearchClient from '@/components/ClinicSearchClient';
 import {clinicRegion} from '@/lib/clinic-region';
@@ -81,7 +82,7 @@ export default async function SearchPage({ params, searchParams }: Props) {
   let clinics: any[] = [];
   let failed = false;
   try {
-    clinics = weekend ? await weekendQuery(supabase,{categorySlug:params.department,locationSlug:params.location,query,specialist,registered,weekend,limit:PAGE_SIZE+1,radius,offset}) : await getClinics({ categorySlug: params.department, locationSlug: params.location, query, specialist, registered, limit: PAGE_SIZE+1, radius, offset });
+    clinics = weekend ? await weekendQuery(supabase,{categorySlug:params.department,locationSlug:params.location,query,specialist,registered,weekend,limit:PAGE_SIZE+1,radius,offset}) : await getClinicListForPage({ categorySlug: params.department, locationSlug: params.location, query, specialist, registered, limit: PAGE_SIZE+1, radius, offset });
   } catch { failed = true; }
   // Collapse repeated imported profiles in the displayed batch without modifying source data.
   const seen = new Set<string>();
