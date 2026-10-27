@@ -1,3 +1,4 @@
+import {applyClassification,isFocusCategory} from './clinic-classification';
 import { createClient } from '@supabase/supabase-js';
 import { searchTerms } from './search';
 import { regionAddresses, addressFilter, scopedLocationIds, extractRegion } from './regions';
@@ -131,11 +132,11 @@ export async function getClinics(params?: { categorySlug?: string, locationSlug?
   if (params?.query?.trim() && searchTerms(params.query).length === 0) return [];
   const station = stationForSlug(params?.locationSlug || '');
   if (station) {
-    const { data, error } = await supabase.rpc(params?.registered?'nearby_registered_clinics_page':params?.offset!==undefined?'nearby_clinics_page':'nearby_clinics', {
+    const { data, error } = await supabase.rpc(isFocusCategory(params?.categorySlug||'all')?(params?.registered?'nearby_registered_clinics_page_v2':'nearby_clinics_page_v2'):(params?.registered?'nearby_registered_clinics_page':params?.offset!==undefined?'nearby_clinics_page':'nearby_clinics'), {
       station_ids: station.stations.map(s => s.id), radius_m: params?.radius || 1000,
       category_slug: params?.categorySlug || 'all', search_query: searchTerms(params?.query || '').join(' '),
       specialist_only: params?.specialist || false, result_limit: params?.limit || 100,
-      ...(params?.offset!==undefined||params?.registered?{result_offset:params?.offset||0}:{}),
+      ...(params?.offset!==undefined||params?.registered||isFocusCategory(params?.categorySlug||'all')?{result_offset:params?.offset||0}:{}),
     });
     if (error) throw new Error('Unable to load clinics near this station');
     return (data || []).map((clinic: any) => ({ ...clinic, station_name: station.name_en }));
@@ -150,10 +151,8 @@ export async function getClinics(params?: { categorySlug?: string, locationSlug?
 
   let query = supabase.from('clinics').select('*, categories!inner(*), locations!inner(*)');
   
-  if (params?.categorySlug && params.categorySlug !== 'all') {
-    query = query.contains('departments', JSON.stringify([{slug:params.categorySlug}]));
-  }
-  
+  query=applyClassification(query,params?.categorySlug,params?.specialist);
+
   if (addressPrefixes) {
     query = query.or(addressFilter(addressPrefixes));
   } else if (locationIds.length > 0) {
@@ -167,11 +166,7 @@ export async function getClinics(params?: { categorySlug?: string, locationSlug?
   }
   // A nonempty query consisting only of punctuation cannot become an unfiltered search.
   if (params?.query?.trim() && terms.length === 0) return [];
-  if (params?.specialist) {
-    query = params.categorySlug && params.categorySlug !== 'all'
-      ? query.contains('specialist_slugs', [params.categorySlug])
-      : query.eq('has_specialist', true).not('department_source','is',null);
-  }
+
 
   if(params?.registered){
     query=query.contains('foreign_patient_registration',{status:'listed'}).filter('foreign_patient_registration->>source_date','match','^[0-9]{4}-[0-9]{2}-[0-9]{2}$');
