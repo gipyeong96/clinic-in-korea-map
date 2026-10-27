@@ -11,7 +11,7 @@ import React from 'react';
 import { SITE_URL, clinicPath, serializeJsonLd, canonicalClinicId } from '@/lib/site';
 import Link from 'next/link';
 import { notFound, permanentRedirect } from 'next/navigation';
-import { getClinicById } from '@/lib/supabase';
+import {getClinicByIdForPage} from '@/lib/public-clinic-reads';
 import { getDictionary } from '@/lib/translation';
 import { MapPin, Phone, Clock, Star, ShieldCheck, Info } from 'lucide-react';
 import { clinicFocus, groupedDepartments } from '@/lib/clinic-evidence';
@@ -39,7 +39,7 @@ interface ClinicDetailProps {
 }
 
 export async function generateMetadata({ params }: ClinicDetailProps) {
-  const clinic = await getClinicById(params.id);
+  const clinic = await getClinicByIdForPage(params.id);
   if (!clinic) return { title: 'Clinic Not Found' };
 
   return {
@@ -58,7 +58,7 @@ export default async function ClinicDetail({ params, searchParams }: ClinicDetai
     const back=searchReturnPath(searchParams.returnTo);
     permanentRedirect(`/clinics/detail/${canonicalId}${back?'?'+new URLSearchParams({returnTo:back}):''}`);
   }
-  const clinic = await getClinicById(params.id);
+  const clinic = await getClinicByIdForPage(params.id);
   if (!clinic) return notFound();
 
   const region=clinicRegion(clinic);

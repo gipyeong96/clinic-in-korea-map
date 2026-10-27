@@ -13,7 +13,7 @@ test('exact verified aliases share canonical paths, branch guides and Google pla
 test('all known detail identifiers resolve the same public evidence and verified branch contact without DB mutation',async()=>{
  let current='',fail=false;const calls=[];
  const client={from:table=>{assert.equal(table,'clinics');return {select:()=>({eq:(field,value)=>{calls.push([field,value]);current=value;return {single:async()=>fail?{data:null,error:{}}:{data:{id:'public-record',hira_code:current,department_source:{provider:'HIRA',as_of:'2026-06-30'},departments:[{slug:'urology',name_en:'Urology',specialist_count:3}],foreign_patient_registration:{status:'listed',source_date:'2026-07-21'},telephone:'incomplete',name_en:'generic source name'},error:null}};}})};}};
- const api=load('lib/supabase.ts',{'./search':{},'./regions':{},'./stations':{},'./site':site,'./goldman':goldman,'@supabase/supabase-js':{createClient:()=>client}});
+ const api=load('lib/supabase.ts',{'./clinic-list-select':load('lib/clinic-list-select.ts'),'./search':{},'./regions':{},'./stations':{},'./site':site,'./goldman':goldman,'@supabase/supabase-js':{createClient:()=>client}});
  for(const record of site.unifiedClinicRecords){
   for(const id of [record.id,...record.aliases,record.hira]){const c=await api.getClinicById(id);assert.equal(c.id,record.id);assert.equal(c.telephone,goldman.goldmanBranch(record.id).phone);assert.equal(c.departments[0].specialist_count,3);assert.equal(c.department_source.provider,'HIRA');assert.equal(c.premium_data.website,goldman.GOLDMAN_ENGLISH_URL);assert.deepEqual(calls.at(-1),['hira_code',record.hira]);}
  }

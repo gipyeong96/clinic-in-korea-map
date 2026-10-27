@@ -1,3 +1,4 @@
+import {CLINIC_LIST_SELECT} from './clinic-list-select';
 import { createClient } from '@supabase/supabase-js';
 import { searchTerms } from './search';
 import { regionAddresses, addressFilter, scopedLocationIds, extractRegion } from './regions';
@@ -148,7 +149,7 @@ export async function getClinics(params?: { categorySlug?: string, locationSlug?
     if(!locationIds.length)return [];
   }
 
-  let query = supabase.from('clinics').select('*, categories!inner(*), locations!inner(*)');
+  let query = supabase.from('clinics').select(CLINIC_LIST_SELECT);
   
   if (params?.categorySlug && params.categorySlug !== 'all') {
     query = query.contains('departments', JSON.stringify([{slug:params.categorySlug}]));
