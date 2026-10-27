@@ -368,9 +368,26 @@ test('registration filter survives navigation and can be removed independently',
 test('English urology regions share explicit area/station intent and retain keyword qualifiers',()=>{
  const cases=[['seoul urology clinic','seoul'],['gangnam urology clinic','gangnam'],['incheon urology clinic','incheon'],['jamsil urology clinic','jamsil-station'],['jamsil-dong urology clinic','jamsil'],['seocho urology clinic','area-seoul-seocho-gu'],['dongtan urology clinic','dongtan'],['seoul station urology clinic','seoul-station']];
  for(const [q,slug] of cases){assert.equal(search.homeSearchPath(q),'/clinics/urology/'+slug);assert.equal(search.urologySearchChoice(q).href,search.homeSearchPath(q));}
- assert.equal(search.homeSearchPath('guwol-dong urology clinic'),'/clinics/urology/area-incheon-namdong-gu?q='+encodeURIComponent('구월동'));
+ assert.equal(search.homeSearchPath('guwol-dong urology clinic'),'/clinics/urology/guwol-dong');
  assert.equal(search.homeSearchPath('Goldman urology Jamsil'),'/clinics/urology/jamsil-station?q=goldman');
  assert.equal(search.homeSearchPath('Jamsil-dong dentistry'),'/clinics/dentistry/jamsil');
  assert.equal(search.urologySearchChoice('urology near me'),undefined);
  assert.equal(search.homeSearchPath('urology near me'),'/nearby?department=urology');
+});
+
+test('Guwol fixed comparison preserves qualifiers and applies exact address scope before pagination',async()=>{
+ for(const q of ['guwol urology clinic','guwol-dong urology clinic','urologist in Guwol dong Incheon'])assert.equal(search.homeSearchPath(q),'/clinics/urology/guwol-dong');
+ assert.equal(search.homeSearchPath('Goldman urology Guwol-dong'),'/clinics/urology/guwol-dong?q=goldman');
+ assert.equal(search.urologySearchChoice('guwol-dong urology clinic').href,'/clinics/urology/guwol-dong');
+ const {calls,api}=database();await api.getClinics({locationSlug:'guwol-dong',categorySlug:'urology',limit:26,offset:25});
+ const scope=calls.find(c=>c[0]==='or')[1];
+ assert(scope.includes('인천광역시 남동구 % (구월동,'));assert(scope.includes('인천 남동구 % (구월동)'));
+ assert(!calls.some(c=>c[0]==='location-eq'||c[0]==='in'));
+ assert(calls.findIndex(c=>c[0]==='or')<calls.findIndex(c=>c[0]==='range'));
+ const matches=address=>regions.regionAddresses['guwol-dong'].some(p=>new RegExp('^'+(p+'%').replace(/[.*+?^${}()|[\]\\]/g,'\\$&').replace(/%/g,'.*')+'$').test(address));
+ assert(matches('인천광역시 남동구 예술로 138, (구월동, 이토타워)'));
+ assert(matches('인천 남동구 예술로 138, (구월동)'));
+ assert(!matches('인천광역시 남동구 구월동의원로 1, (만수동)'));
+ assert(!matches('서울특별시 남동구 예술로 138, (구월동)'));
+ assert(!matches('인천광역시 남동구 예술로 138, (구월동산)'));
 });

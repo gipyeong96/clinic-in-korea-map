@@ -17,3 +17,10 @@ test('Jamsil-dong is not expanded to include Sincheon partner and branch metadat
  assert.equal(d.goldmanSearchMetadata('unrelated-clinic'),undefined);
  for(const id of ids)assert(d.urologyAreas[d.goldmanComparison[id]]);
 });
+
+test('every regional comparison has a short choice guide and Guwol has its own crawlable link',()=>{
+ for(const slug of Object.keys(d.urologyAreas)){assert(d.urologyChoiceGuides[slug]?.question);assert(d.urologyChoiceGuides[slug]?.answer);}
+ assert(d.urologyAreaLinks.some(([slug])=>slug==='guwol-dong'));
+ assert(d.urologyAreaLinks.some(([slug])=>slug==='area-incheon-namdong-gu'));
+ assert.deepEqual(d.urologyAreas['guwol-dong'].branches,['goldman-incheon']);
+});

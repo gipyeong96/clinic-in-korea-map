@@ -27,6 +27,8 @@ export const regionAddresses: Record<string, string[]> = {
   ulsan: ['울산광역시 ', '울산 '],
   jeju: ['제주특별자치도 ', '제주도 ', '제주 '],
   incheon: ['인천광역시 ', '인천 '],
+  // Match the address neighbourhood, not a clinic name or a similarly named dong.
+  'guwol-dong': ['인천광역시 남동구 ', '인천 남동구 '].flatMap(prefix=>[`${prefix}% (구월동,`,`${prefix}% (구월동)`]),
   jamsil: ['서울특별시 송파구 % (잠실', '서울 송파구 % (잠실'],
   dongtan: ['경기도 화성시 % (동탄', '경기도 화성시 동탄', '경기 화성시 동탄'],
 };
