@@ -1,0 +1,31 @@
+EMERGENCY DIRECTORY FIRST RELEASE — 2026-10-28
+
+Included
+- /emergency, home shortcut and canonical sitemap entry.
+- Official NMC snapshot: 532 unique institutions in all 17 provinces/cities, retrieved 2026-10-28 17:57 KST. This is a checked snapshot, not live open/acceptance information.
+- Exact HPID identities; original Korean institution names, Korean addresses and official classifications. English region/type labels are navigation translations, not a claim of English clinical service.
+- Province, Korean district/city and official-type filters. 20 records/page, Korean name order, without clinical or commercial ranking.
+- Recorded emergency telephone and separately labelled main switchboard where different. Telephone link formatting verified; staff availability and phone reachability were not independently tested.
+- Directions using the institution's official coordinates, with no user coordinates in the URL.
+- Visible 119 ambulance guidance with KTO source. Tests never place a real call.
+- Empty/invalid-filter recovery and source/check time. Failed/incomplete imports leave previous data untouched; unknown categories, IDs, coordinates and large count drops require review.
+
+Explicitly excluded / deferred
+1. Live available beds: source coverage and freshness differ from institution lists; bed count cannot guarantee patient acceptance. No live API calls from this page.
+2. Critical-condition acceptance and institution messages: not shown or interpreted; first release is contact/location discovery, not acceptance prediction.
+3. Symptom triage, diagnosis, first-aid instruction generation and treatment/provider recommendation: no symptom collection or clinical decision system.
+4. GPS/near-me permission, geolocation collection and distance sorting: region selection only. Existing ordinary-clinic nearby functionality is unchanged.
+5. English-support/interpretation filters and automatic English hospital-name translations: not verified from this official list. Original Korean names/categories retained.
+6. Sponsored sorting/Goldman cards inside emergency results: commercial affiliation does not establish emergency capability. Existing Goldman cards and exact eligible-result priority in the ordinary clinic directory stay unchanged.
+7. Nationwide regular hours/weekend and HIRA condition expansion: separate later phases, not inferred from this NMC snapshot. Existing provider and condition data untouched.
+8. WordPress main-site edits: explicitly out of scope under user instruction.
+9. Automatic scheduled refresh/monitoring: no scheduler created. Refresh script is operator-run, validates before replacement, followed by tests/build/deployment. The browser receives no NMC credential; production needs no new secret for this bundled snapshot release.
+10. New health/search/location analytics, inquiry forms, uploads, appointments or contact messages: not added. Existing GA ID and coarse synthetic measurement paths remain unchanged; /emergency uses existing 'other' page group. No record IDs, region filter values, medical terms or personal location added to payloads.
+11. Maps embedded on the page, dedicated institution profiles, pharmacy/AED directories: not part of this first release.
+
+Data and operation
+Source: https://www.data.go.kr/data/15000563/openapi.do
+119/English assistance wording: https://english.visitkorea.or.kr/svc/contents/contentsView.do?vcontsId=248145
+NMC class counts: G00144, G006139, G007233, G009116. G009 is 'reported ER operating institution', not a designated emergency medical center.
+Refresh: python scripts/refresh-emergency-directory.py (NMC_SERVICE_KEY from local private configuration), or --input a previously verified official baseline. Never print/commit a key or authenticated URL. Validate record changes, run tests/build and deploy; do not imply snapshot changed simply by changing check date.
+No database migrations/deletions, existing record resets, GA identifier changes or existing sponsorship changes.

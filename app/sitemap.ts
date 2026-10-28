@@ -15,6 +15,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const departments = ['all', 'urology', 'dentistry', 'internal-medicine', 'dermatology', 'plastic-surgery'];
   const locations = ['all', 'gangnam', 'seoul-station', 'gangnam-station', 'jamsil-station', 'jamsil', 'incheon', 'dongtan', 'busan', 'daegu', 'daejeon', 'gwangju', 'ulsan', 'jeju'];
   return [
+    {url:`${SITE_URL}/emergency`,priority:0.7},
     ...urologyAreaLinks.filter(([slug])=>!locations.includes(slug)).map(([slug])=>({url:`${SITE_URL}/clinics/urology/${slug}`,priority:0.8})),
     ...conditionGuides.map(g=>({url:`${SITE_URL}${conditionGuidePath(g.condition)}`,priority:0.6})),
     {url:`${SITE_URL}/conditions`,priority:0.6},

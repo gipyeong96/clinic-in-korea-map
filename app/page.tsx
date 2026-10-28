@@ -77,6 +77,7 @@ export default function HomePage({ params }: HomePageProps) {
       </section>
 
       <div className="max-w-6xl mx-auto px-4">
+        <Link href="/emergency" className="flex min-h-11 items-center justify-between gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-900"><span>Emergency rooms in Korea</span><span aria-hidden="true">→</span></Link>
         <nav aria-label="Choose how to find a clinic" className="grid grid-cols-3 gap-2 sm:gap-4">{[
           {id:'station-search',label:'By station',Icon:TrainFront,tone:'bg-blue-50 text-blue-800 border-blue-200',hint:'Near a rail stop'},
           {id:'area-search',label:'By area',Icon:MapPin,tone:'bg-emerald-50 text-emerald-800 border-emerald-200',hint:'Choose a city'},
