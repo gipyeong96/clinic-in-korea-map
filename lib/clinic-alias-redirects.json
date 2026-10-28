@@ -1,0 +1,102 @@
+[
+  {
+    "source": "/clinics/detail/a48f738d-b360-4121-8b85-d49c15889baf",
+    "destination": "/clinics/detail/goldman-gangnam",
+    "permanent": true
+  },
+  {
+    "source": "/clinics/detail/85ed27c9-0b6e-45c6-81ee-5d81fe36a2fc",
+    "destination": "/clinics/detail/goldman-gangnam",
+    "permanent": true
+  },
+  {
+    "source": "/clinics/detail/e5d6e98f-98b5-498f-b6ec-cc50f560ebe5",
+    "destination": "/clinics/detail/goldman-gangnam",
+    "permanent": true
+  },
+  {
+    "source": "/clinics/detail/JDQ4MTg4MSM1MSMkMiMkNCMkMDAkNTgxOTYxIzExIyQxIyQzIyQ5OSQzNjE4MzIjNjEjJDEjJDQjJDgz",
+    "destination": "/clinics/detail/goldman-gangnam",
+    "permanent": true
+  },
+  {
+    "source": "/clinics/detail/013294ef-1ab5-45e9-a4f1-068c38cc5553",
+    "destination": "/clinics/detail/goldman-seoulyeok",
+    "permanent": true
+  },
+  {
+    "source": "/clinics/detail/9cd4a930-5820-4ac0-8081-444ac1cca448",
+    "destination": "/clinics/detail/goldman-seoulyeok",
+    "permanent": true
+  },
+  {
+    "source": "/clinics/detail/fc5c4dae-aeed-4492-9f46-0295d5df3ad8",
+    "destination": "/clinics/detail/goldman-seoulyeok",
+    "permanent": true
+  },
+  {
+    "source": "/clinics/detail/JDQ4MTg4MSM1MSMkMiMkNCMkMDAkNTgxOTYxIzIxIyQxIyQ5IyQwMyQ0NjEwMDIjNDEjJDEjJDgjJDgz",
+    "destination": "/clinics/detail/goldman-seoulyeok",
+    "permanent": true
+  },
+  {
+    "source": "/clinics/detail/1abfbc12-0679-4897-8b0d-398a8633c145",
+    "destination": "/clinics/detail/goldman-incheon",
+    "permanent": true
+  },
+  {
+    "source": "/clinics/detail/13ebcee5-2afd-4917-a484-60a5a38d9f0e",
+    "destination": "/clinics/detail/goldman-incheon",
+    "permanent": true
+  },
+  {
+    "source": "/clinics/detail/d28d025c-eee5-4c0d-ae89-4ea824eaa623",
+    "destination": "/clinics/detail/goldman-incheon",
+    "permanent": true
+  },
+  {
+    "source": "/clinics/detail/JDU4MTI3MSM1MSMkMiMkMCMkMDAkNDgxNzAyIzExIyQyIyQzIyQwMCQzNjE4MzIjNjEjJDEjJDgjJDgz",
+    "destination": "/clinics/detail/goldman-incheon",
+    "permanent": true
+  },
+  {
+    "source": "/clinics/detail/58364127-19b7-4f35-bacf-4f62a0d4ef7e",
+    "destination": "/clinics/detail/goldman-dongtan",
+    "permanent": true
+  },
+  {
+    "source": "/clinics/detail/6f05a9f6-9d3a-4a8e-98a1-ce1a211f4c55",
+    "destination": "/clinics/detail/goldman-dongtan",
+    "permanent": true
+  },
+  {
+    "source": "/clinics/detail/bd44562e-af8c-407a-8c0b-22b95c8e81ee",
+    "destination": "/clinics/detail/goldman-dongtan",
+    "permanent": true
+  },
+  {
+    "source": "/clinics/detail/JDU4MTI3MSM1MSMkMiMkMCMkMDAkNTgxMzUxIzExIyQxIyQ3IyQ4OSQzNjEwMDIjNzEjJDEjJDgjJDgz",
+    "destination": "/clinics/detail/goldman-dongtan",
+    "permanent": true
+  },
+  {
+    "source": "/clinics/detail/c1072301-45cc-4fe4-9d88-0538511d3df8",
+    "destination": "/clinics/detail/goldman-jamsil",
+    "permanent": true
+  },
+  {
+    "source": "/clinics/detail/0018c959-9e0a-4858-b27c-9f19a803a15a",
+    "destination": "/clinics/detail/goldman-jamsil",
+    "permanent": true
+  },
+  {
+    "source": "/clinics/detail/3327f0c8-252b-4c3f-99ef-ab6fee61ec79",
+    "destination": "/clinics/detail/goldman-jamsil",
+    "permanent": true
+  },
+  {
+    "source": "/clinics/detail/JDQ4MTg4MSM1MSMkMiMkOCMkMDAkMzgxMzUxIzMxIyQyIyQ3IyQwMCQyNjEyMjIjNjEjJDEjJDAjJDgz",
+    "destination": "/clinics/detail/goldman-jamsil",
+    "permanent": true
+  }
+]

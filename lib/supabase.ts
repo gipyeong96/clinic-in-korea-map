@@ -192,11 +192,12 @@ export async function getClinics(params?: { categorySlug?: string, locationSlug?
   return data || [];
 }
 
-export async function getClinicById(id: string) {
+export async function getClinicById(id: string, options:{throwOnError?:boolean}={}) {
   const record=unifiedClinicRecord(id);
   if(record){
     const fallback=mockClinics.find(c=>c.id===record.id)||additionalGoldmanClinic(record.id);
-    const {data}=await supabase.from('clinics').select('*, categories(*), locations(*)').eq('hira_code',record.hira).single();
+    const {data,error}=await supabase.from('clinics').select('*, categories(*), locations(*)').eq('hira_code',record.hira).single();
+    if(error&&options.throwOnError&&error.code!=='PGRST116')throw new Error('Unable to refresh clinic profile');
     // Public evidence stays attached to its original source. Branch contact and
     // visit details come from the verified English branch directory.
     return {...fallback,...data,id:record.id,hira_code:record.hira,name_en:fallback.name_en,name_ko:fallback.name_ko,
@@ -218,6 +219,8 @@ export async function getClinicById(id: string) {
   }
   const { data, error } = await query.single();
   if (error) {
+    // ISR must retain the last good page on outages, never replace it with 404.
+    if(options.throwOnError&&error.code!=='PGRST116')throw new Error('Unable to refresh clinic profile');
     console.error('Supabase getClinicById error:', error);
     return null;
   }

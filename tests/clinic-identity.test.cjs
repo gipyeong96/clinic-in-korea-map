@@ -18,6 +18,17 @@ test('all known detail identifiers resolve the same public evidence and verified
   for(const id of [record.id,...record.aliases,record.hira]){const c=await api.getClinicById(id);assert.equal(c.id,record.id);assert.equal(c.telephone,goldman.goldmanBranch(record.id).phone);assert.equal(c.departments[0].specialist_count,3);assert.equal(c.department_source.provider,'HIRA');assert.equal(c.premium_data.website,goldman.GOLDMAN_ENGLISH_URL);assert.deepEqual(calls.at(-1),['hira_code',record.hira]);}
  }
  fail=true;const fallback=await api.getClinicById('goldman-gangnam');assert.equal(fallback.department_source,undefined);assert.equal(fallback.departments,undefined);assert.equal(fallback.telephone,'02-556-7533');
+ await assert.rejects(api.getClinicById('goldman-gangnam',{throwOnError:true}),/Unable to refresh clinic profile/);
+ await assert.rejects(api.getClinicById('unknown-profile',{throwOnError:true}),/Unable to refresh clinic profile/);
+});
+
+test('edge redirects preserve all existing identities without consuming the navigation query',async()=>{
+ const config=require('../next.config.js');const redirects=await config.redirects();
+ const expected=site.unifiedClinicRecords.flatMap(r=>[...r.aliases,r.hira].map(id=>({source:'/clinics/detail/'+id,destination:'/clinics/detail/'+r.id,permanent:true})));
+ assert.deepEqual(redirects.filter(r=>r.source.startsWith('/clinics/detail/')),expected);
+ assert(redirects.some(r=>r.source==='/en/:path*'));assert(redirects.some(r=>r.source==='/mn/:path*'));
+ // No query in destination: Next forwards existing returnTo automatically.
+ assert(expected.every(r=>!r.destination.includes('?')));
 });
 
 test('same-page dedup prefers HIRA evidence while preserving first anchor, order, other clinics and source input',()=>{
