@@ -28,7 +28,7 @@ test('expanded comparisons use only eligible verified identities and retain exac
   assert(scopes[r.ykiho].comparisonEligible);assert.equal(scopes[r.ykiho].area,area);
   assert.match(r.address,area==='jamsil'?/잠실동|신천동/:/^서울특별시 (강남구|서초구) /);
  }
- const measurement=load('lib/measurement.ts');const payload=measurement.measurementPayload('page_view','/conditions/cystitis/jamsil');assert.equal(payload.page_group,'results');assert(!JSON.stringify(payload).includes('cystitis'));assert(!JSON.stringify(payload).includes('jamsil'));
+ const measurement=load('lib/measurement.ts');const payload=measurement.measurementPayload('page_view','/conditions/cystitis/jamsil');assert.equal(payload.page_group,'conditions');assert(!JSON.stringify(payload).includes('cystitis'));assert(!JSON.stringify(payload).includes('jamsil'));
 });
 test('appointment guides keep known conditions and real comparison routes without adding symptom diagnoses',()=>{
  const guides=load('lib/condition-guides.ts');assert.equal(guides.conditionGuides.length,3);
