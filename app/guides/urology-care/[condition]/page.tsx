@@ -5,11 +5,12 @@ import {conditionCatalog,conditionAreas,conditionPath} from '@/lib/condition-sea
 import {conditionMatches} from '@/lib/condition-pages';
 import {conditionSource} from '@/lib/hira-conditions';
 import {SITE_URL,serializeJsonLd} from '@/lib/site';
+import BphPlanningGuide from '@/components/BphPlanningGuide';
 type Props={params:{condition:string}};
 function guide(props:Props){const g=conditionGuides.find(g=>g.condition===props.params.condition);if(!g)notFound();return g;}
 export function generateStaticParams(){return conditionGuides.map(g=>({condition:g.condition}));}
 export function generateMetadata(props:Props){const g=guide(props);return {title:g.title,description:g.intro,alternates:{canonical:`${SITE_URL}${conditionGuidePath(g.condition)}`}};}
-export default function ConditionGuide(props:Props){const g=guide(props),c=conditionCatalog.find(c=>c.slug===g.condition)!;return <article className="max-w-3xl mx-auto px-4 py-8 space-y-6 break-words">
+export default function ConditionGuide(props:Props){const g=guide(props),c=conditionCatalog.find(c=>c.slug===g.condition)!;if(g.condition==='bph')return <BphPlanningGuide guide={g}/>;return <article className="max-w-3xl mx-auto px-4 py-8 space-y-6 break-words">
  <Link className="inline-flex min-h-11 items-center underline" href="/guides">← Care guides</Link><header className="space-y-3"><h1 className="text-3xl font-bold">{g.title}</h1><p className="text-sm text-slate-500">Clinic in Korea editorial team · Updated {conditionGuideUpdated} · Patient navigation guide; not medically reviewed.</p><p className="text-lg">{g.intro}</p></header>
  <nav aria-label="Compare condition records by area" className="grid sm:grid-cols-2 gap-3">{conditionAreas.map(a=><Link key={a.slug} href={conditionPath(g.condition,a.slug)} className="rounded-lg border bg-white p-4"><strong className="block">{c.name} · {a.name}</strong><span className="block text-sm">{conditionMatches(g.condition,a.slug).length} verified records · {a.scope}</span><span className="inline-flex min-h-11 items-center underline">View source dates and profiles →</span></Link>)}</nav>
  <section className="space-y-3"><h2 className="text-xl font-bold">What does this condition label tell me?</h2><p>{g.clinical}</p><p>{c.note}</p><p className="text-sm">General information reference: <a className="underline" href={g.source}>NHS condition information</a>. It provides clinical context, not Korean clinic availability; UK service numbers and access arrangements do not apply in Korea.</p></section>
