@@ -1,6 +1,7 @@
 // Only local search pages can be used as return destinations. Never accept an
 // arbitrary URL from a detail-page query parameter.
 export function searchReturnPath(value:unknown):string|null {
+  if(typeof value==='string'&&/^\/nearby\?resume=1(?:#clinic-card-[a-zA-Z0-9-]+)?$/.test(value))return value;
   if(typeof value!=='string'||value.length>2000||!value.startsWith('/clinics/'))return null;
   try {
     const url=new URL(value,'https://clinic.invalid');

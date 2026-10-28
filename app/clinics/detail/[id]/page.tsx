@@ -159,7 +159,7 @@ export default async function ClinicDetail({ params }: ClinicDetailProps) {
                 </span>
                 {isPremium && (
                   <span className="flex items-center gap-1 text-xs font-bold px-2 py-1 bg-amber-100 text-amber-700 rounded">
-                    <Star className="w-3 h-3" /> Premium Verified
+                    <Star className="w-3 h-3" /> Partner clinic
                   </span>
                 )}
                 {departments.some(d=>d.specialists>0) && (
@@ -171,35 +171,38 @@ export default async function ClinicDetail({ params }: ClinicDetailProps) {
               
               <h1 className="text-2xl sm:text-3xl font-black text-slate-900 mb-1 break-words">{name}</h1>
               <h2 className="text-sm font-medium text-slate-500">{clinic.name_ko}</h2>
-              <RegistrationBadge clinic={clinic} detailed />
+              <RegistrationBadge clinic={clinic} />
+              {isPremium&&<p className="mt-2 text-xs text-slate-600">Commercial relationship · not a clinical certification.{branch?' Clinic in Korea has a consulting relationship with Goldman.':''}</p>}
             </div>
           </div>
           
           {isPremium && pd.slogan_en && (
-            <p className="mt-6 text-lg font-medium text-slate-700 italic border-l-4 border-amber-400 pl-4">
+            <details className="mt-3 text-sm"><summary className="min-h-11 cursor-pointer py-3 font-semibold">Clinic introduction</summary><p className="text-slate-700 border-l-4 border-amber-400 pl-4">
               "{pd.slogan_en}"
-            </p>
+            </p></details>
           )}
         </section>
 
-        {comparison&&<aside aria-label="Local urology comparison" className="rounded-xl border border-blue-200 bg-blue-50 p-4 space-y-2 text-sm">
-          {branch&&<><p className="font-semibold">Goldman {branch.name} visit overview</p><p>{branch.address} · {branch.transit}</p><p className="text-xs text-slate-600">Partner clinic · Clinic in Korea has a consulting relationship with Goldman.</p></>}
-          <a href={'/clinics/urology/'+comparison} className="min-h-11 inline-flex items-center font-semibold underline">{urologyAreas[comparison].title} →</a>
-          <p>Explore other clinic records, reported specialists and contact details before choosing where to visit.</p>
-        </aside>}
         <section id="visit-details" className="scroll-mt-24 bg-white rounded-2xl border border-blue-200 p-4 sm:p-6 space-y-3" aria-label="Plan your visit">
           <h2 className="flex items-center gap-2 text-xl font-bold text-slate-900"><MapPin aria-hidden="true" className="h-5 w-5 text-blue-700"/>Plan your visit</h2>
           <p className="text-sm font-medium select-all">{address||'Address not provided'}</p>
-          {nearest&&<div className="rounded-lg bg-slate-50 p-3 space-y-1 text-sm"><Link href={`/clinics/${focusSlug}/${nearest.slug}`} className="inline-flex min-h-11 items-center underline font-semibold">Nearby station: {nearest.name}</Link><p>{Math.round(nearest.distance).toLocaleString()} m straight-line distance · official station coordinates</p><InlineHelp label="About this distance">Distance is measured from official station coordinates, not an exit or walking route.</InlineHelp></div>}
           <ClinicContact clinic={clinic} />
+          {nearest&&<div className="rounded-lg bg-slate-50 p-3 space-y-1 text-sm"><Link href={`/clinics/${focusSlug}/${nearest.slug}`} className="inline-flex min-h-11 items-center underline font-semibold">Nearby station: {nearest.name}</Link><p>{Math.round(nearest.distance).toLocaleString()} m straight-line distance · official station coordinates</p><InlineHelp label="About this distance">Distance is measured from official station coordinates, not an exit or walking route.</InlineHelp></div>}
           <div className="flex flex-wrap items-start gap-3 border-t pt-3"><SaveClinic clinic={snapshot}/><ShareClinic name={name} url={`${SITE_URL}${clinicPath(clinic)}`}/></div>
           <Link href={clinicCorrectionLink(clinic.hira_code||String(clinic.id))} className="inline-flex min-h-11 items-center underline text-sm">Report incorrect information for this clinic</Link>
         </section>
 
         <nav aria-label="Clinic page sections" className="flex flex-wrap gap-2 text-sm"><a href="#visit-details" className="min-h-11 inline-flex items-center rounded-full border border-blue-200 bg-blue-50 px-4 font-semibold text-blue-900">Contact & directions</a><a href="#clinic-information" className="min-h-11 inline-flex items-center rounded-full border border-violet-200 bg-violet-50 px-4 font-semibold text-violet-900">Departments & clinic information</a></nav>
+        <details className="rounded-2xl border bg-white p-4 sm:p-6"><summary className="min-h-11 cursor-pointer py-2 text-lg font-bold">Reported hours & care information</summary><div className="space-y-4 pt-3">
         <ClinicWeekendHours id={clinic.hira_code||params.id} name={clinic.name_ko||''} address={clinic.address_ko||''} telephone={clinic.telephone||''}/>
         <ClinicConditions ykiho={clinic.hira_code||params.id} record={(conditionPilot as Record<string,unknown>)[clinic.hira_code||params.id]}/>
         <ContextualCareGuides department={focusSlug} location={region?.slug} stage="profile"/>
+        </div></details>
+        {comparison&&<aside aria-label="Local urology comparison" className="rounded-xl border border-blue-200 bg-blue-50 p-4 space-y-2 text-sm">
+          {branch&&<><p className="font-semibold">Goldman {branch.name} visit overview</p><p>{branch.address} · {branch.transit}</p><p className="text-xs text-slate-600">Partner clinic · Clinic in Korea has a consulting relationship with Goldman.</p></>}
+          <a href={'/clinics/urology/'+comparison} className="min-h-11 inline-flex items-center font-semibold underline">{urologyAreas[comparison].title} →</a>
+          <p>Explore other clinic records, reported specialists and contact details before choosing where to visit.</p>
+        </aside>}
         {(region||nearest)&&<section aria-label="Compare clinics in this area" className="rounded-xl border bg-white p-4 space-y-3 text-sm">
           <h2 className="font-bold">Compare clinics in this area</h2>
           <nav className="flex flex-wrap gap-2" aria-label="Nearby clinic comparison">
@@ -210,19 +213,17 @@ export default async function ClinicDetail({ params }: ClinicDetailProps) {
           <InlineHelp label="Area or station — what’s the difference?">Area results follow address boundaries. Station results use a straight-line radius and can cross neighbourhood boundaries. Save clinics from results to compare them in <Link className="underline" href="/my-clinics">My clinics</Link>.</InlineHelp>
         </section>}
 
+        {branch&&<details className="rounded-2xl border bg-white p-4 sm:p-6"><summary className="min-h-11 cursor-pointer py-2 text-lg font-bold">Partner visit guides & reviews</summary><div className="space-y-4 pt-3">
         <GoldmanVisitGuide clinicId={String(clinic.id)} />
         <GoldmanGoogleReviews key={String(clinic.id)} clinicId={String(clinic.id)} />
         <GoldmanCareGuide clinicId={String(clinic.id)} />
 
+        </div></details>}
+
         {/* Always-visible anchors keep the full evidence table accessible. */}
-        <section id="clinic-information" className="scroll-mt-24 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-          <div className="p-6 border-b border-slate-100">
-            <h2 className="text-xl font-bold flex items-center gap-2">
-              <Info className="w-5 h-5 text-slate-400" /> 
-              Clinic Information
-            </h2>
-          </div>
-          
+        <details id="clinic-information" className="scroll-mt-24 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+          <summary className="min-h-11 cursor-pointer p-5 text-lg font-bold">Departments, facilities & source details</summary>
+          <div className="px-5"><RegistrationBadge clinic={clinic} detailed /></div>
           <table className="clinic-info-table w-full text-sm text-left">
             <tbody className="divide-y divide-slate-100">
               {departments.length>0 && <tr><th scope="row" className="px-6 py-4 font-semibold text-slate-700 bg-slate-50/50">Reported departments</th><td className="px-6 py-4"><ul className="space-y-2">{departments.map(d=><li key={d.slug}><span className="font-medium">{d.name}</span><span className="text-slate-500"> · {d.specialists} specialist{d.specialists===1?'':'s'} recorded</span></li>)}</ul><p className="mt-3 text-xs text-slate-500">Clinic focus is a directory classification; reported departments and specialist counts are listed separately.</p>{clinic.department_source?.provider==='HIRA' && <p className="mt-2 text-xs text-slate-500"><a className="underline" href="https://opendata.hira.or.kr/op/opc/selectOpenData.do?sno=11925" target="_blank" rel="noreferrer">HIRA official data</a> · As of {clinic.department_source.as_of} · Checked {clinic.department_source.checked_at}</p>}</td></tr>}
@@ -260,7 +261,7 @@ export default async function ClinicDetail({ params }: ClinicDetailProps) {
               )}
             </tbody>
           </table>
-        </section>
+        </details>
 
       </div>
     </>

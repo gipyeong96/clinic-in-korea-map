@@ -10,5 +10,5 @@ export default function NearbyPage({searchParams}:{searchParams:Record<string,st
   initial.query=parsed.searchParams.get('q')||'';
   if(initial.department==='all')initial.department=parsed.searchParams.get('department')||'all';
  }
- return <div className="max-w-5xl mx-auto px-4 py-5 space-y-3 sm:py-8"><NearbySearch key={JSON.stringify(initial)} initial={initial}/></div>;
+ return <div className="max-w-5xl mx-auto px-4 py-5 space-y-3 sm:py-8"><NearbySearch key={JSON.stringify(initial)} initial={initial} resume={searchParams.resume==='1'}/></div>;
 }
