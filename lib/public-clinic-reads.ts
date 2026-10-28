@@ -5,7 +5,7 @@ import {urologyAreas} from './urology-discovery';
 import {PAGE_SIZE} from './pagination';
 
 // Request lifetime only: metadata and body share one detail read, including failures.
-export const getClinicByIdForPage=cache(getClinicById);
+export const getClinicByIdForPage=cache((id:string)=>getClinicById(id,{throwOnError:true}));
 
 // Only finite, public, unfiltered first-page comparisons use a shared data cache.
 // Search terms, filters, later pages and GPS never enter it. Failures throw rather
