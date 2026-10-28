@@ -7,7 +7,8 @@ import ResultSearchOptions from '@/components/ResultSearchOptions';
 import {registeredLocationLabel} from '@/lib/registered-location';
 import {nearbyAction} from '@/lib/nearby-copy';
 import ContextualCareGuides from '@/components/ContextualCareGuides';
-import {uniqueClinicProfiles} from '@/lib/site';
+import PartnerClinicCards from '@/components/PartnerClinicCards';
+import {prioritizeGoldman,goldmanProfileId,uniqueClinicProfiles} from '@/lib/site';
 import ResultDepartmentPicker from '@/components/ResultDepartmentPicker';
 import StationFinder from '@/components/StationFinder';
 import {nearbyStation} from '@/lib/card-location';
@@ -87,12 +88,12 @@ export default async function SearchPage({ params, searchParams }: Props) {
   // Collapse repeated imported profiles in the displayed batch without modifying source data.
   const seen = new Set<string>();
   const hasNext=clinics.length>PAGE_SIZE;
-  const filteredClinics = uniqueClinicProfiles(clinics.slice(0,PAGE_SIZE).filter(clinic => {
+  const filteredClinics = prioritizeGoldman(uniqueClinicProfiles(clinics.slice(0,PAGE_SIZE).filter(clinic => {
     const key = JSON.stringify([clinic.name_ko, clinic.address_ko?.replace(/\s/g, ''), clinic.telephone?.replace(/[^0-9]/g, '')]);
     if (seen.has(key)) return false;
     seen.add(key);
     return true;
-  }));
+  })));
   const { dept, loc } = await names(params.department, params.location);
   const weekendNotice=weekendCoverageCopy(weekendCoverage(params.location,loc,!!station));
   const withoutWeekend=searchLink(params.department,params.location,{query,specialist,registered,radius:station?radius:undefined});
@@ -114,7 +115,7 @@ export default async function SearchPage({ params, searchParams }: Props) {
       <h1 className="text-2xl md:text-3xl font-black break-words">{params.department==='dentistry'?`Dentists ${station?'near':'in'} ${station?stationHeading:loc}`:station ? `${params.department === 'all' ? 'Clinics' : `${dept} Clinics`} near ${stationHeading}` : `${dept} Clinics in ${loc}`}</h1>
       <a href={nearbySearchLink(params.department,{query,specialist,registered,weekend,radius:station?radius:undefined})} className="min-h-11 inline-flex items-center rounded-lg bg-slate-900 px-4 py-3 text-sm font-semibold text-white">{nearbyAction(params.department)}</a>
       {params.department==='urology'&&!failed&&filteredClinics.length>0&&<a href="#clinic-results" className="min-h-11 inline-flex items-center rounded-lg border border-blue-300 bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-900">View {filteredClinics.length} clinics{hasNext?' on this page':''} ↓</a>}
-      {params.department==='urology'&&page===1&&<UrologyDiscovery location={params.location} showPartners={!query&&!specialist&&!registered&&!weekend&&!searchParams.radius}/>}
+      {params.department==='urology'&&<UrologyDiscovery location={params.location} showPartners={true}/>}
       {params.department==='urology'&&['jamsil','jamsil-station'].includes(params.location)&&<section aria-label="Jamsil comparison search scope" className="rounded-xl border bg-white p-4 space-y-3 text-sm">
         <p>{station?<>Within <strong>{radius.toLocaleString()} m of Jamsil Station</strong> · Straight-line distance · May include Sincheon-dong and parts of Jamsil-dong.</>:<>Addresses in <strong>Jamsil-dong only</strong>. Use the station search for nearby Sincheon-dong.</>}</p>
         <details><summary className="min-h-11 py-3 cursor-pointer underline">Change area scope</summary>
@@ -133,10 +134,12 @@ export default async function SearchPage({ params, searchParams }: Props) {
         </nav>
         <details><summary className="min-h-11 py-3 cursor-pointer underline">How to compare clinics</summary><p>Save two or three clinics, then <a className="underline" href="/my-clinics">compare saved clinics</a> by reported specialists, registration, address and contact details. Registration does not confirm English support. Station searches sort by straight-line distance. <a className="underline" href="/guides/choose-urology-clinic-gangnam">Read the clinic selection checklist</a>.</p></details>
       </section>}
+      {!(params.department==='urology'&&urologyAreas[params.location])&&<PartnerClinicCards ids={filteredClinics.map(goldmanProfileId).filter((id):id is string=>!!id)}/>}
+      <p className="text-xs text-slate-600">Matching Goldman partner clinics appear first on each result page. Other results retain their existing order. Placement is not a clinical quality ranking.</p>
       {station && <div className="space-y-2 text-sm text-slate-600">
-        <p>{station.name_ko} · Within {radius.toLocaleString()} m · Nearest first</p>
+        <p>{station.name_ko} · Within {radius.toLocaleString()} m · Distance shown; matching Goldman partners first</p>
         <details><summary className="cursor-pointer underline">Station and distance details</summary><div className="space-y-2 py-2"><p>{station.city} · {station.stations.map(s => s.line).join(' / ')}</p>
-        <p>Within {radius.toLocaleString()} m · Nearest first · Straight-line distance, not walking distance. For interchanges, the nearest listed line coordinate is used.</p>
+        <p>Within {radius.toLocaleString()} m · Distance shown; matching Goldman partners first · Straight-line distance, not walking distance. For interchanges, the nearest listed line coordinate is used.</p>
         <details className="text-xs"><summary className="cursor-pointer underline">Official station sources and dates</summary><div className="space-y-1 py-2">{station.stations.map(s => <p key={s.id}>{s.line} · <a className="underline" href={s.source_url} target="_blank" rel="noreferrer">Official source</a> · Source record: {s.source_date}</p>)}<p>These are dated records, not a live timetable. Routes and train services may change. Source dates may be dataset or portal update dates.</p></div></details>
         </div></details>
 

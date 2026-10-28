@@ -11,6 +11,13 @@ export const unifiedClinicRecords=[
 ];
 export function unifiedClinicRecord(id:string){if(typeof id!=='string')return undefined;return unifiedClinicRecords.find(c=>c.id===id||c.hira===id||c.aliases.includes(id.toLowerCase()));}
 export function canonicalClinicId(id:string){return unifiedClinicRecord(id)?.id||id;}
+export function goldmanProfileId(clinic:{id?:string;hira_code?:string;ykiho?:string}){
+ return [clinic.id,clinic.hira_code,clinic.ykiho].map(id=>unifiedClinicRecord(id||'')).find(Boolean)?.id;
+}
+// Commercial priority only within the already eligible page. Never inject or drop records.
+export function prioritizeGoldman<T extends {id?:string;hira_code?:string;ykiho?:string}>(clinics:T[]):T[]{
+ return [...clinics.filter(c=>goldmanProfileId(c)),...clinics.filter(c=>!goldmanProfileId(c))];
+}
 
 // Deduplicate only verified branch identities within the already paginated page.
 // Keep the first result's anchor/order, preferring public evidence over managed data.

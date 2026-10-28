@@ -37,6 +37,7 @@ export default function ClinicCard({ clinic, selectedDepartment='all', onShowMap
   const name = clinicName(clinic);
   const address = cardAddress(clinic);
   const branch=goldmanBranch(String(clinic.id));
+  const isPartner=Boolean(branch)||clinic.is_premium;
   const nearby=clinic.card_station;
   const phone=clinicPhone(branch?.phone||clinic.telephone);
   const slogan = clinic.premium_data?.slogan_en;
@@ -50,7 +51,7 @@ export default function ClinicCard({ clinic, selectedDepartment='all', onShowMap
   return (
     <div 
       className={`min-w-0 break-words p-5 rounded-2xl border transition shadow-sm hover:shadow-md flex flex-col justify-between ${
-        clinic.is_premium 
+        isPartner
           ? 'bg-amber-50/50 border-amber-300 ring-1 ring-amber-300/30' 
           : 'bg-white border-slate-200'
       }`}
@@ -58,13 +59,13 @@ export default function ClinicCard({ clinic, selectedDepartment='all', onShowMap
       <div>
         <div className="flex justify-between items-start gap-2 mb-2">
           <span className={`text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full ${
-            clinic.is_premium 
+            isPartner
               ? 'bg-amber-100 text-amber-900'
               : 'bg-slate-100 text-slate-500'
           }`}>
-            {clinic.is_premium ? 'Partner clinic' : 'HIRA Public'}
+            {isPartner ? 'Partner clinic' : 'HIRA Public'}
           </span>
-          {clinic.is_premium&&<span className="text-xs text-slate-600">Commercial relationship · not a clinical certification</span>}
+          {isPartner&&<span className="text-xs text-slate-600">Commercial relationship · not a clinical certification</span>}
         </div>
 
         <Link href={detailHref} prefetch={false}>
@@ -89,7 +90,7 @@ export default function ClinicCard({ clinic, selectedDepartment='all', onShowMap
         {selected && <p className="flex items-start gap-2 text-sm text-slate-700 mb-2"><Stethoscope aria-hidden="true" className="h-4 w-4 shrink-0 mt-0.5"/>{selected.name} reported · {selected.specialists>0 ? `${selected.specialists} specialist${selected.specialists===1?'':'s'} reported` : 'No specialist recorded in this department'}</p>}
 
 
-        {clinic.is_premium && slogan && slogan!==branch?.transit && (
+        {isPartner && slogan && slogan!==branch?.transit && (
           <p className="text-xs italic text-slate-600 mb-4 line-clamp-2">
             "{slogan}"
           </p>
@@ -132,7 +133,7 @@ export default function ClinicCard({ clinic, selectedDepartment='all', onShowMap
           href={detailHref}
           prefetch={false}
           className={`min-h-11 flex-1 inline-flex items-center justify-center text-center py-2 rounded-lg text-sm font-semibold transition ${
-            clinic.is_premium
+            isPartner
               ? 'bg-amber-400 hover:bg-amber-300 text-slate-950'
             : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
           }`}
@@ -140,7 +141,7 @@ export default function ClinicCard({ clinic, selectedDepartment='all', onShowMap
           View Details
         </Link>
         {onShowMap&&hasClinicCoordinates(clinic)&&<button type="button" onClick={onShowMap} className="min-h-11 border rounded-lg px-3 py-2 text-sm font-semibold">Show on map</button>}
-        {(branch || (clinic.is_premium && clinic.premium_data?.website)) && (
+        {(branch || (isPartner && clinic.premium_data?.website)) && (
           <a
             href={branch?GOLDMAN_ENGLISH_URL:clinic.premium_data.website}
             target="_blank"
