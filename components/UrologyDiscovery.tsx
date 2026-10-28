@@ -1,12 +1,12 @@
 import {urologyAreas,urologyAreaLinks,urologyChoiceGuides} from '@/lib/urology-discovery';
-import {goldmanBranch,goldmanLocationUrl} from '@/lib/goldman';
+import PartnerClinicCards from '@/components/PartnerClinicCards';
 export default function UrologyDiscovery({location,showPartners}:{location:string;showPartners:boolean}){
  const area=urologyAreas[location];if(!area)return null;
  const guide=urologyChoiceGuides[location];
  return <section aria-label="Urology comparison and partner information" className="rounded-xl border border-blue-200 bg-white p-3 space-y-2 text-sm">
  <p className="text-slate-700">{area.scope}</p>
  {guide&&<details><summary className="cursor-pointer min-h-11 py-3 font-semibold">{guide.question}</summary><p>{guide.answer}</p><a className="inline-flex min-h-11 items-center underline" href={guide.href}>{guide.label} →</a><p className="py-2">Need English consultation or interpretation? Confirm arrangements with the exact clinic before booking. An English website or international-patient registration does not confirm language support.</p></details>}
- {showPartners&&area.branches.length>0&&<><p className="text-xs text-slate-600">Partner clinics · Goldman is a consulting client.</p><div className="grid gap-2 sm:grid-cols-2">{area.branches.map(id=>{const branch=goldmanBranch(id)!;return <article key={id} className="rounded-lg border border-amber-200 bg-amber-50/50 p-3 space-y-2"><h2 className="font-bold text-base"><a className="underline" href={'/clinics/detail/'+id}>Goldman Urology {branch.name}</a></h2><p className="text-xs text-slate-600">{branch.transit}</p><a className="inline-flex min-h-11 items-center rounded-lg bg-slate-900 px-3 text-white font-semibold" href={'/clinics/detail/'+id}>Branch details & contact →</a><details><summary className="cursor-pointer min-h-11 py-3 text-xs underline">Address & official English guide</summary><p>{branch.address}</p><a className="inline-flex min-h-11 items-center underline" href={goldmanLocationUrl(branch.tab)} target="_blank" rel="sponsored noopener noreferrer">Official English location guide ↗</a></details></article>})}</div></>}
+ {showPartners&&<PartnerClinicCards ids={area.branches}/>}
  <details><summary className="cursor-pointer min-h-11 py-3 font-semibold">Comparison tips & other areas</summary><p>Partner placement is separate from clinic results and is not a quality ranking.</p><p className="py-2">Check reported specialists, services, language support, fees and appointments directly with the clinic. Registration does not confirm English support. Save clinics to <a href="/my-clinics" className="underline">compare their information</a>.</p><nav aria-label="Urology area comparisons" className="flex flex-wrap gap-2">{urologyAreaLinks.map(([slug,label])=><a key={slug} href={'/clinics/urology/'+slug} className="min-h-11 inline-flex items-center rounded-lg border px-3 underline">{label}</a>)}</nav></details>
  </section>;
 }
