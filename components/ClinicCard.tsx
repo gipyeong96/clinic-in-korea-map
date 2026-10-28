@@ -33,7 +33,7 @@ interface ClinicCardProps {
   };
 }
 
-export default function ClinicCard({ clinic, selectedDepartment='all', onShowMap, returnTo }: any) {
+export default function ClinicCard({ clinic, selectedDepartment='all', onShowMap, returnTo, distanceOrigin }: any) {
   const name = clinicName(clinic);
   const address = cardAddress(clinic);
   const branch=goldmanBranch(String(clinic.id));
@@ -59,11 +59,12 @@ export default function ClinicCard({ clinic, selectedDepartment='all', onShowMap
         <div className="flex justify-between items-start gap-2 mb-2">
           <span className={`text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full ${
             clinic.is_premium 
-              ? 'bg-amber-500 text-white' 
+              ? 'bg-amber-100 text-amber-900'
               : 'bg-slate-100 text-slate-500'
           }`}>
-            {clinic.is_premium ? 'Premium Certified' : 'HIRA Public'}
+            {clinic.is_premium ? 'Partner clinic' : 'HIRA Public'}
           </span>
+          {clinic.is_premium&&<span className="text-xs text-slate-600">Commercial relationship · not a clinical certification</span>}
         </div>
 
         <Link href={detailHref} prefetch={false}>
@@ -78,7 +79,7 @@ export default function ClinicCard({ clinic, selectedDepartment='all', onShowMap
         )}
         <RegistrationBadge clinic={clinic} />
         {clinic.weekend_label&&<p className="flex items-start gap-2 rounded-lg bg-amber-50 border border-amber-200 p-2 text-sm font-semibold text-amber-900 my-2"><CalendarDays aria-hidden="true" className="h-4 w-4 shrink-0 mt-0.5"/>{clinic.weekend_label}</p>}
-        {typeof clinic.distance_m === 'number' && <p className="flex flex-wrap items-center gap-1.5 rounded-lg bg-blue-50 p-2 text-sm font-semibold text-blue-900 mb-2"><TrainFront aria-hidden="true" className="h-4 w-4 shrink-0"/>{clinic.station_name} · {Math.round(clinic.distance_m)} m <span className="text-xs font-normal">straight-line distance</span></p>}
+        {typeof clinic.distance_m === 'number' && <p className="flex flex-wrap items-center gap-1.5 rounded-lg bg-blue-50 p-2 text-sm font-semibold text-blue-900 mb-2"><TrainFront aria-hidden="true" className="h-4 w-4 shrink-0"/>{distanceOrigin?`From ${distanceOrigin}`:clinic.station_name||'Search origin'} · {Math.round(clinic.distance_m)} m <span className="text-xs font-normal">straight-line distance</span></p>}
         {branch?<p className="text-sm text-slate-700 mb-2"><a href={goldmanLocationUrl(branch.tab)} target="_blank" rel="noopener noreferrer" className="underline">Station access: {branch.transit}</a><span className="block text-xs text-slate-500">Clinic’s published directions</span></p>:!(typeof clinic.distance_m==='number')&&nearby&&<p className="text-sm text-slate-700 mb-2"><Link href={`/clinics/${selectedDepartment}/${nearby.slug}`} className="underline">Nearby station: {nearby.name}</Link> · {Math.round(nearby.distance)} m<span className="block text-xs text-slate-500">Straight-line distance · official station coordinates</span></p>}
         {(categoryName || locationName) && (
           <span className="text-xs text-slate-600 font-medium block mb-3">
