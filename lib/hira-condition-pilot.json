@@ -3348,5 +3348,47 @@
       "만성질환"
     ],
     "verified": true
+  },
+  "JDQ4MTg4MSM1MSMkMiMkNCMkMDAkNTgxOTYxIzIxIyQxIyQ5IyQwMyQ0NjEwMDIjNDEjJDEjJDgjJDgz": {
+    "ykiho": "JDQ4MTg4MSM1MSMkMiMkNCMkMDAkNTgxOTYxIzIxIyQxIyQ5IyQwMyQ0NjEwMDIjNDEjJDEjJDgjJDgz",
+    "clinicName": "골드만비뇨기과의원",
+    "referenceMonth": "202604",
+    "checkedAt": "2026-10-28",
+    "conditions": [
+      "방광염",
+      "성매개감염병",
+      "신경인성 방광",
+      "요로결석증",
+      "전립선증식증"
+    ],
+    "verified": true
+  },
+  "JDU4MTI3MSM1MSMkMiMkMCMkMDAkNDgxNzAyIzExIyQyIyQzIyQwMCQzNjE4MzIjNjEjJDEjJDgjJDgz": {
+    "ykiho": "JDU4MTI3MSM1MSMkMiMkMCMkMDAkNDgxNzAyIzExIyQyIyQzIyQwMCQzNjE4MzIjNjEjJDEjJDgjJDgz",
+    "clinicName": "골드만비뇨기과의원",
+    "referenceMonth": "202604",
+    "checkedAt": "2026-10-28",
+    "conditions": [
+      "방광염",
+      "성매개감염병",
+      "야뇨증",
+      "요로결석증",
+      "전립선증식증"
+    ],
+    "verified": true
+  },
+  "JDU4MTI3MSM1MSMkMiMkMCMkMDAkNTgxMzUxIzExIyQxIyQ3IyQ4OSQzNjEwMDIjNzEjJDEjJDgjJDgz": {
+    "ykiho": "JDU4MTI3MSM1MSMkMiMkMCMkMDAkNTgxMzUxIzExIyQxIyQ3IyQ4OSQzNjEwMDIjNzEjJDEjJDgjJDgz",
+    "clinicName": "골드만비뇨의학과의원",
+    "referenceMonth": "202604",
+    "checkedAt": "2026-10-28",
+    "conditions": [
+      "방광염",
+      "성매개감염병",
+      "신경인성 방광",
+      "요로결석증",
+      "전립선증식증"
+    ],
+    "verified": true
   }
 }

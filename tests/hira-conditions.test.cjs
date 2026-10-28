@@ -8,6 +8,13 @@ test('condition evidence requires exact institution identity, valid period, posi
  assert.equal(m.exports.referenceLabel('202402'),'February 2024');
 });
 test('expanded records retain identity, original names, source order and actual reference month',()=>{
- const records=JSON.parse(fs.readFileSync('lib/hira-condition-pilot.json','utf8').replace(/^\uFEFF/,''));assert.equal(Object.keys(records).length,240);
+ const records=JSON.parse(fs.readFileSync('lib/hira-condition-pilot.json','utf8').replace(/^\uFEFF/,''));assert.equal(Object.keys(records).length,243);
  for(const [key,record] of Object.entries(records)){const result=m.exports.conditionRecord(record,key);assert(result);assert.equal(result.referenceMonth,'202604');assert.deepEqual(result.conditions,record.conditions);assert(result.clinicName);}
+});
+
+test('all Goldman branches have separate official identities and Incheon retains its distinct condition',()=>{
+ const records=JSON.parse(fs.readFileSync('lib/hira-condition-pilot.json','utf8'));
+ const source=fs.readFileSync('lib/site.ts','utf8').split('export function unifiedClinicRecord')[0];
+ const branches=[...source.matchAll(/id:'(goldman-[^']+)'[^\n]*hira:'([^']+)'/g)];assert.equal(branches.length,5);
+ for(const [,id,key] of branches){const record=m.exports.conditionRecord(records[key],key);assert(record,id);assert.equal(record.conditions.length,5);if(id==='goldman-incheon'){assert(record.conditions.includes('야뇨증'));assert(!record.conditions.includes('신경인성 방광'));}}
 });
