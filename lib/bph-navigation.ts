@@ -10,12 +10,14 @@ function normalize(value:string){return value.normalize('NFD').replace(/[\u0300-
 // Recognize navigation intent, not a diagnosis or a list of procedure providers.
 export function matchBphSearch(query:string){
  if(query.length>200)return null;
- let remaining=normalize(query).replace(/(전립선비대증|전립선증식증)(치료|수술)/g,'$1 $2');
+ let remaining=normalize(query).replace(/전립선\s+(비대증|증식증)/g,'전립선$1').replace(/(전립선비대증|전립선증식증|홀렙|아쿠아블레이션|리줌)((?:치료|수술|시술|비용|회복)+)(?=\s|$)/g,(_,name,suffix)=>name+suffix.replace(/치료|수술|시술|비용|회복/g,' $&'));
  const consume=(alias:string)=>{const escaped=normalize(alias).replace(/[.*+?^${}()|[\]\\]/g,'\\$&');const pattern=new RegExp(`(^|\\s)${escaped}(?=\\s|$)`,'g');const found=pattern.test(remaining);remaining=remaining.replace(pattern,' ').replace(/\s+/g,' ').trim();return found;};
  const procedures=bphProcedures.filter(p=>{let found=false;for(const alias of [...p.aliases].sort((a,b)=>b.length-a.length))if(consume(alias))found=true;return found;});
  let bph=false;for(const alias of ['benign prostatic hyperplasia','benign prostate enlargement','enlarged prostate','prostatic hyperplasia','전립선비대증','전립선증식증','bph'])if(consume(alias))bph=true;
  if(!bph&&!procedures.length)return null;
- const areas=regions.filter(([en,ko])=>consume(en)||consume(ko));
+ let areas=regions.filter(([en,ko])=>{const english=consume(en),korean=consume(ko);return english||korean;});
+ // A Seoul district/station may be qualified by its parent city, not another region.
+ if(areas.length===2&&areas.some(a=>a[2]==='seoul')&&areas.some(a=>['gangnam','jamsil-station','seoul-station'].includes(a[2])))areas=areas.filter(a=>a[2]!=='seoul');
  if(areas.length>1)return null;
  const nearby=/\b(?:near me|nearby|around me)\b/.test(remaining);
  const costs=/\b(?:costs?|prices?)\b|비용/.test(remaining),recovery=/\brecovery\b|회복/.test(remaining);

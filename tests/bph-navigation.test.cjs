@@ -25,3 +25,14 @@ test('guide keeps shared partner cards and historical records; procedure queries
  const payload=JSON.stringify(measurement.exports.measurementPayload('page_view','/guides/urology-care/bph#procedure-holep'));
  assert(!/bph|holep|rezum|aquablation/i.test(payload));
 });
+
+test('Korean spacing and joined modifiers preserve cost/recovery intent',()=>{
+ for(const q of ['전립선 비대증 치료','전립선 증식증 수술'])assert.equal(match(q).guideHref,'/guides/urology-care/bph#treatment-options');
+ for(const q of ['홀렙수술비용','아쿠아블레이션수술비용','리줌시술비용','전립선비대증수술비용'])assert.equal(match(q).guideHref,'/guides/urology-care/bph#costs-and-quotes',q);
+ assert.equal(match('리줌시술회복').guideHref,'/guides/urology-care/bph#travel-and-follow-up');
+});
+test('Seoul qualifies one known Seoul area without discarding other locations or names',()=>{
+ for(const q of ['HoLEP in Gangnam Seoul','HoLEP Seoul Gangnam','홀렙 강남 서울','HoLEP Gangnam 강남 Seoul'])assert.equal(match(q).directoryHref,'/clinics/urology/gangnam',q);
+ assert.equal(match('Rezum Jamsil Seoul').directoryHref,'/clinics/urology/jamsil-station');
+ for(const q of ['Rezum Incheon Seoul','HoLEP Dongtan Seoul','HoLEP Gangnam Jamsil Seoul','Goldman 홀렙수술비용','홀렙수술비용병원명'])assert.equal(match(q),null,q);
+});
