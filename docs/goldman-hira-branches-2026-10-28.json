@@ -1,0 +1,123 @@
+{
+  "source": "https://www.data.go.kr/data/3039508/openapi.do",
+  "endpoint": "https://apis.data.go.kr/B551182/hospDiagInfoService1/getClinicTop5List1",
+  "checkedAt": "2026-10-28",
+  "identitySource": "HIRA June 2026 provider snapshot; exact branch identity mapping in lib/site.ts",
+  "scope": "Three additional profile records only; existing geographic comparison cohorts unchanged. Existing records preserved byte-for-value.",
+  "branches": [
+    {
+      "id": "goldman-seoulyeok",
+      "ykiho": "JDQ4MTg4MSM1MSMkMiMkNCMkMDAkNTgxOTYxIzIxIyQxIyQ5IyQwMyQ0NjEwMDIjNDEjJDEjJDgjJDgz",
+      "name_ko": "골드만비뇨기과의원",
+      "address_ko": "서울특별시 중구 세종대로 23, (봉래동1가)",
+      "telephone": "02-773-7522",
+      "checked_at": "2026-10-28",
+      "api_status": "verified",
+      "result_code": "00",
+      "response": {
+        "crtrYm": "202604",
+        "mfrnIntrsIlnsCdNm1": "방광염",
+        "mfrnIntrsIlnsCdNm2": "성매개감염병",
+        "mfrnIntrsIlnsCdNm3": "신경인성 방광",
+        "mfrnIntrsIlnsCdNm4": "요로결석증",
+        "mfrnIntrsIlnsCdNm5": "전립선증식증",
+        "rnum": "1",
+        "shwSbjtCdNm": "비뇨의학과",
+        "yadmNm": "골드만비뇨기과의원",
+        "ykiho": "JDQ4MTg4MSM1MSMkMiMkNCMkMDAkNTgxOTYxIzIxIyQxIyQ5IyQwMyQ0NjEwMDIjNDEjJDEjJDgjJDgz"
+      },
+      "identity_match": true,
+      "name_match": true,
+      "record": {
+        "ykiho": "JDQ4MTg4MSM1MSMkMiMkNCMkMDAkNTgxOTYxIzIxIyQxIyQ5IyQwMyQ0NjEwMDIjNDEjJDEjJDgjJDgz",
+        "clinicName": "골드만비뇨기과의원",
+        "referenceMonth": "202604",
+        "checkedAt": "2026-10-28",
+        "conditions": [
+          "방광염",
+          "성매개감염병",
+          "신경인성 방광",
+          "요로결석증",
+          "전립선증식증"
+        ],
+        "verified": true
+      }
+    },
+    {
+      "id": "goldman-incheon",
+      "ykiho": "JDU4MTI3MSM1MSMkMiMkMCMkMDAkNDgxNzAyIzExIyQyIyQzIyQwMCQzNjE4MzIjNjEjJDEjJDgjJDgz",
+      "name_ko": "골드만비뇨기과의원",
+      "address_ko": "인천광역시 남동구 예술로 138, 이토타워 15층 1501,1509,1510,1511,1512,1513호 (구월동)",
+      "telephone": "221-1911",
+      "checked_at": "2026-10-28",
+      "api_status": "verified",
+      "result_code": "00",
+      "response": {
+        "crtrYm": "202604",
+        "mfrnIntrsIlnsCdNm1": "방광염",
+        "mfrnIntrsIlnsCdNm2": "성매개감염병",
+        "mfrnIntrsIlnsCdNm3": "야뇨증",
+        "mfrnIntrsIlnsCdNm4": "요로결석증",
+        "mfrnIntrsIlnsCdNm5": "전립선증식증",
+        "rnum": "1",
+        "shwSbjtCdNm": "비뇨의학과",
+        "yadmNm": "골드만비뇨기과의원",
+        "ykiho": "JDU4MTI3MSM1MSMkMiMkMCMkMDAkNDgxNzAyIzExIyQyIyQzIyQwMCQzNjE4MzIjNjEjJDEjJDgjJDgz"
+      },
+      "identity_match": true,
+      "name_match": true,
+      "record": {
+        "ykiho": "JDU4MTI3MSM1MSMkMiMkMCMkMDAkNDgxNzAyIzExIyQyIyQzIyQwMCQzNjE4MzIjNjEjJDEjJDgjJDgz",
+        "clinicName": "골드만비뇨기과의원",
+        "referenceMonth": "202604",
+        "checkedAt": "2026-10-28",
+        "conditions": [
+          "방광염",
+          "성매개감염병",
+          "야뇨증",
+          "요로결석증",
+          "전립선증식증"
+        ],
+        "verified": true
+      }
+    },
+    {
+      "id": "goldman-dongtan",
+      "ykiho": "JDU4MTI3MSM1MSMkMiMkMCMkMDAkNTgxMzUxIzExIyQxIyQ3IyQ4OSQzNjEwMDIjNzEjJDEjJDgjJDgz",
+      "name_ko": "골드만비뇨의학과의원",
+      "address_ko": "경기도 화성시 동탄구 동탄대로 489, 906,907,908호 (오산동)",
+      "telephone": "031-373-7532",
+      "checked_at": "2026-10-28",
+      "api_status": "verified",
+      "result_code": "00",
+      "response": {
+        "crtrYm": "202604",
+        "mfrnIntrsIlnsCdNm1": "방광염",
+        "mfrnIntrsIlnsCdNm2": "성매개감염병",
+        "mfrnIntrsIlnsCdNm3": "신경인성 방광",
+        "mfrnIntrsIlnsCdNm4": "요로결석증",
+        "mfrnIntrsIlnsCdNm5": "전립선증식증",
+        "rnum": "1",
+        "shwSbjtCdNm": "비뇨의학과",
+        "yadmNm": "골드만비뇨의학과의원",
+        "ykiho": "JDU4MTI3MSM1MSMkMiMkMCMkMDAkNTgxMzUxIzExIyQxIyQ3IyQ4OSQzNjEwMDIjNzEjJDEjJDgjJDgz"
+      },
+      "identity_match": true,
+      "name_match": true,
+      "record": {
+        "ykiho": "JDU4MTI3MSM1MSMkMiMkMCMkMDAkNTgxMzUxIzExIyQxIyQ3IyQ4OSQzNjEwMDIjNzEjJDEjJDgjJDgz",
+        "clinicName": "골드만비뇨의학과의원",
+        "referenceMonth": "202604",
+        "checkedAt": "2026-10-28",
+        "conditions": [
+          "방광염",
+          "성매개감염병",
+          "신경인성 방광",
+          "요로결석증",
+          "전립선증식증"
+        ],
+        "verified": true
+      }
+    }
+  ]
+}

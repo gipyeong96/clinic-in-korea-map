@@ -1378,5 +1378,20 @@
     "area": "jamsil",
     "address": "서울특별시 송파구 올림픽로35길 10, B동 2층 214호 (신천동, 파크리오)",
     "comparisonEligible": true
+  },
+  "JDQ4MTg4MSM1MSMkMiMkNCMkMDAkNTgxOTYxIzIxIyQxIyQ5IyQwMyQ0NjEwMDIjNDEjJDEjJDgjJDgz": {
+    "area": "",
+    "address": "서울특별시 중구 세종대로 23, (봉래동1가)",
+    "comparisonEligible": false
+  },
+  "JDU4MTI3MSM1MSMkMiMkMCMkMDAkNDgxNzAyIzExIyQyIyQzIyQwMCQzNjE4MzIjNjEjJDEjJDgjJDgz": {
+    "area": "",
+    "address": "인천광역시 남동구 예술로 138, 이토타워 15층 1501,1509,1510,1511,1512,1513호 (구월동)",
+    "comparisonEligible": false
+  },
+  "JDU4MTI3MSM1MSMkMiMkMCMkMDAkNTgxMzUxIzExIyQxIyQ3IyQ4OSQzNjEwMDIjNzEjJDEjJDgjJDgz": {
+    "area": "",
+    "address": "경기도 화성시 동탄구 동탄대로 489, 906,907,908호 (오산동)",
+    "comparisonEligible": false
   }
 }

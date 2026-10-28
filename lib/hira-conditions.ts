@@ -1,5 +1,5 @@
 export const conditionSource='https://www.data.go.kr/data/3039508/openapi.do';
-export const conditionEnglish:Record<string,string>={'방광염':'Cystitis','성매개감염병':'Sexually transmitted infections','신경인성 방광':'Neurogenic bladder','요로결석증':'Urinary stones','전립선증식증':'Prostatic hyperplasia (BPH)','만성질환':'Chronic conditions'};
+export const conditionEnglish:Record<string,string>={'방광염':'Cystitis','성매개감염병':'Sexually transmitted infections','신경인성 방광':'Neurogenic bladder','야뇨증':'Enuresis (bedwetting)','요로결석증':'Urinary stones','전립선증식증':'Prostatic hyperplasia (BPH)','만성질환':'Chronic conditions'};
 export type ConditionRecord={ykiho:string;clinicName:string;referenceMonth:string;checkedAt:string;conditions:string[];verified:boolean};
 export function conditionRecord(value:unknown,ykiho:string):ConditionRecord|null{
  if(!value||typeof value!=='object')return null;

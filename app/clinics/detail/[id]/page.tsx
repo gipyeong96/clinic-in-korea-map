@@ -193,9 +193,10 @@ export default async function ClinicDetail({ params }: ClinicDetailProps) {
         </section>
 
         <nav aria-label="Clinic page sections" className="flex flex-wrap gap-2 text-sm"><a href="#visit-details" className="min-h-11 inline-flex items-center rounded-full border border-blue-200 bg-blue-50 px-4 font-semibold text-blue-900">Contact & directions</a><a href="#clinic-information" className="min-h-11 inline-flex items-center rounded-full border border-violet-200 bg-violet-50 px-4 font-semibold text-violet-900">Departments & clinic information</a></nav>
+        {branch&&<ClinicConditions ykiho={clinic.hira_code||params.id} record={(conditionPilot as Record<string,unknown>)[clinic.hira_code||params.id]}/>}
         <details className="rounded-2xl border bg-white p-4 sm:p-6"><summary className="min-h-11 cursor-pointer py-2 text-lg font-bold">Reported hours & care information</summary><div className="space-y-4 pt-3">
         <ClinicWeekendHours id={clinic.hira_code||params.id} name={clinic.name_ko||''} address={clinic.address_ko||''} telephone={clinic.telephone||''}/>
-        <ClinicConditions ykiho={clinic.hira_code||params.id} record={(conditionPilot as Record<string,unknown>)[clinic.hira_code||params.id]}/>
+        {!branch&&<ClinicConditions ykiho={clinic.hira_code||params.id} record={(conditionPilot as Record<string,unknown>)[clinic.hira_code||params.id]}/>}
         <ContextualCareGuides department={focusSlug} location={region?.slug} stage="profile"/>
         </div></details>
         {comparison&&<aside aria-label="Local urology comparison" className="rounded-xl border border-blue-200 bg-blue-50 p-4 space-y-2 text-sm">
