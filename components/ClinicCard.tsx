@@ -8,6 +8,7 @@ import {cardAddress} from '@/lib/card-location';
 import Link from 'next/link';
 import { Phone, MapPin, Globe, TrainFront, CalendarDays, Stethoscope, ChevronDown } from 'lucide-react';
 import { clinicFocus, groupedDepartments } from '@/lib/clinic-evidence';
+import MobileCardDetails from './MobileCardDetails';
 import RegistrationBadge from './RegistrationBadge';
 import ClinicContact from './ClinicContact';
 import {clinicName,clinicPhone,hasClinicCoordinates} from '@/lib/clinic-contact';
@@ -50,7 +51,7 @@ export default function ClinicCard({ clinic, selectedDepartment='all', onShowMap
 
   return (
     <div 
-      className={`min-w-0 break-words p-5 rounded-2xl border transition shadow-sm hover:shadow-md flex flex-col justify-between ${
+      className={`min-w-0 break-words p-3 sm:p-5 rounded-2xl border transition shadow-sm hover:shadow-md flex flex-col justify-between ${
         isPartner
           ? 'bg-amber-50/50 border-amber-300 ring-1 ring-amber-300/30' 
           : 'bg-white border-slate-200'
@@ -65,14 +66,22 @@ export default function ClinicCard({ clinic, selectedDepartment='all', onShowMap
           }`}>
             {isPartner ? 'Partner clinic' : 'HIRA Public'}
           </span>
-          {isPartner&&<span className="text-xs text-slate-600">Commercial relationship · not a clinical certification</span>}
+          {isPartner&&<span className="hidden sm:inline text-xs text-slate-600">Commercial relationship · not a clinical certification</span>}
         </div>
 
         <Link href={detailHref} prefetch={false}>
-          <h3 className="text-xl font-bold text-slate-900 hover:text-emerald-600 transition mb-0.5 leading-snug">
+          <h3 className="text-lg sm:text-xl font-bold text-slate-900 hover:text-emerald-600 transition mb-0.5 leading-snug">
             {name}
           </h3>
         </Link>
+        <div className="sm:hidden space-y-1 text-xs text-slate-600">
+          <p className="line-clamp-2">{address.primary||'Address not provided'}</p>
+          {typeof clinic.distance_m==='number'&&<p>{distanceOrigin?`From ${distanceOrigin}`:clinic.station_name||'Search origin'} · {Math.round(clinic.distance_m).toLocaleString()} m straight-line</p>}
+          {selected&&<p>{selected.name} · {selected.specialists>0?`${selected.specialists} specialist${selected.specialists===1?'':'s'} reported`:'No specialist recorded'}</p>}
+          {clinic.weekend_label&&<p className="font-semibold text-amber-900">{clinic.weekend_label}</p>}
+        </div>
+        <MobileCardDetails label="More clinic information">
+        {isPartner&&<p className="text-xs text-slate-600 sm:hidden">Commercial partner · not a clinical certification.</p>}
         {clinic.name_ko && clinic.name_ko !== name && (
           <p className="text-xs text-slate-500 font-medium mb-1">
             {clinic.name_ko}
@@ -123,24 +132,7 @@ export default function ClinicCard({ clinic, selectedDepartment='all', onShowMap
           </div>
         </details>}
 
-      </div>
-
-      <div className="mt-5 pt-3 border-t border-slate-100 space-y-2">
-        <SaveClinic clinic={clinicSnapshot(clinic)} />
-        <ClinicContact clinic={branch?{...clinic,telephone:branch.phone}:clinic} compact />
-        <div className="flex gap-2">
-        <Link 
-          href={detailHref}
-          prefetch={false}
-          className={`min-h-11 flex-1 inline-flex items-center justify-center text-center py-2 rounded-lg text-sm font-semibold transition ${
-            isPartner
-              ? 'bg-amber-400 hover:bg-amber-300 text-slate-950'
-            : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
-          }`}
-        >
-          View Details
-        </Link>
-        {onShowMap&&hasClinicCoordinates(clinic)&&<button type="button" onClick={onShowMap} className="min-h-11 border rounded-lg px-3 py-2 text-sm font-semibold">Show on map</button>}
+        <div className="flex flex-wrap gap-2 sm:hidden">        {onShowMap&&hasClinicCoordinates(clinic)&&<button type="button" onClick={onShowMap} className="min-h-11 border rounded-lg px-3 py-2 text-sm font-semibold">Show on map</button>}
         {(branch || (isPartner && clinic.premium_data?.website)) && (
           <a
             href={branch?GOLDMAN_ENGLISH_URL:clinic.premium_data.website}
@@ -153,7 +145,40 @@ export default function ClinicCard({ clinic, selectedDepartment='all', onShowMap
             <Globe className="w-4 h-4 shrink-0" />
             {goldmanBranch(String(clinic.id))&&<span>English site</span>}
           </a>
-        )}
+        )}</div>
+        </MobileCardDetails>
+      </div>
+
+      <div className="mt-2 sm:mt-5 pt-2 sm:pt-3 border-t border-slate-100 space-y-2">
+        <div className="hidden sm:block"><SaveClinic clinic={clinicSnapshot(clinic)} /></div>
+        <ClinicContact clinic={branch?{...clinic,telephone:branch.phone}:clinic} compact />
+        <div className="flex gap-2 items-stretch">
+        <div className="sm:hidden shrink-0"><SaveClinic clinic={clinicSnapshot(clinic)} /></div>
+        <Link 
+          href={detailHref}
+          prefetch={false}
+          className={`min-h-11 flex-1 inline-flex items-center justify-center text-center py-2 rounded-lg text-sm font-semibold transition ${
+            isPartner
+              ? 'bg-amber-400 hover:bg-amber-300 text-slate-950'
+            : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+          }`}
+        >
+          <span className="sm:hidden">Details →</span><span className="hidden sm:inline">View Details</span>
+        </Link>
+        <div className="hidden sm:contents">        {onShowMap&&hasClinicCoordinates(clinic)&&<button type="button" onClick={onShowMap} className="min-h-11 border rounded-lg px-3 py-2 text-sm font-semibold">Show on map</button>}
+        {(branch || (isPartner && clinic.premium_data?.website)) && (
+          <a
+            href={branch?GOLDMAN_ENGLISH_URL:clinic.premium_data.website}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="min-h-11 inline-flex items-center justify-center gap-1 px-2 py-2 bg-white border border-amber-300 text-amber-700 rounded-lg hover:bg-amber-100 transition text-xs font-semibold"
+            title={goldmanBranch(String(clinic.id))?'Official English website':'Website'}
+            aria-label={goldmanBranch(String(clinic.id))?`Official English website for ${name}`:`Website for ${name}`}
+          >
+            <Globe className="w-4 h-4 shrink-0" />
+            {goldmanBranch(String(clinic.id))&&<span>English site</span>}
+          </a>
+        )}</div>
         </div>
       </div>
     </div>
