@@ -1,4 +1,5 @@
 import UrologyDiscovery from '@/components/UrologyDiscovery';
+import InfoDisclosure from '@/components/InfoDisclosure';
 import {urologyAreas} from '@/lib/urology-discovery';
 import {weekendCoverage,weekendCoverageCopy} from '@/lib/weekend-coverage';
 import {weekendQuery} from '@/lib/weekend-query';
@@ -135,7 +136,7 @@ export default async function SearchPage({ params, searchParams }: Props) {
         <details><summary className="min-h-11 py-3 cursor-pointer underline">How to compare clinics</summary><p>Save two or three clinics, then <a className="underline" href="/my-clinics">compare saved clinics</a> by reported specialists, registration, address and contact details. Registration does not confirm English support. Station searches sort by straight-line distance. <a className="underline" href="/guides/choose-urology-clinic-gangnam">Read the clinic selection checklist</a>.</p></details>
       </section>}
       {!(params.department==='urology'&&urologyAreas[params.location])&&<PartnerClinicCards ids={filteredClinics.map(goldmanProfileId).filter((id):id is string=>!!id)}/>}
-      <p className="text-xs text-slate-600">Matching Goldman partner clinics appear first on each result page. Other results retain their existing order. Placement is not a clinical quality ranking.</p>
+      <InfoDisclosure label="About result order"><p>Matching Goldman partner clinics appear first, before pagination. Other results retain their existing order. This is commercial placement, not a clinical quality ranking.</p></InfoDisclosure>
       {station && <div className="space-y-2 text-sm text-slate-600">
         <p>{station.name_ko} · Within {radius.toLocaleString()} m · Distance shown; matching Goldman partners first</p>
         <details><summary className="cursor-pointer underline">Station and distance details</summary><div className="space-y-2 py-2"><p>{station.city} · {station.stations.map(s => s.line).join(' / ')}</p>
@@ -164,14 +165,16 @@ export default async function SearchPage({ params, searchParams }: Props) {
       <p id="clinic-results" tabIndex={-1} className="scroll-mt-24 text-sm text-slate-500" role={failed ? 'alert' : 'status'}>
         {failed ? 'Clinic information is temporarily unavailable. Please try again later.' : `Page ${page} · ${filteredClinics.length} clinic profiles on this page.${!filteredClinics.length&&page>1?' No further results. Use Previous page or change your search.':''}`}
       </p>
-      {weekend&&<section aria-label="Weekend data coverage" className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm space-y-2">
-        <h2 className="font-bold"><span aria-hidden="true">📅 </span>{weekendNotice.title}</h2>
+      {weekend&&<section aria-label="Weekend data coverage">
+       <InfoDisclosure label="About weekend hours">
+        <h2 className="font-bold">{weekendNotice.title}</h2>
         <p>{weekendNotice.description}</p>
         <p className="text-xs text-slate-600">Reported schedule, not live availability. Call before visiting.</p>
         <a href={withoutWeekend} className="min-h-11 inline-flex items-center rounded-lg border border-amber-300 bg-white px-3 py-2 font-semibold">Show clinics without weekend filter</a>
-        <details className="text-xs"><summary className="min-h-11 py-3 cursor-pointer underline">Coverage and retained search options</summary><p>Current pilot: Gangnam-gu, Seocho-gu, Jamsil-dong and Sincheon-dong in Seoul. Removing the weekend filter keeps your area, department, name/address, specialist and registration options, and station radius. Results restart on page 1.</p></details>
+        <p>Coverage includes parts of Seoul (Gangnam-gu, Seocho-gu, Jamsil-dong and Sincheon-dong), Incheon and Dongtan-gu in Hwaseong. Removing the weekend filter keeps your other search options and restarts on page 1.</p>
+       </InfoDisclosure>
       </section>}
-      <details className="text-xs text-slate-500"><summary className="cursor-pointer underline">About these results</summary><p className="pt-2">Results use HIRA-reported departments. A reported department does not necessarily have a specialist. Clinic focus and full department details are shown separately.</p></details>
+      <InfoDisclosure label="About these results"><p>Results use HIRA-reported departments. A reported department does not necessarily have a specialist. Clinic focus and full department details are shown separately.</p></InfoDisclosure>
       {failed&&<a className="inline-flex min-h-11 items-center px-4 rounded-lg border bg-white font-semibold" href={searchLink(params.department,params.location,{query,specialist,registered,weekend,radius:station?radius:undefined,page})}>Try again</a>}
       {!failed&&!filteredClinics.length&&<section aria-label="Search suggestions" className="rounded-xl border bg-white p-5 space-y-4"><h2 className="text-lg font-bold">{page>1?'Continue your search':'Try a broader search'}</h2><p className="text-sm text-slate-600">{page>1?'There are no clinic profiles on this page. Return to the first page or adjust your search.':'No clinic profiles matched these options. Try one change below; the other options stay selected.'}</p><nav aria-label="Broaden your search" className="grid sm:grid-cols-2 gap-3">{searchRecovery({department:params.department,location:params.location,query,specialist,registered,weekend,radius:station?radius:undefined,page,departmentLabel:dept,locationLabel:loc}).map(link=><a key={link.label} href={link.href} className="min-h-11 min-w-0 break-words block rounded-lg border px-4 py-3 text-sm hover:border-slate-500"><span className="block font-semibold underline">{link.title||link.label}</span><span className="block text-xs text-slate-600 mt-1">{link.description}</span></a>)}</nav></section>}
       {!failed&&(page>1||!filteredClinics.length)&&pagination}

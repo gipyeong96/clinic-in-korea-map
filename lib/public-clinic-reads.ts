@@ -13,7 +13,7 @@ export const getClinicByIdForPage=cache((id:string)=>getClinicById(id,{throwOnEr
 const publicList=unstable_cache(async(location:string)=>getClinics({
  categorySlug:'urology',locationSlug:location,query:'',specialist:false,
  registered:false,limit:PAGE_SIZE+1,offset:0,radius:1000,
-}),['public-urology-list-v1'],{revalidate:60});
+}),['public-urology-list-v2-partner-first'],{revalidate:60});
 const pending=new Map<string,Promise<any[]>>();
 function sharedPublicList(location:string){
  const existing=pending.get(location);if(existing)return existing;

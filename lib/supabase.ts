@@ -5,6 +5,7 @@ import { regionAddresses, addressFilter, scopedLocationIds, extractRegion } from
 import { stationForSlug } from './stations';
 import {unifiedClinicRecord} from './site';
 import {additionalGoldmanClinic,GOLDMAN_ENGLISH_URL} from './goldman';
+import {partnerFirstPage} from './partner-query';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://lgbiyvqwurtlqsfsdnyy.supabase.co';
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'sb_publishable_gw_11u4mkJiC-NvZPxUbOw_7AnTbO7s';
@@ -149,6 +150,7 @@ export async function getClinics(params?: { categorySlug?: string, locationSlug?
     if(!locationIds.length)return [];
   }
 
+  const build=()=>{
   let query = supabase.from('clinics').select(CLINIC_LIST_SELECT);
   
   if (params?.categorySlug && params.categorySlug !== 'all') {
@@ -166,8 +168,6 @@ export async function getClinics(params?: { categorySlug?: string, locationSlug?
   for (const term of terms) {
     query = query.or(`name_en.ilike.%${term}%,name_ko.ilike.%${term}%,address_en.ilike.%${term}%,address_ko.ilike.%${term}%`);
   }
-  // A nonempty query consisting only of punctuation cannot become an unfiltered search.
-  if (params?.query?.trim() && terms.length === 0) return [];
   if (params?.specialist) {
     query = params.categorySlug && params.categorySlug !== 'all'
       ? query.contains('specialist_slugs', [params.categorySlug])
@@ -178,18 +178,9 @@ export async function getClinics(params?: { categorySlug?: string, locationSlug?
     query=query.contains('foreign_patient_registration',{status:'listed'}).filter('foreign_patient_registration->>source_date','match','^[0-9]{4}-[0-9]{2}-[0-9]{2}$');
   }
 
-  // Always bring premium first, then other clinics
-  query = query.order('is_premium', { ascending: false }).order('id');
-  query = params?.offset!==undefined
-    ? query.range(params.offset,params.offset+(params.limit||100)-1)
-    : query.limit(params?.limit||100);
-  
-  const { data, error } = await query;
-  if (error) {
-    console.error('Supabase getClinics error:', error);
-    throw new Error('Unable to load clinics. Please try again later.');
-  }
-  return data || [];
+  return query;
+  };
+  return partnerFirstPage(build,{offset:params?.offset,limit:params?.limit});
 }
 
 export async function getClinicById(id: string, options:{throwOnError?:boolean}={}) {

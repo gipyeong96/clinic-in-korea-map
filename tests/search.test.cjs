@@ -200,7 +200,7 @@ function database({ error = null, locations = [], data = [] } = {}) {
     range(start,end){calls.push(['location-range',start,end]);this.rows=this.rows.slice(start,end+1);return this;},
     async maybeSingle(){return {data:this.rows[0]||null,error};},then(resolve){return Promise.resolve({data:this.rows,error}).then(resolve);}
   } : builder; } };
-  const api = load('lib/supabase.ts', { './clinic-list-select':load('lib/clinic-list-select.ts'), './search': search, './regions': regions, './stations': stations, './site':site, './goldman':load('lib/goldman.ts',{'./site':site}), '@supabase/supabase-js': { createClient: () => client } });
+  const api = load('lib/supabase.ts', { './partner-query':load('lib/partner-query.ts',{'./site':site}),'./clinic-list-select':load('lib/clinic-list-select.ts'), './search': search, './regions': regions, './stations': stations, './site':site, './goldman':load('lib/goldman.ts',{'./site':site}), '@supabase/supabase-js': { createClient: () => client } });
   return { calls, api };
 }
 test('keyword and specialist constraints reach the database before the result limit', async () => {
@@ -208,7 +208,7 @@ test('keyword and specialist constraints reach the database before the result li
   await api.getClinics({ query: 'Goldman 강남', specialist: true, categorySlug: 'urology' });
   assert(calls.some(call => call[0] === 'contains' && call[1] === 'departments' && JSON.parse(call[2])[0].slug === 'urology'));
   assert(calls.some(call => call[0] === 'contains' && call[1] === 'specialist_slugs' && call[2][0] === 'urology'));
-  assert.equal(calls.filter(call => call[0] === 'or').length, 2);
+  assert.equal(new Set(calls.filter(call => call[0] === 'or' && call[1].startsWith('name_en.ilike')).map(call=>call[1])).size, 2);
   assert(calls.some(call => call[0] === 'or' && call[1].includes('name_en.ilike.%Goldman%')));
 });
 test('exact scoped location search includes descendants but not prefix neighbours', async () => {
