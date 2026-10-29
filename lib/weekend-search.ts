@@ -18,6 +18,8 @@ export function filterWeekendClinics(rows:any[],options:{weekend:string;category
   if(options.registered&&!registeredEvidence(c))return false;
   return terms.every(t=>[c.name_en,c.name_ko,c.address_en,c.address_ko].some(v=>typeof v==='string'&&v.toLowerCase().includes(t.toLowerCase())));
  }).map(c=>{
+  const evidence=weekendHours(c.hira_code||'',c.name_ko||'',c.address_ko||'',c.telephone||'')!;
+  c={...c,telephone:evidence.telephone};
   if(!options.origins)return c;
   const valid=typeof c.latitude==='number'&&typeof c.longitude==='number'&&c.latitude>=33&&c.latitude<=39&&c.longitude>=124&&c.longitude<=132&&!(c.latitude===37.5665&&c.longitude===126.978);
   return {...c,distance_m:valid?Math.min(...options.origins.map(o=>distanceMeters(o.latitude,o.longitude,c.latitude,c.longitude))):Infinity};
