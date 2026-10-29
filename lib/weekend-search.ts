@@ -1,6 +1,7 @@
 import {weekendHours,hoursLabel} from './weekend-hours';
 import {registeredEvidence} from './clinic-evidence';
 import {searchTerms} from './search';
+import {prioritizeGoldman,uniqueClinicProfiles} from './site';
 export function weekendDay(value:unknown):'saturday'|'sunday'|undefined{return value==='saturday'||value==='sunday'?value:undefined;}
 export function distanceMeters(lat:number,lng:number,toLat:number,toLng:number){
  const rad=(v:number)=>v*Math.PI/180;
@@ -25,5 +26,5 @@ export function filterWeekendClinics(rows:any[],options:{weekend:string;category
   return {...c,distance_m:valid?Math.min(...options.origins.map(o=>distanceMeters(o.latitude,o.longitude,c.latitude,c.longitude))):Infinity};
  }).filter(c=>!options.origins||c.distance_m<=(options.radius||1000));
  result.sort((a,b)=>options.origins?a.distance_m-b.distance_m||String(a.id).localeCompare(String(b.id)):Number(!!b.is_premium)-Number(!!a.is_premium)||String(a.id).localeCompare(String(b.id)));
- return result.slice(options.offset||0,(options.offset||0)+(options.limit||100)).map(c=>({...c,weekend_label:`${day==='saturday'?'Saturday':'Sunday'} ${hoursLabel(weekendHours(c.hira_code,c.name_ko,c.address_ko,c.telephone)![day])} · reported schedule`}));
+ return prioritizeGoldman(uniqueClinicProfiles(result)).slice(options.offset||0,(options.offset||0)+(options.limit||100)).map(c=>({...c,weekend_label:`${day==='saturday'?'Saturday':'Sunday'} ${hoursLabel(weekendHours(c.hira_code,c.name_ko,c.address_ko,c.telephone)![day])} · reported schedule`}));
 }
