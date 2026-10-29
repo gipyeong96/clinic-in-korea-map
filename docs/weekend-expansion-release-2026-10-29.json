@@ -1,0 +1,49 @@
+{
+  "checkedAt": "2026-10-29",
+  "source": "https://www.data.go.kr/data/15000736/openapi.do",
+  "existingPreserved": 2583,
+  "added": 1467,
+  "total": 4050,
+  "excludedAfterResearch": [
+    {
+      "id": "JDU4MTI3MSM1MSMkMiMkMCMkMDAkNDgxOTYxIzQxIyQxIyQ3IyQ3MiQzNjEwMDIjODEjJDEjJDIjJDgz",
+      "reason": "outside_dongtan_district"
+    },
+    {
+      "id": "JDU4MTI3MSM1MSMkMiMkMCMkMDAkNDgxNzAyIzIxIyQxIyQ5IyQ2MiQzNjEyMjIjNDEjJDEjJDgjJDgz",
+      "reason": "outside_dongtan_district"
+    },
+    {
+      "id": "JDU4MTI3MSM1MSMkMiMkMCMkMDAkMzgxMTkxIzMxIyQxIyQ3IyQ5MiQyNjEyMjIjNjEjJDEjJDQjJDgz",
+      "reason": "current_directory_identity_mismatch"
+    },
+    {
+      "id": "JDU4MTI3MSM1MSMkMiMkMCMkMDAkMzgxMTkxIzExIyQxIyQ3IyQ3OSQyNjE4MzIjNDEjJDEjJDgjJDgz",
+      "reason": "outside_dongtan_district"
+    }
+  ],
+  "regions": {
+    "incheon": {
+      "records": 1229,
+      "saturday": {
+        "reported_schedule": 1200,
+        "not_reported": 29
+      },
+      "sunday": {
+        "not_reported": 1110,
+        "reported_schedule": 119
+      }
+    },
+    "dongtan": {
+      "records": 238,
+      "saturday": {
+        "reported_schedule": 235,
+        "not_reported": 3
+      },
+      "sunday": {
+        "not_reported": 215,
+        "reported_schedule": 23
+      }
+    }
+  }
+}

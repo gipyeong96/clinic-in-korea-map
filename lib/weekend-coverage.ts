@@ -3,6 +3,8 @@ export type WeekendCoverage = 'pilot' | 'limited' | 'outside';
 // Coverage describes the imported pilot, never whether a clinic is open.
 export function weekendCoverage(slug:string,label:string,station=false):WeekendCoverage {
   if(station)return 'limited'; // A radius can cross administrative boundaries.
+  if(['incheon','dongtan','guwol-dong'].includes(slug)||slug.startsWith('area-incheon-'))return 'pilot';
+  if(['hwaseong','gyeonggi','area-gyeonggi-hwaseong-si'].includes(slug))return 'limited';
   if(['gangnam','jamsil','area-seoul-gangnam-gu','area-seoul-seocho-gu'].includes(slug))return 'pilot';
   if(['all','seoul','area-seoul-songpa-gu'].includes(slug))return 'limited';
   const area=nationalAreas.find(a=>a.slug===slug);
@@ -21,6 +23,6 @@ export function weekendCoverageCopy(coverage:WeekendCoverage){
   return coverage==='outside'
     ? {title:'Weekend hours are not covered in this area',description:'Our current weekend dataset does not cover this area. This does not mean local clinics are closed.'}
     : coverage==='pilot'
-    ? {title:'Weekend hours: partial records',description:'This area is included in our pilot. Only clinics with recorded hours for the selected day appear; missing hours do not mean closed.'}
-    : {title:'Weekend hours: limited area coverage',description:'Only recorded hours in Gangnam-gu, Seocho-gu, Jamsil-dong and Sincheon-dong, Seoul are included. Missing results do not mean local clinics are closed.'};
+    ? {title:'Weekend hours: partial records',description:'This area is included in our dataset. Only clinics with recorded hours for the selected day appear; missing hours do not mean closed.'}
+    : {title:'Weekend hours: limited area coverage',description:'Recorded hours cover parts of Seoul (Gangnam-gu, Seocho-gu, Jamsil-dong and Sincheon-dong), Incheon and Dongtan-gu in Hwaseong. Missing results do not mean local clinics are closed.'};
 }

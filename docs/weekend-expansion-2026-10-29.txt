@@ -1,0 +1,15 @@
+WEEKEND HOURS RELEASE — 2026-10-29
+
+Adds 1,467 verified records: Incheon 1,229 and Dongtan-gu, Hwaseong 238. All 2,583 existing records preserved byte-for-value. Total 4,050. Saturday schedules: Incheon 1,200 / Dongtan 235; Sunday: 119 / 23. Missing values do not indicate closure; schedules require telephone confirmation before visiting.
+
+Official NMC list: 4,947 unique HPIDs, complete 11-page fetch (Incheon 3,901 / Hwaseong 1,046). Name, road address and phone matched to June 2026 HIRA workbook, then checked against current public directory rows. Full candidate match review in the local research artifacts. Beyond initial exclusions, withheld 3 provisional Dongtan candidates actually in Manse-gu and 1 current name mismatch. Final Dongtan records require the explicit Dongtan-gu address. No claim of all-Hwaseong coverage.
+
+Goldman Incheon: HIRA public telephone omitted area code (221-1911). Exact NMC A1400705 name/address and official website confirm 032-221-1911; user explicitly requested the official number. Only the exact reviewed HIRA identity accepts that source telephone plus the already established branch profile name/address variant. Search results and hours confirmation link use the full official phone. General clinic identity validation remains strict.
+
+Goldman Dongtan: NMC reports Saturday 09:00–16:00, but the official branch's visible Saturday panel and structured data confirm 09:00–15:00 with no lunch break. Official website schedule takes precedence and is labelled separately from NMC. Checked 2026-10-29, https://www.gold-man.com/ennew/support/location?tab=7 . Incheon official contact: https://www.gold-man.com/ennew/support/location?tab=5 . No live-open or acceptance claims.
+
+Coverage labels include Incheon and Dongtan, while wider Hwaseong/Gyeonggi remain limited. Station radii retain limited coverage. Existing geographic filters, partner ordering within eligible pages, contact history, analytics identifiers and privacy rules preserved. No database writes, credentials, migrations, automated refresh or new analytics.
+
+Validation: 128 tests passed; production build passed; existing-record equality verified against prior commit. Runtime and mobile production checks recorded separately after deployment.
+
+Operational caution: the older refresh-weekend-hours.py is still Seoul-only. Its candidate must never replace the expanded dataset wholesale. Future refreshes must explicitly preserve out-of-scope records and the exact reviewed official-branch contact/schedule overrides.
