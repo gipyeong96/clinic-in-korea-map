@@ -2,6 +2,7 @@ import {urologyAreaLinks} from '@/lib/urology-discovery';
 import {conditionGuides,conditionGuidePath} from '@/lib/condition-guides';
 import {indexableConditionPages} from '@/lib/condition-pages';
 import {careGuides} from '@/lib/care-guides';
+import {stiGuides,stiGuideUpdated} from '@/lib/sti-visit-guides';
 import {urologyVisitGuides,visitGuidePath,visitGuideUpdated} from '@/lib/urology-visit-guides';
 import {additionalGoldmanClinics} from '@/lib/goldman';
 import { MetadataRoute } from 'next';
@@ -22,6 +23,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     {url:`${SITE_URL}/conditions`,priority:0.6},
     ...indexableConditionPages.map(p=>({url:`${SITE_URL}${p.path}`,priority:0.6})),
     {url:`${SITE_URL}/guides`,priority:0.6},
+    ...stiGuides.map(g=>({url:SITE_URL+'/guides/'+g.slug,lastModified:stiGuideUpdated,priority:0.6})),
     ...urologyVisitGuides.map(g=>({url:SITE_URL+visitGuidePath(g.slug),lastModified:visitGuideUpdated,priority:0.6})),
     ...careGuides.map(guide=>({url:`${SITE_URL}/guides/${guide.slug}`,priority:0.6})),
     { url: SITE_URL, changeFrequency: 'weekly', priority: 1 },
