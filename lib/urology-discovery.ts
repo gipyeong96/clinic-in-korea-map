@@ -15,7 +15,7 @@ export const urologyAreaLinks=[['seoul','Seoul'],['gangnam','Gangnam'],['area-se
 export const goldmanComparison:Record<string,string>={'goldman-jamsil':'jamsil-station','goldman-gangnam':'gangnam','goldman-incheon':'incheon','goldman-dongtan':'dongtan','goldman-seoulyeok':'seoul-station'};
 export function goldmanSearchMetadata(id:string){
  const branch=goldmanBranch(id);if(!branch)return undefined;
- const place=branch.id==='goldman-incheon'?'Guwol-dong, Incheon':branch.id==='goldman-gangnam'?'Seocho-gu, Seoul':branch.id==='goldman-dongtan'?'Hwaseong': 'Seoul';
+ const place=branch.id==='goldman-incheon'?'Guwol-dong, Incheon':branch.id==='goldman-gangnam'?'Seocho-gu, Seoul':branch.id==='goldman-dongtan'?'Dongtan, Hwaseong':branch.id==='goldman-jamsil'?'Sincheon-dong, Songpa-gu, Seoul':'Jung-gu, Seoul';
  return {title:`Goldman Urology ${branch.name} — ${place} | Korea Clinic Map`,description:`Plan a visit to Goldman Urology ${branch.name}: ${branch.address}. Find the branch phone, station access, opening hours, official English website and local clinic comparison.`};
 }
 // Address evidence, never the hospital name, determines the local comparison.
