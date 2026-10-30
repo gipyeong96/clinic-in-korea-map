@@ -1,3 +1,4 @@
+import ClinicSearchScope from '@/components/ClinicSearchScope';
 import UrologyDiscovery from '@/components/UrologyDiscovery';
 import InfoDisclosure from '@/components/InfoDisclosure';
 import {urologyAreas} from '@/lib/urology-discovery';
@@ -115,6 +116,7 @@ export default async function SearchPage({ params, searchParams }: Props) {
     <div className="max-w-6xl mx-auto px-4 py-5 space-y-3 sm:py-8 sm:space-y-6">
       <h1 className="text-2xl md:text-3xl font-black break-words">{params.department==='dentistry'?`Dentists ${station?'near':'in'} ${station?stationHeading:loc}`:station ? `${params.department === 'all' ? 'Clinics' : `${dept} Clinics`} near ${stationHeading}` : `${dept} Clinics in ${loc}`}</h1>
       <a href={nearbySearchLink(params.department,{query,specialist,registered,weekend,radius:station?radius:undefined})} className="min-h-11 inline-flex items-center rounded-lg bg-slate-900 px-4 py-3 text-sm font-semibold text-white">{nearbyAction(params.department)}</a>
+      <ClinicSearchScope location={loc} station={station?.name_en} radius={radius} nearbyLabel={nearbyAction(params.department)}/>
       {params.department==='urology'&&!failed&&filteredClinics.length>0&&<a href="#clinic-results" className="min-h-11 inline-flex items-center rounded-lg border border-blue-300 bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-900">View {filteredClinics.length} clinics{hasNext?' on this page':''} ↓</a>}
       {params.department==='urology'&&<UrologyDiscovery location={params.location} showPartners={true}/>}
       {params.department==='urology'&&['jamsil','jamsil-station'].includes(params.location)&&<section aria-label="Jamsil comparison search scope" className="rounded-xl border bg-white p-4 space-y-3 text-sm">
