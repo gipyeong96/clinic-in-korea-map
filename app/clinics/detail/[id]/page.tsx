@@ -1,3 +1,5 @@
+import {excludedFromSearch} from '@/lib/profile-indexing';
+import {profileSearchMetadata} from '@/lib/profile-search-metadata';
 import {goldmanSearchMetadata,goldmanComparison,urologyComparisonForAddress,urologyAreas} from '@/lib/urology-discovery';
 import {goldmanBranch} from '@/lib/goldman';
 import InlineHelp from '@/components/InlineHelp';
@@ -45,7 +47,9 @@ export async function generateMetadata({ params }: ClinicDetailProps) {
   return {
     title: `${clinicName(clinic)} | Korea Clinic Map`,
     description: `Contact information and medical equipment details for ${clinicName(clinic)} in ${clinicRegion(clinic)?.label || 'Korea'}.`,
+    ...profileSearchMetadata(clinic),
     ...goldmanSearchMetadata(params.id),
+    ...(excludedFromSearch(clinic)?{robots:{index:false,follow:true}}:{}),
     alternates: {
       canonical: `${SITE_URL}${clinicPath(clinic)}`,
     }

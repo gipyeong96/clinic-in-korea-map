@@ -1,3 +1,4 @@
+import EmergencyDepartmentScope from '@/components/EmergencyDepartmentScope';
 import ClinicSearchScope from '@/components/ClinicSearchScope';
 import UrologyDiscovery from '@/components/UrologyDiscovery';
 import InfoDisclosure from '@/components/InfoDisclosure';
@@ -60,6 +61,7 @@ export async function generateMetadata({ params, searchParams }: Props) {
     alternates: { canonical: `${SITE_URL}/clinics/${params.department}/${params.location}` },
     ...(jamsilDescription?{title:`Compare Urology Clinics ${params.location==='jamsil'?'in Jamsil-dong':'near Jamsil Station'}, Seoul | Korea Clinic Map`,description:jamsilDescription}:{}),
     ...(params.department==='urology'&&urologyAreas[params.location]?{title:urologyAreas[params.location].title+' | Korea Clinic Map',description:urologyAreas[params.location].description}:{}),
+    ...(params.department==='emergency-medicine'?{title:`Hospitals & Clinics Reporting Emergency Medicine ${place} | Korea Clinic Map`,description:`Browse HIRA-reported emergency medicine departments ${place}. This is not a verified emergency-room or live acceptance list. Use the official emergency institution directory for emergency contacts.`}:{}),
     robots: Object.keys(searchParams).length || !resolved ? { index: false, follow: true } : undefined,
   };
 }
@@ -114,7 +116,8 @@ export default async function SearchPage({ params, searchParams }: Props) {
   return <>
     <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(schema) }} />
     <div className="max-w-6xl mx-auto px-4 py-5 space-y-3 sm:py-8 sm:space-y-6">
-      <h1 className="text-2xl md:text-3xl font-black break-words">{params.department==='dentistry'?`Dentists ${station?'near':'in'} ${station?stationHeading:loc}`:station ? `${params.department === 'all' ? 'Clinics' : `${dept} Clinics`} near ${stationHeading}` : `${dept} Clinics in ${loc}`}</h1>
+      <h1 className="text-2xl md:text-3xl font-black break-words">{params.department==='emergency-medicine'?`Hospitals & Clinics Reporting Emergency Medicine ${station?'near':'in'} ${station?stationHeading:loc}`:params.department==='dentistry'?`Dentists ${station?'near':'in'} ${station?stationHeading:loc}`:station ? `${params.department === 'all' ? 'Clinics' : `${dept} Clinics`} near ${stationHeading}` : `${dept} Clinics in ${loc}`}</h1>
+      {params.department==='emergency-medicine'&&<EmergencyDepartmentScope/>}
       <a href={nearbySearchLink(params.department,{query,specialist,registered,weekend,radius:station?radius:undefined})} className="min-h-11 inline-flex items-center rounded-lg bg-slate-900 px-4 py-3 text-sm font-semibold text-white">{nearbyAction(params.department)}</a>
       <ClinicSearchScope location={loc} station={station?.name_en} radius={radius} nearbyLabel={nearbyAction(params.department)}/>
       {params.department==='urology'&&!failed&&filteredClinics.length>0&&<a href="#clinic-results" className="min-h-11 inline-flex items-center rounded-lg border border-blue-300 bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-900">View {filteredClinics.length} clinics{hasNext?' on this page':''} ↓</a>}
