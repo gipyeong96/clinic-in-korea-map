@@ -1,3 +1,4 @@
+import GuideBranchLocations from '@/components/GuideBranchLocations';
 import Link from 'next/link';
 import PartnerClinicCards from '@/components/PartnerClinicCards';
 import MobileCardDetails from '@/components/MobileCardDetails';
@@ -49,7 +50,7 @@ export default function UrologyVisitGuide({guide:g}:{guide:Guide}) {
   <section id="branches" className="scroll-mt-24 space-y-3">
    <h2 className="text-xl font-bold">Choose your Goldman branch</h2>
    <p>{vasectomy?'Vasectomy':'Circumcision'} and English consultations are available at all five branches. Open a branch profile for contact details.</p>
-   <PartnerClinicCards ids={goldmanBranches.map(b=>b.id)}/>
+   <GuideBranchLocations/><PartnerClinicCards ids={goldmanBranches.map(b=>b.id)} anchorPrefix="guide-branch-"/>
   </section>
   <section id="inquiry" className={section}>
    <h2 className="text-lg sm:text-xl font-bold">Start your inquiry</h2>
