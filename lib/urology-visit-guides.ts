@@ -15,7 +15,7 @@ export const urologyVisitGuides = [
     preparation: ['Your concerns and any previous treatment or surgery.', 'Medicines, supplements, allergies and relevant medical conditions.', 'Your preferred branch and appointment dates.', 'Your departure date, if you are visiting Korea.'],
     quote: 'Ask whether consultation, tests, anaesthesia, surgery, medicines, dressings and follow-up visits are included. Your estimate should explain additional charges and which costs may change after assessment.',
     followUp: ['When should my wound be checked, and how many visits might I need?', 'How should I wash the area and care for dressings or stitches?', 'When can I return to work, exercise and sexual activity?', 'When can the clinician assess whether I am ready to travel?', 'Who should I contact if I have a concern after returning home?'],
-    inquiry: 'Hello, I would like an English consultation about adult circumcision at your [branch name] branch. My preferred dates are [dates], and I plan to leave Korea on [date, if applicable]. Could you confirm appointment availability, preparation, an itemised estimate and the follow-up arrangements?',
+    cardDescription: 'Consultation options, written quotes and recovery planning.', inquiry: 'I would like an English consultation about adult circumcision, costs and follow-up.',
   },
   {
     slug: 'vasectomy-korea',
@@ -32,7 +32,7 @@ export const urologyVisitGuides = [
     preparation: ['Your family-planning goals and any questions about permanent contraception.', 'Previous surgery or medical problems affecting the area.', 'Medicines, supplements, allergies and relevant medical conditions.', 'Your preferred branch, appointment dates and departure date, if applicable.'],
     quote: 'Check whether consultation, tests, anaesthesia, the procedure, medicines, follow-up appointments and post-vasectomy semen analysis are included. Ask whether additional tests or repeat semen samples would involve separate charges.',
     followUp: ['When should I have the semen analysis?', 'Where can I provide the sample, and what preparation is required?', 'If I have returned home, can I use a local laboratory?', 'Will the clinic accept and review results from that laboratory?', 'How will I receive confirmation, and what happens if another sample is needed?'],
-    inquiry: 'Hello, I would like an English consultation about vasectomy at your [branch name] branch. My preferred dates are [dates], and I plan to leave Korea on [date, if applicable]. Could you confirm appointment availability, an itemised estimate and how post-vasectomy semen testing would be arranged?',
+    cardDescription: 'Permanent contraception, costs and semen test follow-up.', inquiry: 'I would like an English vasectomy consultation, including costs and semen test follow-up.',
   },
 ] as const;
 export type UrologyVisitGuide = typeof urologyVisitGuides[number];

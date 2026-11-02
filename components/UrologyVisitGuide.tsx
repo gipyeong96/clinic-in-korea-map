@@ -53,9 +53,9 @@ export default function UrologyVisitGuide({guide:g}:{guide:Guide}) {
   </section>
   <section id="inquiry" className={section}>
    <h2 className="text-lg sm:text-xl font-bold">Start your inquiry</h2>
-   <p>Use this message as a starting point. Replace the bracketed details before sending it through the clinic’s contact channel.</p>
+   <p>Use this short message to start your inquiry. Select your preferred branch in the consultation form, and discuss detailed questions with the clinic.</p>
    <blockquote className="rounded-xl border-l-4 border-slate-300 bg-slate-50 p-4 select-text">{g.inquiry}</blockquote>
-   <a href="https://www.gold-man.com/ennew/" target="_blank" rel="sponsored noopener noreferrer" className={button}>Official website & inquiry form ↗</a>
+   <a href="https://www.gold-man.com/ennew/#gm-consult" target="_blank" rel="sponsored noopener noreferrer" className={button}>Open English consultation form ↗</a>
   </section>
   <nav aria-label="Related visit guides" className="space-y-2">{urologyVisitGuides.filter(other=>other.slug!==g.slug).map(other=><Link key={other.slug} href={visitGuidePath(other.slug)} className="flex min-h-11 items-center underline">{other.shortTitle} →</Link>)}<Link href="/guides/urology-care/bph" className="flex min-h-11 items-center underline">BPH treatment & surgery planning →</Link></nav>
   <footer className="border-t pt-4 space-y-3 text-xs sm:text-sm text-slate-600">
