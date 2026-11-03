@@ -132,7 +132,7 @@ export default function ClinicCard({ clinic, selectedDepartment='all', onShowMap
           </div>
         </details>}
 
-        <div className="flex flex-wrap gap-2 sm:hidden">        {onShowMap&&hasClinicCoordinates(clinic)&&<button type="button" onClick={onShowMap} className="min-h-11 border rounded-lg px-3 py-2 text-sm font-semibold">Show on map</button>}
+        <div className="flex flex-wrap gap-2 sm:hidden">        {onShowMap&&hasClinicCoordinates(clinic)&&<button type="button" aria-label={`Show on map for ${name}`} onClick={onShowMap} className="min-h-11 border rounded-lg px-3 py-2 text-sm font-semibold">Show on map</button>}
         {(branch || (isPartner && clinic.premium_data?.website)) && (
           <a
             href={branch?GOLDMAN_ENGLISH_URL:clinic.premium_data.website}
@@ -165,7 +165,7 @@ export default function ClinicCard({ clinic, selectedDepartment='all', onShowMap
         >
           <span className="sm:hidden">Details →</span><span className="hidden sm:inline">View Details</span>
         </Link>
-        <div className="hidden sm:contents">        {onShowMap&&hasClinicCoordinates(clinic)&&<button type="button" onClick={onShowMap} className="min-h-11 border rounded-lg px-3 py-2 text-sm font-semibold">Show on map</button>}
+        <div className="hidden sm:contents">        {onShowMap&&hasClinicCoordinates(clinic)&&<button type="button" aria-label={`Show on map for ${name}`} onClick={onShowMap} className="min-h-11 border rounded-lg px-3 py-2 text-sm font-semibold">Show on map</button>}
         {(branch || (isPartner && clinic.premium_data?.website)) && (
           <a
             href={branch?GOLDMAN_ENGLISH_URL:clinic.premium_data.website}
