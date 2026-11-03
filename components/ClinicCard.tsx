@@ -5,6 +5,7 @@ import {goldmanBranch,goldmanLocationUrl,GOLDMAN_ENGLISH_URL} from '@/lib/goldma
 
 import React from 'react';
 import {cardAddress} from '@/lib/card-location';
+import KoreanAddressCopy from './KoreanAddressCopy';
 import Link from 'next/link';
 import { Phone, MapPin, Globe, TrainFront, CalendarDays, Stethoscope, ChevronDown } from 'lucide-react';
 import { clinicFocus, groupedDepartments } from '@/lib/clinic-evidence';
@@ -108,9 +109,9 @@ export default function ClinicCard({ clinic, selectedDepartment='all', onShowMap
         <div className="space-y-2 text-xs text-slate-500">
           <div className="flex items-start gap-2">
             <MapPin className="w-3.5 h-3.5 text-slate-400 mt-0.5 shrink-0" />
-              <span className="break-words">{address.primary || 'Address not provided'}</span>
+              <span lang={address.korean&&address.korean===address.primary?'ko':undefined} className={`break-words ${address.korean&&address.korean===address.primary?'select-all':''}`}>{address.primary || 'Address not provided'}</span>
           </div>
-          {address.korean&&address.korean!==address.primary&&<details><summary className="cursor-pointer min-h-11 py-3 underline">Korean address for taxi / copy</summary><p className="select-all break-words pb-2">{address.korean}</p></details>}
+          <KoreanAddressCopy key={address.korean} korean={address.korean} primary={address.primary} />
           {phone.display && (
             <div aria-label="Clinic telephone" className="flex items-center gap-2">
               <Phone className="w-3.5 h-3.5 text-slate-400 shrink-0" />
