@@ -1,0 +1,164 @@
+name: Clinic map approved autodev
+run-name: Clinic autodev / ${{ vars.CLINIC_MAP_AUTODEV_TASK_ID }}
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # 09:00 Asia/Seoul; GitHub scheduling can be delayed.
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: clinic-map-approved-autodev
+  cancel-in-progress: false
+
+jobs:
+  gate:
+    name: Check approval and previous attempts
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    permissions:
+      contents: read
+      actions: read
+      pull-requests: read
+    outputs:
+      run: ${{ steps.gate.outputs.run }}
+      task_id: ${{ steps.gate.outputs.task_id }}
+      base_sha: ${{ steps.gate.outputs.base_sha }}
+      task_digest: ${{ steps.gate.outputs.task_digest }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/github-script@v8
+        id: gate
+        env:
+          AUTODEV_ENABLED: ${{ vars.CLINIC_MAP_AUTODEV_ENABLED }}
+          AUTODEV_TASK: ${{ vars.CLINIC_MAP_AUTODEV_TASK }}
+          AUTODEV_TASK_ID: ${{ vars.CLINIC_MAP_AUTODEV_TASK_ID }}
+          # A presence boolean only; the gate does not receive the API key.
+          AUTODEV_KEY_PRESENT: ${{ secrets.OPENAI_API_KEY != '' }}
+        with:
+          script: |
+            const gate = require('./.github/scripts/autodev-gate.cjs');
+            await gate({github, context, core, env: process.env});
+
+  develop:
+    name: Develop approved task
+    needs: gate
+    if: needs.gate.outputs.run == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ needs.gate.outputs.base_sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+      - name: Install locked development dependencies
+        run: npm ci --no-audit --no-fund
+      - name: Prepare single approved task
+        env:
+          APPROVED_TASK: ${{ vars.CLINIC_MAP_AUTODEV_TASK }}
+          APPROVED_TASK_ID: ${{ needs.gate.outputs.task_id }}
+          CURRENT_TASK_ID: ${{ vars.CLINIC_MAP_AUTODEV_TASK_ID }}
+          APPROVED_DIGEST: ${{ needs.gate.outputs.task_digest }}
+          ENABLED: ${{ vars.CLINIC_MAP_AUTODEV_ENABLED }}
+          KEY_PRESENT: ${{ secrets.OPENAI_API_KEY != '' }}
+        run: |
+          python3 - <<'PY'
+          import os, hashlib
+          from pathlib import Path
+          policy = Path('.github/autodev/instructions.md').read_text()
+          task = os.environ['APPROVED_TASK'].strip()
+          if (not task or os.environ['ENABLED'] != 'true' or os.environ['KEY_PRESENT'] != 'true'
+              or os.environ['CURRENT_TASK_ID'] != os.environ['APPROVED_TASK_ID']
+              or hashlib.sha256(task.encode()).hexdigest() != os.environ['APPROVED_DIGEST']):
+              raise SystemExit('Approval changed after the gate; refusing AI execution')
+          Path(os.environ['RUNNER_TEMP'], 'autodev-prompt.md').write_text(
+              policy + '\n\nApproved task ID: ' + os.environ['APPROVED_TASK_ID'] +
+              '\nImplement only this approved task:\n' + task + '\n')
+          PY
+      - name: Run Codex for approved task
+        id: codex
+        uses: openai/codex-action@v1
+        with:
+          openai-api-key: ${{ secrets.OPENAI_API_KEY }}
+          prompt-file: ${{ runner.temp }}/autodev-prompt.md
+          output-file: ${{ runner.temp }}/autodev-final.md
+          permission-profile: ':workspace'
+          safety-strategy: drop-sudo
+          # Empty keeps the Action/Codex default; never select a model implicitly.
+          model: ${{ vars.CLINIC_MAP_AUTODEV_MODEL }}
+      # No privileged commands follow drop-sudo. All artifacts are untrusted proposals.
+      - name: Collect patch without publishing code
+        if: always() && steps.codex.outcome != 'skipped'
+        env:
+          BASE_SHA: ${{ needs.gate.outputs.base_sha }}
+          TASK_ID: ${{ needs.gate.outputs.task_id }}
+          CODEX_OUTCOME: ${{ steps.codex.outcome }}
+        run: |
+          git show "$BASE_SHA:.github/scripts/autodev-collect.py" > "$RUNNER_TEMP/autodev-collect.py"
+          python3 "$RUNNER_TEMP/autodev-collect.py"
+      - uses: actions/upload-artifact@v4
+        if: always() && steps.codex.outcome != 'skipped'
+        with:
+          name: autodev-${{ needs.gate.outputs.task_id }}-${{ github.run_id }}
+          path: ${{ runner.temp }}/autodev-result/
+          if-no-files-found: error
+          retention-days: 30
+
+  validate:
+    name: Validate untrusted patch without secrets
+    needs: [gate, develop]
+    if: needs.develop.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ needs.gate.outputs.base_sha }}
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: autodev-${{ needs.gate.outputs.task_id }}-${{ github.run_id }}
+          path: ${{ runner.temp }}/autodev-input
+      - name: Check proposal scope and apply locally
+        env:
+          PROPOSAL_DIR: ${{ runner.temp }}/autodev-input
+        run: python3 .github/scripts/autodev-apply.py
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+      - name: Validate proposal
+        run: |
+          mkdir -p "$RUNNER_TEMP/autodev-checks"
+          set +e
+          npm ci --no-audit --no-fund > "$RUNNER_TEMP/autodev-checks/install.log" 2>&1
+          install_status=$?
+          if [ "$install_status" -ne 0 ]; then
+            echo "Installation failed ($install_status)" >> "$GITHUB_STEP_SUMMARY"
+            exit "$install_status"
+          fi
+          node --test tests/*.test.cjs > "$RUNNER_TEMP/autodev-checks/tests.log" 2>&1
+          test_status=$?
+          npm run build > "$RUNNER_TEMP/autodev-checks/build.log" 2>&1
+          build_status=$?
+          ./node_modules/.bin/tsc --noEmit > "$RUNNER_TEMP/autodev-checks/types.log" 2>&1
+          type_status=$?
+          echo "Tests: $test_status; build: $build_status; types: $type_status" >> "$GITHUB_STEP_SUMMARY"
+          test "$test_status" -eq 0 && test "$build_status" -eq 0 && test "$type_status" -eq 0
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: autodev-checks-${{ needs.gate.outputs.task_id }}-${{ github.run_id }}
+          path: ${{ runner.temp }}/autodev-checks/
+          if-no-files-found: warn
+          retention-days: 30
