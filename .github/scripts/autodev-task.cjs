@@ -1,14 +1,18 @@
 'use strict';
-function approvedTask(data) {
+function approvedTask(data, today = new Date(Date.now() + 9 * 60 * 60 * 1000).toISOString().slice(0, 10)) {
   if (!data || data.version !== 1 || !Array.isArray(data.tasks)) throw new Error('Invalid task list');
   const ids = new Set();
   for (const task of data.tasks) {
     if (!task || !/^[a-z0-9][a-z0-9-]{0,63}$/.test(task.id || '') || ids.has(task.id)) throw new Error('Invalid or duplicate task ID');
     ids.add(task.id);
     if (!['approved','completed','blocked'].includes(task.status) || typeof task.instructions !== 'string' || !task.instructions.trim()) throw new Error('Invalid task entry');
+    if (task.notBefore !== undefined && (!/^\d{4}-\d{2}-\d{2}$/.test(task.notBefore) || !Number.isFinite(Date.parse(task.notBefore)) || new Date(task.notBefore).toISOString().slice(0, 10) !== task.notBefore)) throw new Error('Invalid notBefore date');
   }
   const pending = data.tasks.filter(task => task.status === 'approved');
   if (pending.length > 1) throw new Error('Only one approved task is allowed');
-  return pending[0] || null;
+  const task = pending[0];
+  const day = new Date(today + 'T00:00:00Z').getUTCDay();
+  if (!task || day === 0 || day === 6 || (task.notBefore && today < task.notBefore)) return null;
+  return task;
 }
 module.exports = {approvedTask};
