@@ -3,7 +3,7 @@ run-name: Clinic autodev / task-file
 
 on:
   schedule:
-    - cron: '0 0 * * *' # 09:00 Asia/Seoul; GitHub scheduling can be delayed.
+    - cron: '0 0 * * 1-5' # Weekdays 09:00 Asia/Seoul; GitHub scheduling can be delayed.
   workflow_dispatch:
     inputs:
       verify_only:
