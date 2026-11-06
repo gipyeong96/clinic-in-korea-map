@@ -3,6 +3,7 @@ const sm={exports:{}};new Function('module','exports',ts.transpileModule(fs.read
 const m={exports:{}};new Function('module','exports','require',ts.transpileModule(fs.readFileSync('lib/clinic-library.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText)(m,m.exports,n=>n==='./site'?sm.exports:require(n));const {readLibrary,updateLibrary,clinicSnapshot}=m.exports;
 const clinic=n=>({id:String(n),path:'/clinics/detail/'+n,name:'Clinic '+n,nameKo:'병원',address:'서울',region:'Seoul'});
 
+// Exercise the actual hook with synchronous state/effect scheduling, without a browser dependency.
 function mountLibraryHook(initial){
  const states=[],effects=[],listeners=new Map(),writes=[];
  let cursor=0,mounted=false,readFails=true,writeFails=false,raw=JSON.stringify(initial);
