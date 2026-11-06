@@ -1,10 +1,15 @@
 name: Clinic map approved autodev
-run-name: Clinic autodev / ${{ vars.CLINIC_MAP_AUTODEV_TASK_ID }}
+run-name: Clinic autodev / task-file
 
 on:
   schedule:
     - cron: '0 0 * * *' # 09:00 Asia/Seoul; GitHub scheduling can be delayed.
   workflow_dispatch:
+    inputs:
+      verify_only:
+        description: 'Validate task-file migration without paid AI execution'
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -31,18 +36,39 @@ jobs:
       - uses: actions/checkout@v5
         with:
           persist-credentials: false
+      - name: Verify task list and duplicate gates
+        run: |
+          node --test .github/scripts/autodev-gate.test.cjs
+          node -e "require('./.github/scripts/autodev-task.cjs').approvedTask(require('./.github/autodev/tasks.json'))"
       - uses: actions/github-script@v8
         id: gate
         env:
+          AUTODEV_VERIFY_ONLY: ${{ inputs.verify_only }}
           AUTODEV_ENABLED: ${{ vars.CLINIC_MAP_AUTODEV_ENABLED }}
-          AUTODEV_TASK: ${{ vars.CLINIC_MAP_AUTODEV_TASK }}
-          AUTODEV_TASK_ID: ${{ vars.CLINIC_MAP_AUTODEV_TASK_ID }}
           # A presence boolean only; the gate does not receive the API key.
           AUTODEV_KEY_PRESENT: ${{ secrets.OPENAI_API_KEY != '' }}
         with:
           script: |
             const gate = require('./.github/scripts/autodev-gate.cjs');
-            await gate({github, context, core, env: process.env});
+            const fs = require('node:fs');
+            const {approvedTask} = require('./.github/scripts/autodev-task.cjs');
+            const env = {...process.env};
+            if (env.AUTODEV_ENABLED === 'true' && env.AUTODEV_KEY_PRESENT === 'true') {
+              const task = approvedTask(JSON.parse(fs.readFileSync('.github/autodev/tasks.json', 'utf8')));
+              env.AUTODEV_TASK = task?.instructions || '';
+              env.AUTODEV_TASK_ID = task?.id || '';
+            }
+            await gate({github, context, core, env});
+            // Uploaded before development; failure to save the claim prevents development.
+            fs.writeFileSync(process.env.RUNNER_TEMP + '/autodev-claim.json', JSON.stringify({task: env.AUTODEV_TASK_ID || '', run: context.runId}));
+      - name: Record attempt claim before development
+        if: steps.gate.outputs.run == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: autodev-claim-${{ steps.gate.outputs.task_id }}
+          path: ${{ runner.temp }}/autodev-claim.json
+          retention-days: 90
+          if-no-files-found: error
 
   develop:
     name: Develop approved task
@@ -63,28 +89,43 @@ jobs:
           node-version: '24'
       - name: Install locked development dependencies
         run: npm ci --no-audit --no-fund
+      - name: Recheck current task approval
+        uses: actions/github-script@v8
+        env:
+          TASK_ID: ${{ needs.gate.outputs.task_id }}
+          TASK_DIGEST: ${{ needs.gate.outputs.task_digest }}
+          ENABLED: ${{ vars.CLINIC_MAP_AUTODEV_ENABLED }}
+        with:
+          script: |
+            const {approvedTask} = require('./.github/scripts/autodev-task.cjs');
+            const response = await github.rest.repos.getContent({...context.repo, path: '.github/autodev/tasks.json', ref: 'main'});
+            if (response.data.encoding !== 'base64') throw new Error('Unexpected task file encoding');
+            const task = approvedTask(JSON.parse(Buffer.from(response.data.content, 'base64').toString('utf8')));
+            const digest = require('node:crypto').createHash('sha256').update(task?.instructions.trim() || '').digest('hex');
+            if (process.env.ENABLED !== 'true' || task?.id !== process.env.TASK_ID || digest !== process.env.TASK_DIGEST) {
+              throw new Error('Task approval changed after gate; refusing AI execution');
+            }
       - name: Prepare single approved task
         env:
-          APPROVED_TASK: ${{ vars.CLINIC_MAP_AUTODEV_TASK }}
           APPROVED_TASK_ID: ${{ needs.gate.outputs.task_id }}
-          CURRENT_TASK_ID: ${{ vars.CLINIC_MAP_AUTODEV_TASK_ID }}
           APPROVED_DIGEST: ${{ needs.gate.outputs.task_digest }}
           ENABLED: ${{ vars.CLINIC_MAP_AUTODEV_ENABLED }}
           KEY_PRESENT: ${{ secrets.OPENAI_API_KEY != '' }}
         run: |
-          python3 - <<'PY'
-          import os, hashlib
-          from pathlib import Path
-          policy = Path('.github/autodev/instructions.md').read_text()
-          task = os.environ['APPROVED_TASK'].strip()
-          if (not task or os.environ['ENABLED'] != 'true' or os.environ['KEY_PRESENT'] != 'true'
-              or os.environ['CURRENT_TASK_ID'] != os.environ['APPROVED_TASK_ID']
-              or hashlib.sha256(task.encode()).hexdigest() != os.environ['APPROVED_DIGEST']):
-              raise SystemExit('Approval changed after the gate; refusing AI execution')
-          Path(os.environ['RUNNER_TEMP'], 'autodev-prompt.md').write_text(
-              policy + '\n\nApproved task ID: ' + os.environ['APPROVED_TASK_ID'] +
-              '\nImplement only this approved task:\n' + task + '\n')
-          PY
+          node <<'JS'
+          const fs = require('node:fs');
+          const {approvedTask} = require('./.github/scripts/autodev-task.cjs');
+          const task = approvedTask(JSON.parse(fs.readFileSync('.github/autodev/tasks.json', 'utf8')));
+          const text = task?.instructions.trim() || '';
+          const digest = require('node:crypto').createHash('sha256').update(text).digest('hex');
+          if (!text || process.env.ENABLED !== 'true' || process.env.KEY_PRESENT !== 'true' ||
+              task.id !== process.env.APPROVED_TASK_ID || digest !== process.env.APPROVED_DIGEST) {
+            throw new Error('Task approval mismatch; refusing AI execution');
+          }
+          const policy = fs.readFileSync('.github/autodev/instructions.md', 'utf8');
+          fs.writeFileSync(process.env.RUNNER_TEMP + '/autodev-prompt.md',
+            policy + '\n\nApproved task ID: ' + task.id + '\nImplement only this approved task:\n' + text + '\n');
+          JS
       - name: Run Codex for approved task
         id: codex
         uses: openai/codex-action@v1
