@@ -56,9 +56,20 @@ test('base pins the checked-out event commit rather than later main',async()=>{
 const {approvedTask}=require('./autodev-task.cjs');
 test('task list selects one explicit approval and rejects malformed/duplicate/ambiguous work',()=>{
  const t={id:'one',status:'approved',instructions:'One task'};
- assert.equal(approvedTask({version:1,tasks:[t]}).id,'one');
+ assert.equal(approvedTask({version:1,tasks:[t]},'2026-11-09').id,'one');
  assert.equal(approvedTask({version:1,tasks:[{...t,status:'completed'}]}),null);
  for(const data of [{}, {version:1,tasks:[t,t]}, {version:1,tasks:[t,{...t,id:'two'}]}, {version:1,tasks:[{...t,status:'pending'}]}, {version:1,tasks:[{...t,instructions:''}]}])assert.throws(()=>approvedTask(data));
 });
 
 test('verification-only never queries remote APIs or invokes development',async()=>{const f=fixture({AUTODEV_VERIFY_ONLY:'true'});await f.run();assert.equal(f.outputs.run,'false');assert.equal(f.calls,0);});
+
+test('KST weekday and notBefore guard holds work until Monday without consuming its ID',()=>{
+ const task={id:'next',status:'approved',instructions:'Keep task',notBefore:'2026-11-09'};
+ const data={version:1,tasks:[task]}, before=JSON.stringify(data);
+ for(const date of ['2026-11-06','2026-11-07','2026-11-08'])assert.equal(approvedTask(data,date),null);
+ assert.equal(approvedTask(data,'2026-11-09'),task);
+ assert.equal(approvedTask(data,'2026-11-10'),task);
+ assert.equal(approvedTask(data,'2026-11-14'),null);
+ assert.equal(JSON.stringify(data),before);
+ for(const notBefore of ['bad','2026-02-30',123])assert.throws(()=>approvedTask({version:1,tasks:[{...task,notBefore}]},'2026-11-09'),/notBefore/);
+});
