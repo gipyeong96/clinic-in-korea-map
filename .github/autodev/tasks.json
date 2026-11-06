@@ -4,7 +4,8 @@
     {
       "id": "comparison-link-a11y-20261107",
       "status": "approved",
-      "instructions": "Improve accessible action names only in components/ClinicComparison.tsx and related tests. In comparison results, profile and directions links currently repeat generic labels for multiple clinics. Include the existing ComparisonProfile.name in their accessible names so screen-reader users distinguish destinations; preserve visible text, href, target/rel, row order, desktop/mobile rendering, fetch/abort behavior, medical wording, saved data and analytics. Add focused component regression coverage for two distinct clinic names, original destinations/target/rel and absence of directions when unavailable. Use locked installed dependencies only. No new features, medical/data/SEO/indexing/ad/analytics/workflow/dependency changes; no PR89 address-copy work. Leave one minimal uncommitted patch proposal, no publication."
+      "instructions": "Improve accessible action names only in components/ClinicComparison.tsx and related tests. In comparison results, profile and directions links currently repeat generic labels for multiple clinics. Include the existing ComparisonProfile.name in their accessible names so screen-reader users distinguish destinations; preserve visible text, href, target/rel, row order, desktop/mobile rendering, fetch/abort behavior, medical wording, saved data and analytics. Add focused component regression coverage for two distinct clinic names, original destinations/target/rel and absence of directions when unavailable. Use locked installed dependencies only. No new features, medical/data/SEO/indexing/ad/analytics/workflow/dependency changes; no PR89 address-copy work. Leave one minimal uncommitted patch proposal, no publication.",
+      "notBefore": "2026-11-09"
     }
   ]
 }
