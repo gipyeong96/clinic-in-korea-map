@@ -1,3 +1,5 @@
+> Current task registration: see [task-file queue](autodev-task-queue.md). The TASK/TASK_ID repository-variable instructions below describe the historical draft; normal registration now uses `.github/autodev/tasks.json`.
+
 # Approved single-task autodev — review-only draft
 
 This workflow uses **GitHub-hosted ubuntu-latest runners**, not the published

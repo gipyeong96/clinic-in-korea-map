@@ -3,6 +3,7 @@
 module.exports = async function gate({github, context, core, env}) {
   core.setOutput('run', 'false');
   const skip = reason => core.summary.addRaw(`Autodev skipped: ${reason}\n`).write();
+  if (env.AUTODEV_VERIFY_ONLY === 'true') return skip('verification only; no AI execution');
   if (env.AUTODEV_ENABLED !== 'true') return skip('explicit enable switch is off');
   if (env.AUTODEV_KEY_PRESENT !== 'true') return skip('API key is absent');
   if (!env.AUTODEV_TASK?.trim()) return skip('approved task is empty');
@@ -26,6 +27,10 @@ module.exports = async function gate({github, context, core, env}) {
   }
   for (const run of runs) {
     if (run.id === context.runId) continue;
+    const claims = await github.paginate(github.rest.actions.listWorkflowRunArtifacts, {...repo, run_id: run.id, per_page: 100});
+    if (claims.some(artifact => artifact.name === `autodev-claim-${id}`)) {
+      return skip('a durable attempt claim already exists for this task');
+    }
     if (run.display_title !== `Clinic autodev / ${id}`) continue;
     const jobs = await github.paginate(github.rest.actions.listJobsForWorkflowRun, {...repo, run_id: run.id, filter: 'all', per_page: 100});
     if (jobs.some(job => job.name === 'Develop approved task' && job.conclusion !== 'skipped')) {
@@ -34,7 +39,7 @@ module.exports = async function gate({github, context, core, env}) {
   }
   // Rerunning the same workflow run must not issue a second paid invocation.
   if (Number(context.runAttempt || env.GITHUB_RUN_ATTEMPT || 1) > 1) return skip('reruns require human reconciliation and a new approved task ID');
-  const main = await github.rest.repos.getCommit({...repo, ref: 'main'});
+  const main = await github.rest.repos.getCommit({...repo, ref: context.sha || 'main'});
   core.setOutput('task_id', id);
   core.setOutput('task_digest', require('node:crypto').createHash('sha256').update(env.AUTODEV_TASK.trim()).digest('hex'));
   core.setOutput('base_sha', main.data.sha);
