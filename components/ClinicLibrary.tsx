@@ -9,7 +9,7 @@ function useLibrary(){
   const [library,setLibrary]=useState<ClinicLibrary>({saved:[],recent:[]});
   const [ready,setReady]=useState(false),[error,setError]=useState('');
   useEffect(()=>{
-    const refresh=()=>{try{setLibrary(readLibrary(localStorage.getItem(LIBRARY_KEY)));setReady(true);}catch{setError('Storage is unavailable. Allow browser storage to save clinics.');setReady(true);}};
+    const refresh=()=>{try{setLibrary(readLibrary(localStorage.getItem(LIBRARY_KEY)));setError('');setReady(true);}catch{setError('Storage is unavailable. Allow browser storage to save clinics.');setReady(true);}};
     refresh();window.addEventListener('clinic-library',refresh);window.addEventListener('storage',refresh);
     return ()=>{window.removeEventListener('clinic-library',refresh);window.removeEventListener('storage',refresh);};
   },[]);
