@@ -1,0 +1,54 @@
+name: Clinic Map Search Console
+run-name: Clinic Map read-only search performance
+
+on:
+  schedule:
+    - cron: '0 20 * * 0-4' # Mon-Fri 05:00 Asia/Seoul; scheduling may be delayed.
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: clinic-map-search-console
+  cancel-in-progress: false
+
+jobs:
+  search-performance:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - name: Check scheduled start date
+        id: start
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+        run: |
+          python3 - <<'PY'
+          import datetime, os, zoneinfo
+          day = datetime.datetime.now(zoneinfo.ZoneInfo('Asia/Seoul')).date()
+          enabled = os.environ['EVENT_NAME'] != 'schedule' or (day >= datetime.date(2026, 11, 10) and day.weekday() < 5)
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
+              output.write(f'run={str(enabled).lower()}\n')
+          PY
+      - name: Test property restriction and reporting
+        if: steps.start.outputs.run == 'true'
+        run: python3 .github/scripts/gsc-reader.test.py
+      - name: Read Clinic Map search performance
+        if: steps.start.outputs.run == 'true'
+        env:
+          CLINIC_MAP_GSC_CLIENT_ID: ${{ secrets.CLINIC_MAP_GSC_CLIENT_ID }}
+          CLINIC_MAP_GSC_CLIENT_SECRET: ${{ secrets.CLINIC_MAP_GSC_CLIENT_SECRET }}
+          CLINIC_MAP_GSC_REFRESH_TOKEN: ${{ secrets.CLINIC_MAP_GSC_REFRESH_TOKEN }}
+          GSC_REPORT_DIR: ${{ runner.temp }}/clinic-map-gsc
+        run: python3 .github/scripts/gsc-reader.py
+      - name: Save search performance report
+        if: always() && steps.start.outputs.run == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: clinic-map-gsc-${{ github.run_id }}
+          path: ${{ runner.temp }}/clinic-map-gsc/
+          retention-days: 30
+          if-no-files-found: error
