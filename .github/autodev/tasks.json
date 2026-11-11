@@ -3,9 +3,15 @@
   "tasks": [
     {
       "id": "comparison-link-a11y-20261107",
-      "status": "approved",
+      "status": "completed",
       "instructions": "Improve accessible action names only in components/ClinicComparison.tsx and related tests. In comparison results, profile and directions links currently repeat generic labels for multiple clinics. Include the existing ComparisonProfile.name in their accessible names so screen-reader users distinguish destinations; preserve visible text, href, target/rel, row order, desktop/mobile rendering, fetch/abort behavior, medical wording, saved data and analytics. Add focused component regression coverage for two distinct clinic names, original destinations/target/rel and absence of directions when unavailable. Use locked installed dependencies only. No new features, medical/data/SEO/indexing/ad/analytics/workflow/dependency changes; no PR89 address-copy work. Leave one minimal uncommitted patch proposal, no publication.",
       "notBefore": "2026-11-09"
+    },
+    {
+      "id": "comparison-busy-a11y-20261112",
+      "status": "approved",
+      "notBefore": "2026-11-12",
+      "instructions": "In components/ClinicComparison.tsx, expose the existing comparison loading state through aria-busy on the existing outer labelled comparison section. Preserve all visible text, aria labels including clinic-specific links, disabled-button logic, selection/order/layout, fetch/abort/error handling, data/storage, medical wording and analytics. Add focused component regression tests demonstrating aria-busy is true only while the existing busy state is true and false when idle/completed, without inventing network behavior or changing hooks. Edit only this component and related tests, use locked installed dependencies. No medical/data/SEO/indexing/ad/analytics/workflow/dependency/DB/Vercel changes; no PR89 copying work. Produce one minimal uncommitted patch only, no publication."
     }
   ]
 }
