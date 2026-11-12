@@ -31,7 +31,7 @@ export default function ClinicComparison({selected}:{selected:LibraryClinic[]}){
  }
  const label=(row:ComparisonRow,index:number)=>row.status==='ok'?row.profile.name:selected[index]?.name||'Clinic';
  const cell=(row:ComparisonRow,field:typeof fields[number])=>row.status==='ok'?field.value(row.profile):<span>This profile is unavailable in the directory right now. Try refreshing the comparison or open its saved profile below.</span>;
- return <section aria-labelledby="compare-heading" className="rounded-xl border bg-white p-4 space-y-4 min-w-0">
+ return <section aria-labelledby="compare-heading" aria-busy={busy} className="rounded-xl border bg-white p-4 space-y-4 min-w-0">
   <h2 id="compare-heading" className="scroll-mt-24 text-xl font-bold">Compare saved clinics</h2>
   <p className="text-sm">Select two or three saved clinics below, then compare their directory information. Clinics appear in your selection order.</p>
   <p role="status" className="text-sm font-semibold">{selected.length} of 3 selected{selected.length===1?' · Choose one more clinic.':''}</p>
