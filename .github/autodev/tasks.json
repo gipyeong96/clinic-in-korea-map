@@ -9,9 +9,15 @@
     },
     {
       "id": "comparison-busy-a11y-20261112",
-      "status": "approved",
+      "status": "completed",
       "notBefore": "2026-11-12",
       "instructions": "In components/ClinicComparison.tsx, expose the existing comparison loading state through aria-busy on the existing outer labelled comparison section. Preserve all visible text, aria labels including clinic-specific links, disabled-button logic, selection/order/layout, fetch/abort/error handling, data/storage, medical wording and analytics. Add focused component regression tests demonstrating aria-busy is true only while the existing busy state is true and false when idle/completed, without inventing network behavior or changing hooks. Edit only this component and related tests, use locked installed dependencies. No medical/data/SEO/indexing/ad/analytics/workflow/dependency/DB/Vercel changes; no PR89 copying work. Produce one minimal uncommitted patch only, no publication."
+    },
+    {
+      "id": "comparison-keyboard-focus-20261113",
+      "status": "approved",
+      "notBefore": "2026-11-13",
+      "instructions": "Improve keyboard focus visibility on the existing Compare selected clinics button in components/ClinicComparison.tsx using a clearly contrasting focus-visible outline with offset. Preserve current layout, text, disabled/loading behavior, click handler, comparison links and accessibility names, storage and analytics. Edit only this component and related tests if needed to cover a specific regression. Use locked dependencies. No changes to medical wording, data, SEO, indexing, advertising, workflow, dependencies, DB or Vercel. Do not duplicate PR89. Produce one minimal uncommitted patch only."
     }
   ]
 }
