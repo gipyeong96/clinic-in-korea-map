@@ -56,5 +56,50 @@ class ReaderTests(unittest.TestCase):
         with self.assertRaisesRegex(reader.ReadFailure,'DIMENSION'):
             reader.query('private',dt.date(2026,11,1),dt.date(2026,11,7),dimensions=['query'])
 
+    def test_exact_keyword_pilot_is_bounded_and_preserves_missing_rows(self):
+        start = dt.date(2026,11,2)
+        end = dt.date(2026,11,8)
+        windows = {'recent7': (start, end), 'previous7': (start-dt.timedelta(days=7), end-dt.timedelta(days=7)),
+                   'recent28': (end-dt.timedelta(days=27), end)}
+        def response(url, body, token, **kwargs):
+            if url == reader.INSPECT_ENDPOINT:
+                self.assertEqual(body['inspectionUrl'], reader.PILOT_URL)
+                self.assertEqual(body['siteUrl'], reader.SITE)
+                return {'inspectionResult': {'indexStatusResult': {'verdict':'PASS', 'googleCanonical':reader.PILOT_URL}}}
+            self.assertEqual(url, reader.SITE_ENDPOINT+'/searchAnalytics/query')
+            self.assertEqual(body['type'], 'web')
+            self.assertEqual(body['dataState'], 'final')
+            self.assertLessEqual(body['rowLimit'], 10)
+            filters = body['dimensionFilterGroups'][0]['filters']
+            self.assertEqual(len(filters), 1)
+            self.assertEqual(filters[0]['operator'], 'equals')
+            self.assertIn(filters[0]['expression'], reader.PILOT_QUERIES)
+            if body.get('dimensions') == ['page']:
+                self.assertEqual(body['aggregationType'], 'byPage')
+                return {'rows':[{'keys':[reader.PILOT_URL+'?hidden=1'], 'clicks':0,'impressions':3,'ctr':0,'position':4}]}
+            return {}
+        with patch.object(reader, 'request_json', side_effect=response) as request:
+            report = reader.keyword_pilot('fake', windows)
+        self.assertEqual(request.call_count, 22)
+        self.assertEqual(report['status'], 'success')
+        self.assertEqual(set(report['queries']), set(reader.PILOT_QUERIES))
+        jamsil = report['queries']['jamsil urology clinic']
+        self.assertIsNone(jamsil['periods']['recent7']['metrics'])
+        self.assertEqual(jamsil['pages']['recent7']['rows'][0]['key'], reader.PILOT_URL)
+        self.assertEqual(report['inspection']['source'], 'google_stored_index')
+
+    def test_pilot_denies_other_queries_and_handles_partial_failure(self):
+        day = dt.date(2026,11,8)
+        with patch.object(reader, 'request_json') as request:
+            with self.assertRaisesRegex(reader.ReadFailure, 'FILTER'):
+                reader.pilot_query('fake', 'other query', day, day)
+            request.assert_not_called()
+        windows = {name: (day, day) for name in ('recent7','previous7','recent28')}
+        with patch.object(reader, 'request_json', side_effect=reader.ReadFailure('HTTP_403')):
+            report = reader.keyword_pilot('fake', windows)
+        self.assertEqual(report['status'], 'incomplete')
+        self.assertEqual(report['inspection']['error'], 'HTTP_403')
+        self.assertEqual(report['queries']['dentist near me']['periods']['recent7']['status'], 'incomplete')
+
 if __name__ == '__main__':
     unittest.main()
