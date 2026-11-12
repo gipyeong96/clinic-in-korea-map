@@ -14,7 +14,7 @@ SCOPE = 'https://www.googleapis.com/auth/webmasters.readonly'
 SITE_ENDPOINT = 'https://www.googleapis.com/webmasters/v3/sites/' + urllib.parse.quote(SITE, safe='')
 TOKEN_ENDPOINT = 'https://oauth2.googleapis.com/token'
 INSPECT_ENDPOINT = 'https://searchconsole.googleapis.com/v1/urlInspection/index:inspect'
-PILOT_QUERIES = ('jamsil urology clinic', 'seoul urology clinic', 'dentist near me')
+PILOT_QUERIES = ('jamsil urology clinic', 'seoul urology clinic')
 PILOT_URL = SITE + 'clinics/urology/jamsil-station'
 
 class ReadFailure(Exception):
@@ -205,7 +205,7 @@ def collect(env=os.environ, now=None, *, include_pilot=False):
                 'External OAuth Testing refresh tokens expire after 7 days; reauthorization may be required.']}
     if include_pilot:
         report['keywordPilot'] = keyword_pilot(token, windows)
-        report['limitations'][0] = ('Pilot covers three exact queries only. Breakdowns are bounded to ten rows '
+        report['limitations'][0] = ('Pilot covers two exact queries only. Breakdowns are bounded to ten rows '
                                     'per dimension and do not necessarily sum to query totals. '
                                     'Page parameters are omitted. URL Inspection reports Google’s stored index.')
     return report

@@ -80,7 +80,7 @@ class ReaderTests(unittest.TestCase):
             return {}
         with patch.object(reader, 'request_json', side_effect=response) as request:
             report = reader.keyword_pilot('fake', windows)
-        self.assertEqual(request.call_count, 22)
+        self.assertEqual(request.call_count, 15)
         self.assertEqual(report['status'], 'success')
         self.assertEqual(set(report['queries']), set(reader.PILOT_QUERIES))
         jamsil = report['queries']['jamsil urology clinic']
@@ -92,14 +92,14 @@ class ReaderTests(unittest.TestCase):
         day = dt.date(2026,11,8)
         with patch.object(reader, 'request_json') as request:
             with self.assertRaisesRegex(reader.ReadFailure, 'FILTER'):
-                reader.pilot_query('fake', 'other query', day, day)
+                reader.pilot_query('fake', 'dentist near me', day, day)
             request.assert_not_called()
         windows = {name: (day, day) for name in ('recent7','previous7','recent28')}
         with patch.object(reader, 'request_json', side_effect=reader.ReadFailure('HTTP_403')):
             report = reader.keyword_pilot('fake', windows)
         self.assertEqual(report['status'], 'incomplete')
         self.assertEqual(report['inspection']['error'], 'HTTP_403')
-        self.assertEqual(report['queries']['dentist near me']['periods']['recent7']['status'], 'incomplete')
+        self.assertEqual(report['queries']['seoul urology clinic']['periods']['recent7']['status'], 'incomplete')
 
 if __name__ == '__main__':
     unittest.main()
