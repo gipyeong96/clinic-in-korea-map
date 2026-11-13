@@ -35,7 +35,7 @@ export default function ClinicComparison({selected}:{selected:LibraryClinic[]}){
   <h2 id="compare-heading" className="scroll-mt-24 text-xl font-bold">Compare saved clinics</h2>
   <p className="text-sm">Select two or three saved clinics below, then compare their directory information. Clinics appear in your selection order.</p>
   <p role="status" className="text-sm font-semibold">{selected.length} of 3 selected{selected.length===1?' · Choose one more clinic.':''}</p>
-  <button type="button" disabled={selected.length<2||busy} onClick={compare} className="min-h-11 rounded-lg bg-slate-900 text-white px-5 py-3 font-semibold disabled:opacity-50">{busy?'Loading comparison…':rows?'Refresh comparison':'Compare selected clinics'}</button>
+  <button type="button" disabled={selected.length<2||busy} onClick={compare} className="min-h-11 rounded-lg bg-slate-900 text-white px-5 py-3 font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700 disabled:opacity-50">{busy?'Loading comparison…':rows?'Refresh comparison':'Compare selected clinics'}</button>
   {error&&<p role="alert" className="text-sm text-rose-700">{error}</p>}
   {rows&&!busy&&<><p className="text-xs text-slate-500">Loaded from the directory {new Date(loadedAt).toLocaleString()}. Source records may be older; confirm current services directly.</p>
    <p className="rounded-lg bg-slate-50 p-3 text-sm">Registration does not confirm English or interpretation support. Specialist counts are department-specific. This comparison is not a ranking or a treatment recommendation.</p>
