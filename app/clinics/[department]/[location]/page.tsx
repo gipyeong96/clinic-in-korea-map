@@ -74,6 +74,7 @@ export default async function SearchPage({ params, searchParams }: Props) {
   const station = stationForSlug(params.location);
   const radius = searchRadius(searchParams.radius);
   const stationHeading=station?.name_en.replace(/\([^)]*\)/g,'').replace(/\s+/g,' ').trim();
+  const jamsilScope = params.department==='urology'&&['jamsil','jamsil-station'].includes(params.location);
   if(hasNearMeIntent(query)){
     const parsed=new URL(homeSearchPath(query),SITE_URL);
     redirect(nearbySearchLink(params.department==='all'?(parsed.searchParams.get('department')||'all'):params.department,{query:parsed.searchParams.get('q')||'',specialist,registered,weekend,radius:station?radius:undefined}));
@@ -122,7 +123,7 @@ export default async function SearchPage({ params, searchParams }: Props) {
       <ClinicSearchScope location={loc} station={station?.name_en} radius={radius} nearbyLabel={nearbyAction(params.department)}/>
       {params.department==='urology'&&!failed&&filteredClinics.length>0&&<a href="#clinic-results" className="min-h-11 inline-flex items-center rounded-lg border border-blue-300 bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-900">View {filteredClinics.length} clinics{hasNext?' on this page':''} ↓</a>}
       {params.department==='urology'&&<UrologyDiscovery location={params.location} showPartners={true}/>}
-      {params.department==='urology'&&['jamsil','jamsil-station'].includes(params.location)&&<section aria-label="Jamsil comparison search scope" className="rounded-xl border bg-white p-4 space-y-3 text-sm">
+      {jamsilScope&&<section aria-label="Jamsil comparison search scope" className="rounded-xl border bg-white p-4 space-y-3 text-sm">
         <p>{station?<>Within <strong>{radius.toLocaleString()} m of Jamsil Station</strong> · Straight-line distance · May include Sincheon-dong and parts of Jamsil-dong.</>:<>Addresses in <strong>Jamsil-dong only</strong>. Use the station search for nearby Sincheon-dong.</>}</p>
         <details><summary className="min-h-11 py-3 cursor-pointer underline">Change area scope</summary>
         <nav aria-label="Jamsil urology comparison choices" className="flex flex-wrap gap-2">
@@ -154,8 +155,9 @@ export default async function SearchPage({ params, searchParams }: Props) {
       {station&&<details id="change-station" className="scroll-mt-24 rounded-xl border bg-white p-3"><summary className="cursor-pointer min-h-11 py-3 font-semibold">Choose another station</summary><p className="pb-3">Your department, radius and filters stay selected. Choose a region or search by station name.</p><StationFinder compact department={params.department} searchOptions={{query,specialist,registered,weekend,radius}} /></details>}
       <form action={`/clinics/${params.department}/${params.location}`} method="get" className="flex flex-wrap items-end gap-3 bg-white p-4 rounded-xl border border-slate-200">
         <label className="flex-1 min-w-[180px] text-sm font-semibold">Clinic name or address
-          <input name="q" defaultValue={query} maxLength={200} className="block border rounded-lg px-3 py-2 w-full mt-1" placeholder="Search names or addresses" />
+          <input name="q" defaultValue={query} maxLength={200} aria-describedby={jamsilScope?'jamsil-search-scope-hint':undefined} className="block border rounded-lg px-3 py-2 w-full mt-1" placeholder="Search names or addresses" />
         </label>
+        {jamsilScope&&<p id="jamsil-search-scope-hint" className="basis-full text-xs text-slate-500">{station?`Searches cover clinics within ${radius.toLocaleString()} m of Jamsil Station and may include Sincheon-dong and parts of Jamsil-dong.`:'This search is limited to Jamsil-dong. Switch to Jamsil Station to include nearby Sincheon-dong.'}</p>}
         {station && <label className="text-sm font-semibold">Radius<select id="search-radius" name="radius" defaultValue={String(radius)} className="scroll-mt-28 block border rounded-lg px-3 py-2 mt-1"><option value="500">500 m</option><option value="1000">1 km</option><option value="2000">2 km</option></select></label>}
         <label className="basis-full text-sm font-semibold">Weekend hours<select name="weekend" defaultValue={weekend||''} className="ml-2 max-w-full rounded-lg border p-3"><option value="">Any schedule</option><option value="saturday">Saturday hours available</option><option value="sunday">Sunday hours available</option></select><span className="block font-normal text-xs text-slate-500 mt-2">{weekendNotice.description} Reported schedule, not live availability.</span></label>
         <fieldset className="basis-full flex flex-wrap gap-x-5 gap-y-2"><legend className="text-sm font-semibold mb-1">Filter clinics</legend><label className="text-sm flex gap-2 min-h-11 items-center"><input type="checkbox" name="specialist" value="1" defaultChecked={specialist} /> {params.department==='all' ? 'Specialists reported' : `${dept} specialist reported`}</label><label className="text-sm flex gap-2 min-h-11 items-center"><input type="checkbox" name="registered" value="1" defaultChecked={registered} /> Registered for international patients</label><p className="basis-full text-xs text-slate-500">Select either or both. Registration is from the official KHIDI registry and does not confirm English or interpretation support.</p></fieldset>
