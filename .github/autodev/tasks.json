@@ -15,9 +15,15 @@
     },
     {
       "id": "comparison-keyboard-focus-20261113",
-      "status": "approved",
+      "status": "completed",
       "notBefore": "2026-11-13",
       "instructions": "Improve keyboard focus visibility on the existing Compare selected clinics button in components/ClinicComparison.tsx using a clearly contrasting focus-visible outline with offset. Preserve current layout, text, disabled/loading behavior, click handler, comparison links and accessibility names, storage and analytics. Edit only this component and related tests if needed to cover a specific regression. Use locked dependencies. No changes to medical wording, data, SEO, indexing, advertising, workflow, dependencies, DB or Vercel. Do not duplicate PR89. Produce one minimal uncommitted patch only."
+    },
+    {
+      "id": "library-recent-remove-focus-20261116",
+      "status": "approved",
+      "notBefore": "2026-11-16",
+      "instructions": "Add a clearly contrasting focus-visible outline and offset to the existing Remove from recent button in components/ClinicLibrary.tsx. Preserve its name, remove behavior, existing data/storage and analytics, visible layout and copy. Inspect current styles and make only the small accessibility change if still needed. No SEO, medical, data, workflow, dependencies, DB or Vercel changes. Produce a minimal uncommitted proposal only."
     }
   ]
 }
