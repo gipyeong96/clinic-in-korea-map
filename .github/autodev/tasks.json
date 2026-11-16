@@ -21,9 +21,15 @@
     },
     {
       "id": "library-recent-remove-focus-20261116",
-      "status": "approved",
+      "status": "completed",
       "notBefore": "2026-11-16",
       "instructions": "Add a clearly contrasting focus-visible outline and offset to the existing Remove from recent button in components/ClinicLibrary.tsx. Preserve its name, remove behavior, existing data/storage and analytics, visible layout and copy. Inspect current styles and make only the small accessibility change if still needed. No SEO, medical, data, workflow, dependencies, DB or Vercel changes. Produce a minimal uncommitted proposal only."
+    },
+    {
+      "id": "library-shortcut-dismiss-focus-20261117",
+      "status": "approved",
+      "notBefore": "2026-11-17",
+      "instructions": "In components/ClinicLibrary.tsx, add a contrasting focus-visible outline with offset to the existing Dismiss saved clinics shortcut button if needed. Preserve its accessible name, dismissal logic, layout and saved clinic data. Only change this button styling. No medical, SEO, analytics, workflow, dependency or deployment changes. Produce a minimal proposal only."
     }
   ]
 }
