@@ -27,9 +27,15 @@
     },
     {
       "id": "library-shortcut-dismiss-focus-20261117",
-      "status": "approved",
+      "status": "completed",
       "notBefore": "2026-11-17",
       "instructions": "In components/ClinicLibrary.tsx, add a contrasting focus-visible outline with offset to the existing Dismiss saved clinics shortcut button if needed. Preserve its accessible name, dismissal logic, layout and saved clinic data. Only change this button styling. No medical, SEO, analytics, workflow, dependency or deployment changes. Produce a minimal proposal only."
+    },
+    {
+      "id": "save-clinic-keyboard-focus-20261120",
+      "status": "approved",
+      "notBefore": "2026-11-20",
+      "instructions": "In components/ClinicLibrary.tsx, add a contrasting focus-visible outline with offset to the existing SaveClinic save/unsave button if needed. Preserve its aria-pressed and clinic-specific accessible name, disabled readiness state, click/storage/error/analytics behavior, visible text and layout. Only change this button styling. No medical, data, SEO, indexing, advertising, workflow, dependency, DB or Vercel changes. Do not duplicate PR89 or other open work. Produce one minimal uncommitted proposal only."
     }
   ]
 }
