@@ -184,13 +184,13 @@ export async function getClinics(params?: { categorySlug?: string, locationSlug?
 }
 
 export async function getClinicById(id: string, options:{throwOnError?:boolean; detailPage?:boolean}={}) {
-  const columns = options.detailPage
-    ? 'id, hira_code, name_en, name_ko, address_ko, address_en, telephone, latitude, longitude, is_premium, has_specialist, public_equipment, premium_data, departments, department_source, foreign_patient_registration, categories(name_en, slug)'
-    : '*, categories(*), locations(*)';
+  const clinicQuery = () => options.detailPage
+    ? supabase.from('clinics').select('id, hira_code, name_en, name_ko, address_ko, address_en, telephone, latitude, longitude, is_premium, has_specialist, public_equipment, premium_data, departments, department_source, foreign_patient_registration, categories(name_en, slug), locations(name_en, slug)')
+    : supabase.from('clinics').select('*, categories(*), locations(*)');
   const record=unifiedClinicRecord(id);
   if(record){
     const fallback=mockClinics.find(c=>c.id===record.id)||additionalGoldmanClinic(record.id);
-    const {data,error}=await supabase.from('clinics').select(columns).eq('hira_code',record.hira).single();
+    const {data,error}=await clinicQuery().eq('hira_code',record.hira).single();
     if(error&&options.throwOnError&&error.code!=='PGRST116')throw new Error('Unable to refresh clinic profile');
     // Public evidence stays attached to its original source. Branch contact and
     // visit details come from the verified English branch directory.
@@ -204,7 +204,7 @@ export async function getClinicById(id: string, options:{throwOnError?:boolean; 
   const mockMatch = mockClinics.find(c => c.id === id);
   if (mockMatch) return { ...mockMatch, categories: mockMatch.category, locations: mockMatch.location };
 
-  let query = supabase.from('clinics').select(columns);
+  let query = clinicQuery();
   const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
   if (isUUID) {
     query = query.eq('id', id);
