@@ -19,6 +19,7 @@ import { MapPin, Phone, Clock, Star, ShieldCheck, Info } from 'lucide-react';
 import { clinicFocus, groupedDepartments } from '@/lib/clinic-evidence';
 import RegistrationBadge from '@/components/RegistrationBadge';
 import ClinicContact from '@/components/ClinicContact';
+import MapContainer from '@/components/MapContainer';
 import {clinicName,clinicAddress,clinicPhone} from '@/lib/clinic-contact';
 import {clinicRegion} from '@/lib/clinic-region';
 import ClinicReturnLink from '@/components/ClinicReturnLink';
@@ -191,6 +192,17 @@ export default async function ClinicDetail({ params }: ClinicDetailProps) {
           <h2 className="flex items-center gap-2 text-xl font-bold text-slate-900"><MapPin aria-hidden="true" className="h-5 w-5 text-blue-700"/>Plan your visit</h2>
           <p className="text-sm font-medium select-all">{address||'Address not provided'}</p>
           <ClinicContact clinic={clinic} />
+          {typeof clinic.latitude === 'number' && typeof clinic.longitude === 'number'
+            && Math.abs(clinic.latitude) <= 90 && Math.abs(clinic.longitude) <= 180
+            && clinic.latitude !== 0 && clinic.longitude !== 0 && (
+              <details className="rounded-lg border border-slate-200 p-3">
+                <summary className="min-h-11 cursor-pointer py-2 font-semibold">Show clinic on map</summary>
+                <MapContainer
+                  center={{ lat: clinic.latitude, lng: clinic.longitude }}
+                  markers={[{ id: String(clinic.id), name, lat: clinic.latitude, lng: clinic.longitude }]}
+                />
+              </details>
+            )}
           {nearest&&<div className="rounded-lg bg-slate-50 p-3 space-y-1 text-sm"><Link href={`/clinics/${focusSlug}/${nearest.slug}`} className="inline-flex min-h-11 items-center underline font-semibold">Nearby station: {nearest.name}</Link><p>{Math.round(nearest.distance).toLocaleString()} m straight-line distance · official station coordinates</p><InlineHelp label="About this distance">Distance is measured from official station coordinates, not an exit or walking route.</InlineHelp></div>}
           <div className="flex flex-wrap items-start gap-3 border-t pt-3"><SaveClinic clinic={snapshot}/><ShareClinic name={name} url={`${SITE_URL}${clinicPath(clinic)}`}/></div>
           <Link href={clinicCorrectionLink(clinic.hira_code||String(clinic.id))} className="inline-flex min-h-11 items-center underline text-sm">Report incorrect information for this clinic</Link>
