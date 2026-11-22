@@ -24,6 +24,7 @@ interface Props {
 }
 
 export default function MapContainer({
+  apiKey,
   center,
   markers,
   selectedMarkerId,
@@ -38,6 +39,12 @@ export default function MapContainer({
   const params = new URLSearchParams({ bbox: bounds, layer: 'mapnik' });
   if (selected) params.set('marker', `${lat},${lng}`);
 
+  const embedKey = apiKey || process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+  const googleEmbed = selected && embedKey
+    ? `https://www.google.com/maps/embed/v1/place?${new URLSearchParams({
+        key: embedKey, q: `${lat},${lng}`, zoom: '16', language: 'en',
+      })}`
+    : undefined;
   const mapLink = `https://www.openstreetmap.org/${selected ? `?mlat=${lat}&mlon=${lng}` : ''}#map=16/${lat}/${lng}`;
 
   return (
@@ -61,7 +68,9 @@ export default function MapContainer({
       )}
       <iframe
         title={selected ? `Map location of ${selected.name}` : 'Area map'}
-        src={`https://www.openstreetmap.org/export/embed.html?${params}`}
+        src={googleEmbed ?? `https://www.openstreetmap.org/export/embed.html?${params}`}
+        referrerPolicy="strict-origin-when-cross-origin"
+        allowFullScreen
         loading="lazy"
         className="w-full flex-1 min-h-[260px] border-0"
       />
