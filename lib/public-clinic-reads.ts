@@ -4,8 +4,26 @@ import {getClinics,getClinicById} from './supabase';
 import {urologyAreas} from './urology-discovery';
 import {PAGE_SIZE} from './pagination';
 
-// Request lifetime only: metadata and body share one detail read, including failures.
-export const getClinicByIdForPage=cache((id:string)=>getClinicById(id,{throwOnError:true,detailPage:true}));
+class ClinicProfileMissing extends Error {}
+
+const readPublicClinicProfile = unstable_cache(
+  async (id: string) => {
+    const clinic = await getClinicById(id, { throwOnError: true, detailPage: true });
+    if (!clinic) throw new ClinicProfileMissing();
+    return clinic;
+  },
+  ['public-clinic-detail-v1'],
+  { revalidate: 6 * 60 * 60, tags: ['public-clinic-detail'] },
+);
+
+export const getClinicByIdForPage = cache(async (id: string) => {
+  try {
+    return await readPublicClinicProfile(id);
+  } catch (error) {
+    if (error instanceof ClinicProfileMissing) return null;
+    throw error;
+  }
+});
 
 // Only finite, public, unfiltered first-page comparisons use a shared data cache.
 // Search terms, filters, later pages and GPS never enter it. Failures throw rather
