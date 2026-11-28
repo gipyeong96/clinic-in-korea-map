@@ -115,7 +115,7 @@ export default async function SearchPage({ params, searchParams }: Props) {
   </nav>;
   return <>
     <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(schema) }} />
-    <div className="max-w-6xl mx-auto px-4 py-5 space-y-3 sm:py-8 sm:space-y-6">
+    <div data-measurement-results-scope={station ? 'station' : params.location === 'all' ? undefined : 'area'} className="max-w-6xl mx-auto px-4 py-5 space-y-3 sm:py-8 sm:space-y-6">
       <h1 className="text-2xl md:text-3xl font-black break-words">{params.department==='emergency-medicine'?`Hospitals & Clinics Reporting Emergency Medicine ${station?'near':'in'} ${station?stationHeading:loc}`:params.department==='dentistry'?`Dentists ${station?'near':'in'} ${station?stationHeading:loc}`:station ? `${params.department === 'all' ? 'Clinics' : `${dept} Clinics`} near ${stationHeading}` : `${dept} Clinics in ${loc}`}</h1>
       {params.department==='emergency-medicine'&&<EmergencyDepartmentScope/>}
       <a href={nearbySearchLink(params.department,{query,specialist,registered,weekend,radius:station?radius:undefined})} className="min-h-11 inline-flex items-center rounded-lg bg-slate-900 px-4 py-3 text-sm font-semibold text-white">{nearbyAction(params.department)}</a>
