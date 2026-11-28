@@ -21,14 +21,16 @@ export function measurementPage(path:string){
  return 'other';
 }
 const events=new Set(['search_submit','call_click','directions_click','clinic_save','share_request','share_complete','link_copy','compare_request']);
-export function measurementPayload(event:string,path:string,referrer=''){
+export function measurementPayload(event:string,path:string,referrer='',resultsScope?:string){
  if(event!=='page_view'&&!events.has(event))return null;
  const page=measurementPage(path);
- return {send_to:MEASUREMENT_ID,page_location:`https://map.clinicinkorea.com/measure/${page}`,page_referrer:measurementReferrer(referrer),page_title:`Korea Clinic Map | ${pageTitles[page]}`,page_group:page};
+ const reportPath=page==='results'&&(resultsScope==='station'||resultsScope==='area')?`results/${resultsScope}`:page;
+ return {send_to:MEASUREMENT_ID,page_location:`https://map.clinicinkorea.com/measure/${reportPath}`,page_referrer:measurementReferrer(referrer),page_title:`Korea Clinic Map | ${pageTitles[page]}`,page_group:page};
 }
 export function measurementExcluded(){try{return typeof window==='undefined'||window.location.hostname!=='map.clinicinkorea.com'||localStorage.getItem(MEASUREMENT_OPT_OUT)==='1';}catch{return true;}}
 export function measure(event:string,referrer=''){
  if(measurementExcluded())return;
- const payload=measurementPayload(event,window.location.pathname,referrer);
+ const resultsScope=document.querySelector('[data-measurement-results-scope]')?.getAttribute('data-measurement-results-scope')??undefined;
+ const payload=measurementPayload(event,window.location.pathname,referrer,resultsScope);
  if(payload)(window as Window&{gtag?:(...args:unknown[])=>void}).gtag?.('event',event,payload);
 }
