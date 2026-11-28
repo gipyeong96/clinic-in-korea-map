@@ -29,3 +29,10 @@
 - Preserve legitimate search, AI search, review and link-preview crawlers. Target confirmed high-volume training crawlers and abnormal request signatures with narrow rules. Check that legitimate landing pages and crawlers still work after changes.
 - Keep total monthly operating costs attributable to this project at or below KRW 30,000, including Vercel, Google API, and Supabase charges. Include the project's attributable share of shared fees, distinguish estimates from verified charges, and flag projected overruns. Prefer the free map embed and load it when users need a location. Review this project's Vercel usage, shared Supabase egress and limits, and map usage separately. Reduce unnecessary fields and duplicate reads, cache public data where appropriate, and compare requests and bytes before and after deployment. Verify search, map and profile flows before shipping cost changes.
 - Grow revenue gradually after AdSense approval. Start with one manually placed unit below a substantive article or guide. Keep automatic ads off and keep ads away from search, maps, clinic profiles, phone and directions. Review revenue alongside real traffic and usability before expanding placement.
+
+## 영문 맵 검색 유입과 봇 운영
+
+- 해외환자의 병원 탐색을 우선한다. 검색·인용용 크롤러의 접근을 유지하고 Vercel에서 확인한 대량 학습·수집 봇만 선별 제한한다.
+- 운영 변경 전후에는 전송량과 재생성 사용량, 검색 클릭과 전화·길찾기 클릭을 함께 비교한다.
+- GA4에는 실제 병원 주소나 진료과·검색어 대신 화면 유형만 보낸다.
+- 판단 기준과 검증 절차는 [검색 유입과 봇 운영](docs/search-and-bot-operations.md)을 따른다.
