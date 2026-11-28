@@ -33,8 +33,8 @@ import ClinicConditions from '@/components/ClinicConditions';
 import ClinicWeekendHours from '@/components/ClinicWeekendHours';
 import conditionPilot from '@/lib/hira-condition-pilot.json';
 
-// Generate only requested public profiles, then reuse HTML/RSC for one hour.
-export const revalidate = 3600;
+// Generate only requested public profiles, then reuse HTML/RSC for six hours, matching the profile data cache.
+export const revalidate = 21600;
 export function generateStaticParams(){return [];}
 
 interface ClinicDetailProps {
